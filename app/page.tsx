@@ -13,7 +13,7 @@ export default function Home() {
       <Header />
       <Image
         src={hedoomyybanner}
-        className="h-[70vh] w-full object-cover"
+        className="md:h-[70vh] h-[76vh] w-full md:object-cover"
         alt="Picture of the author"
       />
       <main className="flex-grow container">
