@@ -10,19 +10,20 @@ import Feedback from "@/components/home/Feedback";
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen ">
-
-        <Image
-          src={hedoomyybanner}
-          className="h-[70vh] w-full object-cover"
-          alt="Picture of the author"
-        />
+      <Header />
+      <Image
+        src={hedoomyybanner}
+        className="h-[70vh] w-full object-cover"
+        alt="Picture of the author"
+      />
       <main className="flex-grow container">
         <Hero />
         <Categories />
         <NewArrivals />
         <BestSeller />
-        <Feedback />  
+        <Feedback />
       </main>
+      <Footer />
     </div>
   );
 }

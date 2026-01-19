@@ -1,7 +1,8 @@
 "use client";
-
+import Image from "next/image";
 import Link from "next/link";
 import { Instagram, Music2 } from "lucide-react";
+import hedoomybanner from "../public/footerhedoomyy.png"
 
 export default function Footer() {
   return (
@@ -10,13 +11,16 @@ export default function Footer() {
         {/* Top section */}
         <div className="grid grid-cols-1 gap-12 md:grid-cols-4">
           {/* Brand */}
-          <div className="space-y-4">
-            <h2 className="text-lg font-semibold">Hedoomyy</h2>
+          <div className="space-y-10">
+            <Image
+              src={hedoomybanner}
+              className=" h-28 w-34"
+              alt="Picture of the author"
+            />
             <p className="text-sm text-zinc-600">
               Designed for Her, Inspired by Her.
             </p>
           </div>
-
           {/* Shop Now */}
           <div>
             <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide">

@@ -1,8 +1,9 @@
 "use client";
-
+import Image from "next/image";
 import Link from "next/link";
-import { User, ShoppingBag } from "lucide-react";
-
+import { User, ShoppingBag, Instagram } from "lucide-react";
+import callIcon from "../public/calIIcon.svg"
+import instagramIcon from "../public/instagramIcon.svg"
 const navLinks = [
   { name: "Home", href: "/" },
   { name: "All Items", href: "/products" },
@@ -17,25 +18,41 @@ export default function Header() {
   return (
     <header className="w-full border-b border-gray-200">
       {/* Top Bar */}
-      <div className="bg-gray-300 text-gray-800 text-sm">
+      <div className="bg-gray-400 text-white text-sm">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-4 py-2">
           {/* Left */}
-          <span className="flex items-center gap-2">
-            📞 <span>+01141088386</span>
-          </span>
+          <div className="flex items-center gap-6">
 
-          {/* Center */}
-          <span className="font-medium">Hedoomyy</span>
+            <span className="flex items-center gap-2">
+              <Image
+                src={callIcon}
+                className=""
+                alt="Picture of the author"
+              /> <span>+01141088386</span>
+            </span>
 
+            {/* Center */}
+            <span className="flex items-center gap-2" >
+              <Image
+                src={instagramIcon}
+                className=""
+                alt="Picture of the author"
+              />
+              <span className="font-medium">Hedoomyy</span>
+            </span>
+          </div>
+
+          <span className="hidden md:block">Enjoy your shopping :)</span>
           {/* Right */}
           <div className="flex items-center gap-4">
-            <span className="hidden md:block">Enjoy your shopping :)</span>
             <Link href="/faqs" className="hover:underline">
               FAQs
             </Link>
+            |
             <Link href="/policy#return" className="hover:underline">
               Return & Exchange
             </Link>
+            |
             <Link href="/policy#delivery" className="hover:underline">
               Delivery
             </Link>
@@ -45,7 +62,7 @@ export default function Header() {
 
       {/* Main Navigation */}
       <div className="bg-white">
-        <div className="max-w-7xl mx-auto flex items-center justify-between px-4 py-4">
+        <div className="max-w-7xl mx-auto flex items-center justify-between px-4 py-6">
           {/* Navigation Links */}
           <nav className="flex items-center gap-6 text-sm font-medium">
             {navLinks.map((link) => (

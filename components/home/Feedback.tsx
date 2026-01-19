@@ -2,11 +2,11 @@ import Image from "next/image";
 import feedbacks from "../../data/feedback";   
 export default function Feedback() {
     return (
-        <section className="relative w-full min-h-[900px] bg-white overflow-hidden flex flex-col justify-center items-center py-24">
+        <section className="relative w-full min-h-[900px] flex flex-col justify-center items-center py-40">
 
             {/* Section Label */}
             <div className="absolute top-8 left-8 z-20">
-                <h3 className="text-2xl font-light text-gray-700">Our Family</h3>
+                <h3 className="text-2xl font-bold text-zinc-900">Our Family</h3>
             </div>
 
             {/* Center Text */}
@@ -29,7 +29,7 @@ export default function Feedback() {
                         alt="Customer feedback"
                         width={600}
                         height={500}
-                        className="w-full h-auto object-contain"
+                        className="w-full h-auto object-contain z-10"
                     />
                 ))}
             </div>

@@ -32,12 +32,12 @@ const categories = [
 
 export default function Categories() {
   return (
-    <section className="px-6 pb-20">
+    <section className=" pb-20">
       <h2 className="mb-8 text-xl font-medium text-zinc-900">
         Explore Categories
       </h2>
 
-      <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide">
+      <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
         {categories.map((cat) => (
           <CategoryCard
             key={cat.title}
