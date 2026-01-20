@@ -10,7 +10,7 @@ const products = [
 
 export default function BestSeller() {
     return (
-        <section className="w-full px-10 py-16">
+        <section className="w-full px-5 py-16">
             {/* Title */}
             <h2 className="mb-6 text-2xl font-medium text-zinc-900">
                 Explore Best Seller
