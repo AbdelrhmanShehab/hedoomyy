@@ -3,7 +3,7 @@ const feedbacks = [
   { id: 2, src: "/feedback2.png", desktop: "top-[3%] right-[23%] w-[380px]" },
   { id: 3, src: "/feedback3.png", desktop: "top-[30%] left-[-4%] w-[380px]" },
 
-  { id: 4, src: "/feedback4.png", desktop: "top-[20%] right-[-7%] w-[380px]" },
+  { id: 4, src: "/feedback4.png", desktop: "top-[22%] right-[0%] w-[380px]" },
   { id: 5, src: "/feedback5.png", desktop: "top-[55%] left-[4%] w-[360px]" },
 
   { id: 6, src: "/feedback6.png", desktop: "top-[60%] right-[5%] w-[380px]" },
