@@ -1,7 +1,7 @@
 "use client";
 
-import ProductCard, { Product } from "./ProductCard";
-
+import ProductCard from "./ProductCard";
+import { Product } from "../data/product";
 type Props = {
   products: Product[];
 };

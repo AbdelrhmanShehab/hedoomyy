@@ -2,16 +2,20 @@
 
 import Image from "next/image";
 import one from "../../public/1.png";
+import { useCart } from "../../context/CartContext";
+import { Product } from "../../data/product";
 
-const products = [
-    { id: 2001, image: one, price: 600 },
-    { id: 2002, image: one, price: 500 },
-    { id: 2003, image: one, price: 400 },
-    { id: 2004, image: one, price: 700 },
-    { id: 2005, image: one, price: 500 },
-];
+const products: Product[] = [
+    {
+        id: "1001",
+        title: "Product 1",
+        price: 500,
+        image: "/1.png",
+    },
+]
 
 export default function NewArrivals() {
+    const { addItem, openCart } = useCart();
     return (
         <section className="px-6 py-20">
             {/* Title */}
@@ -62,7 +66,10 @@ export default function NewArrivals() {
                             <div className="absolute inset-0 hidden bg-black/40 group-hover:block" />
 
                             {/* Price + Button */}
-                            <div className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 text-center text-white group-hover:block">
+                            <div className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 text-center text-white group-hover:block" onClick={() => {
+                                addItem(product);
+                                openCart();
+                            }}>
                                 <h3 className="mb-3 text-xl font-light">
                                     {product.price} EGP
                                 </h3>
