@@ -1,16 +1,10 @@
 "use client";
-
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import one from "@/public/1.png";
 import FilterBar from "../../components/FilterBar";
 import ProductGrid from "../../components/ProductGrid";
 import Pagination from "../../components/Pagination";
 import { Product } from "../../components/ProductCard";
-const CATEGORIES = [
-    { id: "upper", name: "Upper Wear" },
-    { id: "lower", name: "Lower Wear" },
-];
-
 const PRODUCTS: Product[] = Array.from({ length: 20 }).map((_, i) => ({
     id: i + 1,
     title: "Blouse and belted skirt",
@@ -19,12 +13,23 @@ const PRODUCTS: Product[] = Array.from({ length: 20 }).map((_, i) => ({
     category: "upper",
 }));
 
+const CATEGORIES = [
+    { id: "upper", name: "Upper Wear" },
+        { id: "lower", name: "Lower Wear" },
+    ];
 const ITEMS_PER_PAGE = 8;
+
 
 export default function UpperWearPage() {
     const [sort, setSort] = useState("new");
     const [category, setCategory] = useState("all");
     const [page, setPage] = useState(1);
+
+    useEffect(() => {
+        setPage(1);
+    }, [sort, category]);
+
+
 
     const filtered = useMemo(() => {
         let list = [...PRODUCTS];

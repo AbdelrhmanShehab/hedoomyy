@@ -1,12 +1,15 @@
 "use client";
 
 import Image from "next/image";
+import { StaticImageData } from "next/image";
+
 
 export type Product = {
   id: string | number;
   title: string;
-  price: string;
-  image: string;
+  price: number;
+  image: StaticImageData;
+  category: string;
 };
 
 type Props = {
@@ -32,7 +35,7 @@ export default function ProductCard({ product, onQuickAdd }: Props) {
         {product.title}
       </p>
       <p className="text-sm text-pink-400 font-medium">
-        {product.price}
+        {product.price} EGP
       </p>
 
       {/* Button */}
