@@ -1,15 +1,15 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import one from "@/public/1.png";
+import one from "../../public/1.png";
 import FilterBar from "../../components/FilterBar";
 import ProductGrid from "../../components/ProductGrid";
 import Pagination from "../../components/Pagination";
-import { Product } from "../../components/ProductCard";
+import { Product } from "../../data/product";
 const PRODUCTS: Product[] = Array.from({ length: 20 }).map((_, i) => ({
     id: i + 1,
     title: "Blouse and belted skirt",
     price: 250,
-    image: one,
+    image: "../../public/1.png",
     category: "upper",
 }));
 
