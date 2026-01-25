@@ -7,7 +7,7 @@ import { Product } from "../../data/product";
 
 const products: Product[] = [
     {
-        id: "1001",
+        id: 1001,
         title: "Product 1",
         price: 500,
         image: "/1.png",
