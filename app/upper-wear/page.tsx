@@ -6,7 +6,7 @@ import ProductGrid from "../../components/ProductGrid";
 import Pagination from "../../components/Pagination";
 import { Product } from "../../data/product";
 const PRODUCTS: Product[] = Array.from({ length: 20 }).map((_, i) => ({
-    id: i + 1,
+    id: i + "1",
     title: "Blouse and belted skirt",
     price: 250,
     image: "../../public/1.png",
