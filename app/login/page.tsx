@@ -1,89 +1,37 @@
 "use client";
-import Image from "next/image";
-import { useState } from "react";
-import { sendSignInLinkToEmail } from "firebase/auth";
-import { auth } from "@/lib/firebase";
-import PrimaryButton from "../../components/PrimaryButton";
-import loginPic from "../../public/login.png"
+
+import { auth } from "../../lib/firebase";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { useRouter } from "next/navigation";
+
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [sent, setSent] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
-  const handleLogin = async () => {
-    if (!email) return;
-
-    setLoading(true);
-    const actionCodeSettings = {
-      url: `${window.location.origin}/verify`,
-      handleCodeInApp: true,
-    };
-
+  const loginWithGoogle = async () => {
     try {
-      await sendSignInLinkToEmail(auth, email, actionCodeSettings);
-      window.localStorage.setItem("emailForSignIn", email);
-      setSent(true);
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+      router.push("/checkout");
     } catch (error) {
       console.error(error);
+      alert("Login failed");
     }
-
-    setLoading(false);
   };
 
   return (
-    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2">
-      
-      {/* Left Image */}
-      <div className="relative hidden lg:block">
-        <Image
-          src={loginPic}
-          alt="Login Visual"
-          
-          className="w-3/4 h-[100vh]"
-        />
-        <div className="absolute bottom-12 left-12 text-white text-[40px] font-semibold flex flex-col">
-          <span>Enter.</span> 
-          <span>Explore.</span> 
-          <span>Express yourself.</span>    
-        </div>
-      </div>
+    <div className="min-h-screen flex items-center justify-center px-4">
+      <div className="w-full max-w-sm space-y-6 text-center">
+        <h1 className="text-2xl font-light">
+          Login to continue
+        </h1>
 
-      {/* Right Form */}
-      <div className="flex items-center justify-center px-6">
-        <div className="w-full max-w-md space-y-6">
-          
-          <h1 className="text-3xl font-light">
-            Welcome Back! <span className="text-pink-400">♡</span>
-          </h1>
-
-          <p className="text-gray-500">
-            Enter your email to login
-          </p>
-
-          {!sent ? (
-            <>
-              <input
-                type="email"
-                placeholder="example@gmail.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="
-                  w-full border rounded-md px-4 py-3
-                  focus:outline-none focus:ring-1 focus:ring-pink-300
-                "
-              />
-
-              <PrimaryButton onClick={handleLogin} disabled={loading}>
-                {loading ? "Sending..." : "Login"}
-              </PrimaryButton>
-            </>
-          ) : (
-            <p className="text-green-600 font-medium">
-              Check your email for the login link ✨
-            </p>
-          )}
-
-        </div>
+        <button
+          onClick={loginWithGoogle}
+          className="w-full border py-3 rounded flex items-center justify-center gap-3 hover:bg-gray-50"
+        >
+          <img src="/google.svg" alt="google" className="w-5 h-5" />
+          Continue with Google
+        </button>
       </div>
     </div>
   );

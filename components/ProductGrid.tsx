@@ -1,22 +1,21 @@
 "use client";
 
-import ProductCard from "./ProductCard";
 import { Product } from "../data/product";
-type Props = {
+import ProductCard from "./ProductCard";
+
+type ProductGridProps = {
   products: Product[];
 };
 
-export default function ProductGrid({ products }: Props) {
+export default function ProductGrid({ products = [] }: ProductGridProps) {
+  if (products.length === 0) {
+    return <p className="text-center text-gray-500">No products found.</p>;
+  }
+
   return (
-    <div className="
-      grid
-      grid-cols-2
-      sm:grid-cols-3
-      lg:grid-cols-4
-      gap-6
-    ">
-      {products.map((p) => (
-        <ProductCard key={p.id} product={p} />
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+      {products.map((product) => (
+        <ProductCard key={product.id} product={product} />
       ))}
     </div>
   );

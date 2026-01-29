@@ -1,7 +1,10 @@
 export type Product = {
   id: string;
-  title: string;
+  name: string; // ← was title
   price: number;
-  image: string;
-  category?: string;
+  imageUrl: string | null; // ← was image
+  category: string;
+  status?: string;
+  stock?: number;
+  isBestSeller: boolean;
 };

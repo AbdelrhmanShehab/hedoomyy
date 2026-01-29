@@ -1,4 +1,6 @@
-export type Category = {
-  id: string;   // used in filtering
-  name: string; // shown in UI
-};
+export interface Category {
+  id: string;
+  name: string;
+  slug?: string;
+  image?: string;
+}
