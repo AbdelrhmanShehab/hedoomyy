@@ -1,8 +1,10 @@
+// src/data/cart.ts
+
 export type CartItem = {
   id: string;
-  title: string;
-  price: number;   // MUST be number
-  qty: number;
-  image: string;
-  variant?: string;
+  name: string;
+  price: number;
+  imageUrl: string | null;
+  category: string;
+  quantity: number;
 };

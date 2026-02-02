@@ -2,11 +2,10 @@
 
 import { createContext, useContext, useState } from "react";
 import { CartItem } from "../data/cart";
-import { Product } from "../data/product";
 
 type CartContextType = {
   items: CartItem[];
-  addItem: (product: Product) => void;
+  addItem: (item: CartItem) => void;
   removeItem: (id: string) => void;
   clearCart: () => void;
   subtotal: number;
@@ -23,39 +22,30 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isOpen, setIsOpen] = useState(false);
 
-  const addItem = (product: Product) => {
+  const addItem = (item: CartItem) => {
     setItems(prev => {
-      const existing = prev.find(i => i.id === product.id);
+      const existing = prev.find(i => i.id === item.id);
 
       if (existing) {
         return prev.map(i =>
-          i.id === product.id
-            ? { ...i, qty: i.qty + 1 }
+          i.id === item.id
+            ? { ...i, quantity: i.quantity + item.quantity }
             : i
         );
       }
 
-      return [
-        ...prev,
-        {
-          id: product.id,
-          title: product.name,
-          price: product.price,
-          image: product.imageUrl,
-          qty: 1,
-        },
-      ];
+      return [...prev, item];
     });
   };
 
   const removeItem = (id: string) => {
-    setItems(prev => prev.filter(i => i.id !== id));
+    setItems(prev => prev.filter(item => item.id !== id));
   };
 
   const clearCart = () => setItems([]);
 
   const subtotal = items.reduce(
-    (sum, item) => sum + item.price * item.qty,
+    (sum, item) => sum + item.price * item.quantity,
     0
   );
 
@@ -82,6 +72,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
 export function useCart() {
   const ctx = useContext(CartContext);
-  if (!ctx) throw new Error("useCart must be inside CartProvider");
+  if (!ctx) throw new Error("useCart must be used inside CartProvider");
   return ctx;
 }

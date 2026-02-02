@@ -1,222 +1,34 @@
 "use client";
-import { useState, useEffect } from "react"; // <-- add this
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { storage, db } from "../../lib/firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { auth } from "../../lib/firebase";
-import { onAuthStateChanged } from "firebase/auth";
 
-export default function CreateProduct() {
-  const [form, setForm] = useState({
-    name: "",
-    category: "",
-    status: "",
-    price: "",
-    stock: "",
-    imageUrl: null,
-  });
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState("");
-  useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (user) => {
-      console.log("AUTH USER:", user);
-    });
+import { useEffect, useState } from "react";
+import ProductsGrid from "../../components/ProductGrid";
+import { Product } from "../../data/product";
 
-    return () => unsub();
-  }, []);
+export default function NewArrivals() {
+    const [products, setProducts] = useState<Product[]>([]);
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+    useEffect(() => {
+        // example API endpoint
+        fetch("/api/products")
+            .then((res) => res.json())
+            .then((data: Product[]) => setProducts(data));
+    }, []);
 
-  const handleImageChange = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const newArrivals = [...products]
+        .sort(
+            (a, b) =>
+                b.createdAt.toMillis() - a.createdAt.toMillis()
+        )
+        .slice(0, 8);
 
-    if (file.size > 800 * 1024) {
-      alert("Image too large! Max 800KB");
-      return;
-    }
-    setForm((prev) => ({ ...prev, imageFile: file }));
-  };
-  useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (user) => {
-      console.log("🔥 AUTH CHECK:", user ? user.uid : "NO USER");
-    });
 
-    return () => unsub();
-  }, []);
+    return (
+        <section className="w-full px-5 py-16">
+            <h2 className="mb-6 text-2xl font-medium">
+                Explore New Arrivals
+            </h2>
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    console.log("SUBMIT CLICKED");
-
-    try {
-      console.log("AUTH USER:", auth.currentUser);
-      console.log("FORM DATA:", form);
-
-      if (!auth.currentUser) {
-        throw new Error("User not authenticated");
-      }
-
-      let imageUrl = "";
-
-      if (form.imageUrl) {
-        console.log("Uploading image...");
-
-        const imageRef = ref(
-          storage,
-          `hedoomyy/${Date.now()}-${form.imageUrl.name}`,
-        );
-
-        await uploadBytes(imageRef, form.imageFile);
-        imageUrl = await getDownloadURL(imageRef);
-
-        console.log("Image uploaded:", imageUrl);
-      }
-      await addDoc(collection(db, "products"), {
-        title: form.name, // 🔥 match frontend
-        category: form.category,
-        status: form.status,
-        price: Number(form.price),
-        stock: Number(form.stock),
-        image: imageUrl, // 🔥 match frontend
-        createdAt: serverTimestamp(),
-      });
-      setSuccess(true);
-      setForm({
-        name: "",
-        category: "",
-        status: "",
-        price: "",
-        stock: "",
-        imageUrl: null,
-      });
-      alert("Product added ✅");
-    } catch (err) {
-      console.error("SUBMIT ERROR:", err);
-      alert(err.message || "Something crashed ❌");
-    }
-  };
-  console.log("AUTH USER:", auth.currentUser);
-
-  return (
-    <div className="max-w-xl mx-auto mt-10 p-6 rounded-xl bg-white shadow">
-      <h1 className="text-2xl font-bold mb-6">Create Product</h1>
-
-      {success && (
-        <div className="mb-4 p-2 bg-green-100 text-green-700 rounded">
-          ✅ Product created successfully!
-        </div>
-      )}
-      {error && (
-        <div className="mb-4 p-2 bg-red-100 text-red-700 rounded">{error}</div>
-      )}
-
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block mb-1 font-medium">Product Name</label>
-          <input
-            type="text"
-            name="name"
-            value={form.name}
-            onChange={handleChange}
-            required
-            className="w-full border px-3 py-2 rounded"
-            placeholder="Enter Product Name"
-          />
-        </div>
-
-        <div>
-          <label className="block mb-1 font-medium">Category</label>
-          <select
-            name="category"
-            value={form.category}
-            onChange={handleChange}
-            required
-            className="w-full border px-3 py-2 rounded"
-          >
-            <option value="">Select Category</option>
-            <option value="upper-wear">Upper-wear</option>
-            <option value="bottoms">Bottoms</option>
-            <option value="jackets">Jackets</option>
-            <option value="full-sets">Full-sets</option>
-          </select>
-        </div>
-
-        <div>
-          <label className="block mb-1 font-medium">Status</label>
-          <select
-            name="status"
-            value={form.status}
-            onChange={handleChange}
-            required
-            className="w-full border px-3 py-2 rounded"
-          >
-            <option value="">Select Status</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </select>
-        </div>
-
-        <div>
-          <label className="block mb-1 font-medium">Price (EGP)</label>
-          <input
-            type="number"
-            name="price"
-            value={form.price}
-            onChange={handleChange}
-            required
-            min="1"
-            max="10000"
-            className="w-full border px-3 py-2 rounded"
-            placeholder="Enter price"
-          />
-        </div>
-
-        <div>
-          <label className="block mb-1 font-medium">Stock</label>
-          <input
-            type="number"
-            name="stock"
-            value={form.stock}
-            onChange={handleChange}
-            required
-            min="1"
-            max="1000"
-            className="w-full border px-3 py-2 rounded"
-            placeholder="Enter stock quantity"
-          />
-        </div>
-
-        <div>
-          <label className="block mb-1 font-medium">
-            Product Image (optional)
-          </label>
-
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageChange}
-            className="w-full border px-3 py-2 rounded"
-          />
-
-          {form.imageUrl && (
-            <img
-              src={form.imageUrl}
-              alt="Preview"
-              className="mt-3 h-24 rounded border object-cover"
-            />
-          )}
-        </div>
-
-        <button
-          type="submit"
-          className="px-4 py-2 rounded text-white w-full bg-[#111827] cursor-pointer hover:bg-blue-700"
-        >
-          Create Product
-        </button>
-      </form>
-    </div>
-  );
+            <ProductsGrid products={newArrivals} />
+        </section>
+    );
 }
