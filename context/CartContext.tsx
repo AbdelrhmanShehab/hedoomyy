@@ -14,6 +14,7 @@ type CartContextType = {
   isOpen: boolean;
   openCart: () => void;
   closeCart: () => void;
+  toggleCart: () => void;
 };
 
 const CartContext = createContext<CartContextType | null>(null);
@@ -29,28 +30,35 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       if (existing) {
         return prev.map(i =>
           i.id === item.id
-            ? { ...i, quantity: i.quantity + item.quantity }
+            ? { ...i, qty: i.qty + item.qty }
             : i
         );
       }
 
       return [...prev, item];
     });
+
+    // 🔥 auto-open cart when item is added
+    setIsOpen(true);
   };
 
   const removeItem = (id: string) => {
     setItems(prev => prev.filter(item => item.id !== id));
   };
 
-  const clearCart = () => setItems([]);
+  const clearCart = () => {
+    setItems([]);
+    setIsOpen(false); // close cart when empty
+  };
 
   const subtotal = items.reduce(
-    (sum, item) => sum + item.price * item.quantity,
+    (sum, item) => sum + item.price * item.qty,
     0
   );
 
   const openCart = () => setIsOpen(true);
   const closeCart = () => setIsOpen(false);
+  const toggleCart = () => setIsOpen(prev => !prev);
 
   return (
     <CartContext.Provider
@@ -63,6 +71,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         isOpen,
         openCart,
         closeCart,
+        toggleCart,
       }}
     >
       {children}

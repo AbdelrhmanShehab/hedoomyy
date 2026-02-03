@@ -1,32 +1,67 @@
 "use client";
-import { useCart } from "@/context/CartContext";
+import Image from "next/image";
+import { useCart } from "../context/CartContext";
 import { useRouter } from "next/navigation";
 
 export function CartSidebar() {
-  const { items, subtotal } = useCart();
+  const { items, subtotal, isOpen, closeCart } = useCart();
   const router = useRouter();
 
+  if (!isOpen) return null;
+
   return (
-    <aside className="fixed right-0 top-0 h-full w-96 bg-white shadow-xl p-6">
-      <h3>Cart</h3>
+    <aside className="fixed right-0 top-0 h-full w-[380px] bg-white shadow-2xl p-6 z-50">
+      <button
+        onClick={closeCart}
+        className="mb-4 text-sm text-gray-500"
+      >
+        ✕ Close
+      </button>
 
-      {items.map(item => (
-        <div key={item.id} className="flex justify-between">
-          <span>{item.title}</span>
-          <span>EGP {item.price * item.qty}</span>
-        </div>
-      ))}
+      <h3 className="text-lg font-medium mb-4">Your Cart</h3>
 
-      <div className="mt-4 font-medium">
-        Total: EGP {subtotal}
+      <div className="space-y-4">
+        {items.map(item => (
+          <div key={item.id} className="flex gap-3">
+            <Image
+              src={item.image}
+              alt={item.title}
+              width={60}
+              height={80}
+              className="rounded-md object-cover"
+            />
+
+            <div className="flex-1 text-sm">
+              <p className="font-medium">{item.title}</p>
+              {item.variant && (
+                <p className="text-gray-500">{item.variant}</p>
+              )}
+              <p className="text-xs">Qty: {item.qty}</p>
+            </div>
+
+            <p className="text-sm font-medium">
+              EGP {item.price * item.qty}
+            </p>
+          </div>
+        ))}
       </div>
 
-      <button
-        onClick={() => router.push("/checkout")}
-        className="mt-6 w-full bg-black text-white py-3 rounded"
-      >
-        Checkout
-      </button>
+      <div className="border-t mt-6 pt-4 space-y-2 text-sm">
+        <div className="flex justify-between">
+          <span>Total</span>
+          <span className="font-medium">EGP {subtotal}</span>
+        </div>
+
+        <button
+          onClick={() => {
+            closeCart();
+            router.push("/checkout");
+          }}
+          className="mt-4 w-full bg-black text-white py-3 rounded-full"
+        >
+          Checkout
+        </button>
+      </div>
     </aside>
   );
 }

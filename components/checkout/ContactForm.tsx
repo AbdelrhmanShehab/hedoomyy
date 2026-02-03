@@ -1,12 +1,12 @@
 "use client";
-import { useCheckout } from "@/context/CheckoutContext";
+import { useCheckout } from "../../context/CheckoutContext";
 
 export default function ContactForm() {
   const { order, setOrder } = useCheckout();
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-lg font-medium">Contact</h2>
+    <div className="space-y-3">
+      <h2 className="text-base font-medium">Contact</h2>
 
       <input
         type="email"
@@ -18,7 +18,7 @@ export default function ContactForm() {
             contact: { email: e.target.value },
           })
         }
-        className="w-full border rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-purple-300"
+        className="w-full border rounded-md px-4 py-3 text-sm outline-none focus:ring-1 focus:ring-purple-300"
       />
     </div>
   );

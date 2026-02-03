@@ -12,10 +12,10 @@ type Props = {
 export default function ProductCard({ product }: Props) {
   const { addItem, openCart } = useCart();
 
-  const imageSrc =
-    typeof product.imageUrl === "string" && product.imageUrl.length > 0
-      ? product.imageUrl
-      : one;
+const imageSrc =
+  typeof product.imageUrl === "string" && product.imageUrl.length > 0
+    ? product.imageUrl
+    : "/1.png"; // 👈 string path, NOT imported image
 
   return (
     <div className="flex flex-col items-center">
@@ -35,12 +35,13 @@ export default function ProductCard({ product }: Props) {
         onClick={() => {
           addItem({
             id: product.id,
-            name: product.name,
+            title: product.name,
             price: product.price,
-            imageUrl: product.imageUrl,
-            category: product.category,
-            quantity: 1,
+            qty: 1,
+            image: imageSrc,
+            variant: product.category,
           });
+
           openCart();
         }}
         className="mt-3 px-6 py-2 rounded-full border border-pink-300 text-pink-400 text-sm"
