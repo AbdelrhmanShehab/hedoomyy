@@ -2,18 +2,59 @@
 
 import { useParams } from "next/navigation";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuantitySelector from "@/components/product/QuantitySelector";
 import ColorSelector from "@/components/product/ColorSelector";
 import SizeSelector from "@/components/product/SizeSelector";
-import one from "@/public/1.png";
 
 export default function ProductPage() {
-  const { id } = useParams(); // 👈 dynamic id
+  const { id } = useParams<{ id: string }>();
+
+  const [product, setProduct] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
   const [color, setColor] = useState("Black");
   const [size, setSize] = useState("90 kg");
+
+  // 🔥 FETCH PRODUCT BY ID
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const ref = doc(db, "products", id);
+        const snap = await getDoc(ref);
+
+        if (snap.exists()) {
+          setProduct({ id: snap.id, ...snap.data() });
+        } else {
+          setProduct(null);
+        }
+      } catch (err) {
+        console.error("Error fetching product:", err);
+        setProduct(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) fetchProduct();
+  }, [id]);
+
+  if (loading) {
+    return <p className="text-center mt-20">Loading…</p>;
+  }
+
+  if (!product) {
+    return (
+      <p className="text-center mt-20 text-red-500">
+        Product not found
+      </p>
+    );
+  }
 
   return (
     <div>
@@ -24,8 +65,8 @@ export default function ProductPage() {
         <div>
           <div className="relative aspect-[4/5] rounded-2xl overflow-hidden bg-gray-100">
             <Image
-              src={one}
-              alt="Product"
+              src={product.image || "/1.png"}
+              alt={product.title}
               fill
               className="object-cover"
             />
@@ -40,9 +81,13 @@ export default function ProductPage() {
         <div className="space-y-8">
           <div>
             <h1 className="text-3xl font-light">
-              Blouse and belted skirt
+              {product.title}
             </h1>
-            <p className="text-gray-500 mt-2">EGP 750</p>
+
+            <p className="text-gray-500 mt-2">
+              EGP {product.price}
+            </p>
+
             <p className="text-xs text-gray-400 mt-1">
               Product ID: {id}
             </p>

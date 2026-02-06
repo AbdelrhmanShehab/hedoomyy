@@ -12,79 +12,74 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 export default function CheckoutPage() {
-  const { items, clearCart } = useCart(); // ✅ FIX
-  const { order, setOrder } = useCheckout();
+  const { items, clearCart } = useCart();
+  const { order, setOrder, setErrors } = useCheckout();
   const router = useRouter();
 
+  // Sync cart → checkout
   useEffect(() => {
-    setOrder(prev => ({
-      ...prev,
-      items,
-    }));
+    setOrder(prev => ({ ...prev, items }));
   }, [items, setOrder]);
 
-const submitOrder = async () => {
-  if (
-    !order.contact.email ||
-    !order.delivery.address ||
-    !order.delivery.phone
-  ) {
-    alert("Please complete all required fields");
-    return; 
-  }
+  // ✅ FORM VALIDATION (MUST BE HERE)
+  const isFormValid =
+    !!order.contact.email &&
+    !!order.delivery.address &&
+    !!order.delivery.phone &&
+    !!order.delivery.firstName &&
+    !!order.delivery.lastName &&
+    !!order.delivery.city &&
+    !!order.delivery.government &&
+    !!order.payment &&
+    order.items.length > 0;
 
-  const orderPayload = {
-    customer: {
-      email: order.contact.email,
-      phone: order.delivery.phone,
-    },
+  const submitOrder = async () => {
+    const newErrors: any = {};
 
-    delivery: {
-      address: order.delivery.address,
-      city: order.delivery.city ?? "",
-      government: order.delivery.government ?? "",
-      apartment: order.delivery.apartment ?? "",
-    },
+    if (!order.contact.email) newErrors.email = "Email is required";
+    if (!order.delivery.address) newErrors.address = "Address is required";
+    if (!order.delivery.phone) newErrors.phone = "Phone number is required";
+    if (!order.delivery.firstName) newErrors.firstName = "First name required";
+    if (!order.delivery.lastName) newErrors.lastName = "Last name required";
+    if (!order.delivery.city) newErrors.city = "City is required";
+    if (!order.delivery.government) newErrors.government = "Government is required";
+    if (!order.payment) newErrors.payment = "Select payment method";
 
-    payment: {
-      method: order.payment,
-      paid: false,
-    },
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
 
-    items: order.items.map(item => ({
-      productId: item.id,
-      title: item.title,
-      price: item.price,
-      qty: item.qty,
-      image: item.image,
-      variant: item.variant ?? "",
-    })),
+    setErrors({});
 
-    totals: {
-      subtotal: order.items.reduce(
-        (sum, i) => sum + i.price * i.qty,
-        0
-      ),
-      shipping: 50,
-      total:
-        order.items.reduce((sum, i) => sum + i.price * i.qty, 0) + 50,
-    },
+    const orderRef = await addDoc(collection(db, "orders"), {
+      customer: {
+        email: order.contact.email,
+        phone: order.delivery.phone,
+      },
+      delivery: order.delivery,
+      payment: {
+        method: order.payment,
+        paid: false,
+      },
+      items: order.items,
+      totals: {
+        subtotal: order.items.reduce((s, i) => s + i.price * i.qty, 0),
+        shipping: 50,
+        total:
+          order.items.reduce((s, i) => s + i.price * i.qty, 0) + 50,
+      },
+      status: "pending",
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
 
-    status: "pending",
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
+    clearCart();
+    router.push(`/confirmation/${orderRef.id}`);
   };
-
-  await addDoc(collection(db, "orders"), orderPayload);
-
-  clearCart();
-  router.push("/confirmation");
-};
-
 
   return (
     <section className="max-w-7xl mx-auto px-6 py-14 grid lg:grid-cols-[1fr_420px] gap-16">
-      {/* LEFT */}
       <div className="space-y-10">
         <ContactForm />
         <DeliveryForm />
@@ -92,13 +87,25 @@ const submitOrder = async () => {
 
         <button
           onClick={submitOrder}
-          className="w-full bg-purple-300 hover:bg-purple-400 transition text-white rounded-full py-4 text-sm font-medium"
+          disabled={!isFormValid}
+          className={`w-full rounded-full py-4 font-medium transition
+            ${
+              isFormValid
+                ? "bg-purple-300 hover:bg-purple-400 text-white"
+                : "bg-gray-200 text-gray-400 cursor-not-allowed"
+            }
+          `}
         >
           Save and Proceed
         </button>
+
+        {!isFormValid && (
+          <p className="text-xs text-gray-400 text-center">
+            Please complete all required fields
+          </p>
+        )}
       </div>
 
-      {/* RIGHT */}
       <OrderSummary />
     </section>
   );

@@ -38,15 +38,16 @@ export default function Header() {
             <Link href="/">Home</Link>
             <Link href="/products">All Items</Link>
 
-            {categories.map((cat) => (
+            {categories.map(cat => (
               <Link
                 key={cat.id}
                 href={`/products?category=${cat.slug}`}
-                className="hover:text-black text-gray-700 transition capitalize"
+                className="capitalize text-gray-700 hover:text-black"
               >
                 {cat.name}
               </Link>
             ))}
+
           </nav>
 
           <div className="flex items-center gap-5">

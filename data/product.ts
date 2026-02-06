@@ -1,13 +1,11 @@
-import { Timestamp } from "firebase/firestore";
-
 export type Product = {
   id: string;
   name: string;
-  price: number;
   imageUrl: string | null;
+  price: number;
   category: string;
-  status?: string;
-  stock?: number;
   isBestSeller: boolean;
-  createdAt: Timestamp | null;
+  createdAt: number | null; // ✅ timestamp (ms)
+  status: string;
+  stock: number;
 };
