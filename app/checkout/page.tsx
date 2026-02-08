@@ -89,10 +89,9 @@ export default function CheckoutPage() {
           onClick={submitOrder}
           disabled={!isFormValid}
           className={`w-full rounded-full py-4 font-medium transition
-            ${
-              isFormValid
-                ? "bg-purple-300 hover:bg-purple-400 text-white"
-                : "bg-gray-200 text-gray-400 cursor-not-allowed"
+            ${isFormValid
+              ? "bg-purple-300 hover:bg-purple-400 text-white"
+              : "bg-gray-200 text-gray-400 cursor-not-allowed"
             }
           `}
         >
