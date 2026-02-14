@@ -6,10 +6,15 @@ import { User, ShoppingBag } from "lucide-react";
 import useCategories from "../usecategories";
 import callIcon from "../public/calIIcon.svg";
 import instagramIcon from "../public/instagramIcon.svg";
-
+import { useCart } from "@/context/CartContext";
 export default function Header() {
   const { categories } = useCategories();
+  const { items } = useCart();
 
+  const cartCount = items.reduce(
+    (sum, item) => sum + item.qty,
+    0
+  );
   return (
     <header className="w-full border-b border-gray-200">
       {/* Top Bar */}
@@ -55,7 +60,12 @@ export default function Header() {
               <User className="w-5 h-5" />
             </Link>
             <Link href="/cart">
-              <ShoppingBag className="w-5 h-5" />
+              <ShoppingBag className="w-5 h-5 cart-icon" />
+              {cartCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-purple-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                  {cartCount}
+                </span>
+              )}
             </Link>
           </div>
         </div>

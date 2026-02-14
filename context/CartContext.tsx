@@ -1,8 +1,9 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { CartItem } from "../data/cart";
-
+import { getDoc, doc } from "firebase/firestore";
+import { db } from "../lib/firebase";
 type CartContextType = {
   items: CartItem[];
   addItem: (item: CartItem) => void;
@@ -13,46 +14,59 @@ type CartContextType = {
   isOpen: boolean;
   openCart: () => void;
   closeCart: () => void;
-  toggleCart: () => void;
 };
 
 const CartContext = createContext<CartContextType | null>(null);
+
+const STORAGE_KEY = "hedoomyy_cart";
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isOpen, setIsOpen] = useState(false);
 
-  const addItem = (item: CartItem) => {
-    setItems((prev) => {
-      const existing = prev.find(
-        (i) =>
-          i.productId === item.productId &&
-          i.variantId === item.variantId
+  /* ---------------- LOAD FROM LOCAL STORAGE ---------------- */
+  useEffect(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      setItems(JSON.parse(saved));
+    }
+  }, []);
+
+  /* ---------------- SAVE TO LOCAL STORAGE ---------------- */
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+  }, [items]);
+
+  /* ---------------- ADD ITEM ---------------- */
+const addItem = (item: CartItem) => {
+  setItems(prev => {
+    const existing = prev.find(
+      i =>
+        i.productId === item.productId &&
+        i.variantId === item.variantId
+    );
+
+    if (existing) {
+      return prev.map(i =>
+        i.productId === item.productId &&
+        i.variantId === item.variantId
+          ? { ...i, qty: i.qty + item.qty }
+          : i
       );
+    }
 
-      if (existing) {
-        return prev.map((i) =>
-          i.productId === item.productId &&
-          i.variantId === item.variantId
-            ? { ...i, qty: i.qty + item.qty }
-            : i
-        );
-      }
+    return [...prev, item];
+  });
 
-      return [...prev, item];
-    });
-
-    setIsOpen(true);
-  };
+  setIsOpen(true);
+};
 
   const removeItem = (productId: string, variantId: string) => {
-    setItems((prev) =>
+    setItems(prev =>
       prev.filter(
-        (item) =>
-          !(
-            item.productId === productId &&
-            item.variantId === variantId
-          )
+        i =>
+          !(i.productId === productId &&
+            i.variantId === variantId)
       )
     );
   };
@@ -69,7 +83,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const openCart = () => setIsOpen(true);
   const closeCart = () => setIsOpen(false);
-  const toggleCart = () => setIsOpen((prev) => !prev);
 
   return (
     <CartContext.Provider
@@ -82,7 +95,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         isOpen,
         openCart,
         closeCart,
-        toggleCart,
       }}
     >
       {children}

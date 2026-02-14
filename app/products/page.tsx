@@ -46,18 +46,20 @@ export default function ProductsPage() {
 
         return {
           id: doc.id,
-          name: data.title,
-          imageUrl: data.image ?? null,
-          price: data.price,
+          title: data.title,
+          description: data.description ?? "",
           category: data.category,
-          isBestSeller: data.isBestSeller ?? false,
-          createdAt: data.createdAt
-            ? data.createdAt.toMillis()
-            : null,
+          price: data.price,
           status: data.status,
-          stock: data.stock,
+          isBestSeller: data.isBestSeller ?? false,
+          images: data.images ?? [],
+          variants: data.variants ?? [], // ✅ FIXED
+          createdAt: data.createdAt ?? null,
+          updatedAt: data.updatedAt ?? null,
         };
       });
+
+
 
       // Categories
       const categoriesSnap = await getDocs(collection(db, "categories"));

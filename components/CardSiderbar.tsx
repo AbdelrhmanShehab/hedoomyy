@@ -3,9 +3,18 @@
 import Image from "next/image";
 import { useCart } from "../context/CartContext";
 import { useRouter } from "next/navigation";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../lib/firebase";
 
 export function CartSidebar() {
-  const { items, subtotal, isOpen, closeCart } = useCart();
+  const {
+    items,
+    subtotal,
+    isOpen,
+    closeCart,
+    removeItem,
+  } = useCart();
+
   const router = useRouter();
 
   if (!isOpen) return null;
@@ -37,7 +46,7 @@ export function CartSidebar() {
               >
                 <Image
                   src={item.image}
-                  alt={item.title || "Cart item"}
+                  alt={item.title}
                   width={60}
                   height={80}
                   className="rounded-md object-cover"
@@ -53,6 +62,18 @@ export function CartSidebar() {
                   <p className="text-xs">
                     Qty: {item.qty}
                   </p>
+
+                  <button
+                    onClick={() =>
+                      removeItem(
+                        item.productId,
+                        item.variantId
+                      )
+                    }
+                    className="text-red-500 text-xs mt-1"
+                  >
+                    Remove
+                  </button>
                 </div>
 
                 <p className="text-sm font-medium">

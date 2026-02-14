@@ -1,64 +1,56 @@
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
-import { User, ShoppingBag } from "lucide-react";
-import useCategories from "../usecategories";
-import callIcon from "../public/calIIcon.svg";
-import instagramIcon from "../public/instagramIcon.svg";
+import { Category } from "../data/category";
 
-export default function Header() {
-  const { categories } = useCategories();
+type Props = {
+  sort: string;
+  setSort: (v: string) => void;
+  category: string;
+  setCategory: (v: string) => void;
+  categories: Category[];
+};
 
+export default function FilterBar({
+  sort,
+  setSort,
+  category,
+  setCategory,
+  categories,
+}: Props) {
   return (
-    <header className="w-full border-b border-gray-200">
-      {/* Top Bar */}
-      <div className="bg-gray-400 text-white text-sm">
-        <div className="max-w-7xl mx-auto flex items-center justify-between px-4 py-2">
-          <div className="flex items-center gap-6">
-            <span className="flex items-center gap-2">
-              <Image src={callIcon} alt="Call" />
-              <span>+01141088386</span>
-            </span>
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
 
-            <span className="flex items-center gap-2">
-              <Image src={instagramIcon} alt="Instagram" />
-              <span className="font-medium">Hedoomyy</span>
-            </span>
-          </div>
+      <h1 className="text-2xl sm:text-3xl font-light tracking-wide">
+        Upper-Wear
+      </h1>
 
-          <span className="hidden md:block">Enjoy your shopping :)</span>
-        </div>
+      <div className="flex flex-wrap gap-3">
+        {/* Sort */}
+        <select
+          value={sort}
+          onChange={(e) => setSort(e.target.value)}
+          className="px-4 py-2 rounded-full border text-sm"
+        >
+          <option value="new">New Arrivals</option>
+          <option value="best">Best Selling</option>
+          <option value="high">Price: High to Low</option>
+          <option value="low">Price: Low to High</option>
+        </select>
+
+        {/* Dynamic Categories */}
+        <select
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          className="px-4 py-2 rounded-full border text-sm"
+        >
+          <option value="all">All</option>
+          {categories.map((cat) => (
+            <option key={cat.id} value={cat.id}>
+              {cat.name}
+            </option>
+          ))}
+        </select>
       </div>
-
-      {/* Main Nav */}
-      <div className="bg-white">
-        <div className="max-w-7xl mx-auto flex items-center justify-between px-4 py-6">
-          <nav className="flex items-center gap-6 text-sm font-medium">
-            <Link href="/">Home</Link>
-            <Link href="/products">All Items</Link>
-
-            {categories.map((cat) => (
-              <Link
-                key={cat.id}
-                href={`/products?category=${cat.slug}`}
-                className="hover:text-black text-gray-700 transition capitalize"
-              >
-                {cat.name}
-              </Link>
-            ))}
-          </nav>
-
-          <div className="flex items-center gap-5">
-            <Link href="/account">
-              <User className="w-5 h-5" />
-            </Link>
-            <Link href="/cart">
-              <ShoppingBag className="w-5 h-5" />
-            </Link>
-          </div>
-        </div>
-      </div>
-    </header>
+    </div>
   );
 }
