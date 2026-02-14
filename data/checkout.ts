@@ -1,16 +1,7 @@
-// data/checkout.ts
-
-export type CheckoutItem = {
-  id: string;
-  title: string;
-  price: number;
-  qty: number;
-  image: string;
-  variant?: string;
-};
+import { CartItem } from "./cart";
 
 export type CheckoutOrder = {
-  items: CheckoutItem[];
+  items: CartItem[];
 
   contact: {
     email: string;

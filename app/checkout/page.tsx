@@ -10,18 +10,20 @@ import { useCheckout } from "../../context/CheckoutContext";
 import { useCart } from "../../context/CartContext";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { OrderItem } from "../../data/order";
 
 export default function CheckoutPage() {
   const { items, clearCart } = useCart();
   const { order, setOrder, setErrors } = useCheckout();
   const router = useRouter();
 
-  // Sync cart → checkout
   useEffect(() => {
-    setOrder(prev => ({ ...prev, items }));
+    setOrder((prev) => ({
+      ...prev,
+      items,
+    }));
   }, [items, setOrder]);
 
-  // ✅ FORM VALIDATION (MUST BE HERE)
   const isFormValid =
     !!order.contact.email &&
     !!order.delivery.address &&
@@ -34,7 +36,7 @@ export default function CheckoutPage() {
     order.items.length > 0;
 
   const submitOrder = async () => {
-    const newErrors: any = {};
+    const newErrors: Record<string, string> = {};
 
     if (!order.contact.email) newErrors.email = "Email is required";
     if (!order.delivery.address) newErrors.address = "Address is required";
@@ -52,7 +54,25 @@ export default function CheckoutPage() {
 
     setErrors({});
 
+    const orderItems: OrderItem[] = order.items.map((item) => ({
+      productId: item.productId,
+      title: item.title,
+      price: item.price,
+      qty: item.qty,
+      image: item.image,
+      variant: `${item.color} / ${item.size}`,
+    }));
+
+    const subtotal = orderItems.reduce(
+      (sum, item) => sum + item.price * item.qty,
+      0
+    );
+
+    const shipping = 50;
+    const total = subtotal + shipping;
+
     const orderRef = await addDoc(collection(db, "orders"), {
+      items: orderItems,
       customer: {
         email: order.contact.email,
         phone: order.delivery.phone,
@@ -62,12 +82,10 @@ export default function CheckoutPage() {
         method: order.payment,
         paid: false,
       },
-      items: order.items,
       totals: {
-        subtotal: order.items.reduce((s, i) => s + i.price * i.qty, 0),
-        shipping: 50,
-        total:
-          order.items.reduce((s, i) => s + i.price * i.qty, 0) + 50,
+        subtotal,
+        shipping,
+        total,
       },
       status: "pending",
       createdAt: serverTimestamp(),
@@ -89,11 +107,11 @@ export default function CheckoutPage() {
           onClick={submitOrder}
           disabled={!isFormValid}
           className={`w-full rounded-full py-4 font-medium transition
-            ${isFormValid
-              ? "bg-purple-300 hover:bg-purple-400 text-white"
-              : "bg-gray-200 text-gray-400 cursor-not-allowed"
-            }
-          `}
+            ${
+              isFormValid
+                ? "bg-purple-300 hover:bg-purple-400 text-white"
+                : "bg-gray-200 text-gray-400 cursor-not-allowed"
+            }`}
         >
           Save and Proceed
         </button>

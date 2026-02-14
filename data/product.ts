@@ -1,11 +1,31 @@
-export type Product = {
+export type ProductStatus = "active" | "inactive";
+
+export interface ProductVariant {
+  id: string; // unique id for variant
+
+  color: string;
+  size: string;
+
+  stock: number; // stock per size + color
+}
+
+export interface Product {
   id: string;
-  name: string;
-  imageUrl: string | null;
-  price: number;
+
+  title: string;
+  description: string;
+
   category: string;
+
+  price: number;
+
+  status: ProductStatus;
   isBestSeller: boolean;
-  createdAt: number | null; // ✅ timestamp (ms)
-  status: string;
-  stock: number;
-};
+
+  images: string[];
+
+  variants: ProductVariant[];
+
+  createdAt?: any;
+  updatedAt?: any;
+}

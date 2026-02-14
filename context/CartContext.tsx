@@ -6,11 +6,10 @@ import { CartItem } from "../data/cart";
 type CartContextType = {
   items: CartItem[];
   addItem: (item: CartItem) => void;
-  removeItem: (id: string) => void;
+  removeItem: (productId: string, variantId: string) => void;
   clearCart: () => void;
   subtotal: number;
 
-  // sidebar control
   isOpen: boolean;
   openCart: () => void;
   closeCart: () => void;
@@ -24,12 +23,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
 
   const addItem = (item: CartItem) => {
-    setItems(prev => {
-      const existing = prev.find(i => i.id === item.id);
+    setItems((prev) => {
+      const existing = prev.find(
+        (i) =>
+          i.productId === item.productId &&
+          i.variantId === item.variantId
+      );
 
       if (existing) {
-        return prev.map(i =>
-          i.id === item.id
+        return prev.map((i) =>
+          i.productId === item.productId &&
+          i.variantId === item.variantId
             ? { ...i, qty: i.qty + item.qty }
             : i
         );
@@ -38,17 +42,24 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       return [...prev, item];
     });
 
-    // 🔥 auto-open cart when item is added
     setIsOpen(true);
   };
 
-  const removeItem = (id: string) => {
-    setItems(prev => prev.filter(item => item.id !== id));
+  const removeItem = (productId: string, variantId: string) => {
+    setItems((prev) =>
+      prev.filter(
+        (item) =>
+          !(
+            item.productId === productId &&
+            item.variantId === variantId
+          )
+      )
+    );
   };
 
   const clearCart = () => {
     setItems([]);
-    setIsOpen(false); // close cart when empty
+    setIsOpen(false);
   };
 
   const subtotal = items.reduce(
@@ -58,7 +69,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const openCart = () => setIsOpen(true);
   const closeCart = () => setIsOpen(false);
-  const toggleCart = () => setIsOpen(prev => !prev);
+  const toggleCart = () => setIsOpen((prev) => !prev);
 
   return (
     <CartContext.Provider
