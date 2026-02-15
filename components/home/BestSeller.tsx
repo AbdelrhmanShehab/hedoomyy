@@ -21,20 +21,22 @@ export default function BestSeller() {
 
       const snap = await getDocs(q);
 
-      const mapped = snap.docs.map(doc => {
+      const mapped: Product[] = snap.docs.map(doc => {
         const data = doc.data();
 
         return {
           id: doc.id,
-          name: data.title,
-          imageUrl: data.image ?? null,
-          price: data.price,
-          category: data.category,
+          title: data.title ?? "",
+          description: data.description ?? "",
+          category: data.category ?? "",
+          price: Number(data.price ?? 0),
+          status: data.status ?? "inactive",
           isBestSeller: data.isBestSeller ?? false,
-          createdAt: data.createdAt?.toDate?.() ?? null,
-          status: data.status,
-          stock: data.stock,
-        } satisfies Product;
+          images: Array.isArray(data.images) ? data.images : [],
+          variants: Array.isArray(data.variants) ? data.variants : [],
+          createdAt: data.createdAt ?? null,
+          updatedAt: data.updatedAt ?? null,
+        };
       });
 
       setProducts(mapped);

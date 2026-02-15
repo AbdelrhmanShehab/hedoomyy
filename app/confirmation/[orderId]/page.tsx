@@ -115,6 +115,9 @@ export default function ConfirmationPage() {
           {items.map((item, i) => (
             <div key={i} className="flex gap-4 items-start">
               <div className="relative w-20 h-28 rounded-xl overflow-hidden">
+                <span className="absolute bg-gray-200 text-xs w-6 h-6 flex items-center justify-center rounded-full z-99">
+                  {item.qty}
+                </span>
                 <Image
                   src={item.image}
                   alt={item.title}
@@ -122,9 +125,6 @@ export default function ConfirmationPage() {
                   className="object-cover"
                   unoptimized
                 />
-                <span className="absolute -top-2 -right-2 bg-gray-200 text-xs w-6 h-6 flex items-center justify-center rounded-full">
-                  {item.qty}
-                </span>
               </div>
 
               <div className="flex-1 text-sm">

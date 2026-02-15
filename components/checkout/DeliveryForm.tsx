@@ -1,7 +1,7 @@
 "use client";
 
 import { useCheckout } from "../../context/CheckoutContext";
-import { EGYPT_CITIES } from "../../data/egyptCities";
+import { egyptCites } from "../../data/egyptCities";
 
 export default function DeliveryForm() {
   const { order, setOrder, errors, setErrors } = useCheckout();
@@ -111,7 +111,7 @@ export default function DeliveryForm() {
             className="w-full border rounded-xl px-4 py-3 text-sm"
           >
             <option value="">Select City</option>
-            {EGYPT_CITIES.map(city => (
+            {egyptCites.map(city => (
               <option key={city} value={city}>
                 {city}
               </option>

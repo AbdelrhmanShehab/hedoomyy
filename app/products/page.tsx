@@ -8,6 +8,8 @@ import ProductGrid from "../../components/ProductGrid";
 import { useRouter, useSearchParams } from "next/navigation";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
+import { where, query } from "firebase/firestore";
+
 /* ---------------- TYPES ---------------- */
 
 type SortType = "" | "new" | "best" | "price-high" | "price-low";
@@ -40,24 +42,30 @@ export default function ProductsPage() {
   useEffect(() => {
     const fetchData = async () => {
       // Products
-      const productsSnap = await getDocs(collection(db, "products"));
+      const productsSnap = await getDocs(
+        query(
+          collection(db, "products"),
+          where("status", "==", "active")
+        )
+      );
       const mappedProducts: Product[] = productsSnap.docs.map(doc => {
         const data = doc.data();
 
         return {
           id: doc.id,
-          title: data.title,
+          title: data.title ?? "",
           description: data.description ?? "",
-          category: data.category,
-          price: data.price,
-          status: data.status,
+          category: data.category ?? "",
+          price: Number(data.price ?? 0),
+          status: data.status ?? "inactive",
           isBestSeller: data.isBestSeller ?? false,
-          images: data.images ?? [],
-          variants: data.variants ?? [], // ✅ FIXED
+          images: Array.isArray(data.images) ? data.images : [],
+          variants: Array.isArray(data.variants) ? data.variants : [],
           createdAt: data.createdAt ?? null,
           updatedAt: data.updatedAt ?? null,
         };
       });
+
 
 
 
