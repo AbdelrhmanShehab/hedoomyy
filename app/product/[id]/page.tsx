@@ -10,69 +10,108 @@ import Footer from "@/components/Footer";
 import { useCart } from "@/context/CartContext";
 import QuantitySelector from "@/components/product/QuantitySelector";
 import Image from "next/image";
+import type { Product, ProductVariant } from "@/data/product";
 
 export default function ProductPage() {
-  const { id } = useParams<{ id: string }>();
+  const params = useParams();
+  const id = params?.id as string;
+
   const { addItem, openCart } = useCart();
 
-  const [product, setProduct] = useState<any>(null);
+  const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
 
   const [selectedImage, setSelectedImage] = useState(0);
-  const [color, setColor] = useState<string>("");
-  const [size, setSize] = useState<string>("");
+  const [color, setColor] = useState("");
+  const [size, setSize] = useState("");
   const [qty, setQty] = useState(1);
+
+  /* ---------------- FETCH PRODUCT ---------------- */
 
   useEffect(() => {
     const fetchProduct = async () => {
-      const snap = await getDoc(doc(db, "products", id));
-      if (snap.exists()) {
-        const data = snap.data();
-        setProduct({ id: snap.id, ...data });
+      try {
+        if (!id) return;
+
+        const snap = await getDoc(doc(db, "products", id));
+
+        if (!snap.exists()) {
+          setProduct(null);
+          return;
+        }
+
+        setProduct({
+          id: snap.id,
+          ...snap.data(),
+        } as Product);
+      } catch (err) {
+        console.error(err);
+        setProduct(null);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
-    if (id) fetchProduct();
+    fetchProduct();
   }, [id]);
 
-  const availableColors: string[] = useMemo(() => {
-    if (!product) return [];
+  if (loading)
+    return <p className="text-center mt-20">Loading…</p>;
 
-    return Array.from(
-      new Set(
-        product.variants.map((v: any) => v.color)
-      )
-    ) as string[];
-  }, [product]);
-
-  const availableSizes: string[] = useMemo(() => {
-    if (!product) return [];
-
-    return Array.from(
-      new Set(
-        product.variants.map((v: any) => v.size)
-      )
-    ) as string[];
-  }, [product]);
-
-
-  const validVariant = useMemo(() => {
-    if (!product || !color || !size) return null;
-
-    return product.variants.find(
-      (v: any) => v.color === color && v.size === size
-    );
-  }, [product, color, size]);
-
-  const canAdd =
-    validVariant &&
-    validVariant.stock > 0 &&
-    product.status === "active";
-
-  if (loading) return <p className="text-center mt-20">Loading…</p>;
   if (!product)
     return <p className="text-center mt-20">Product not found</p>;
+
+  /* ---------------- VARIANTS ---------------- */
+
+  const variants: ProductVariant[] = product.variants ?? [];
+
+  const allColors = Array.from(
+    new Set(variants.map(v => v.color))
+  );
+
+  const allSizes = Array.from(
+    new Set(variants.map(v => v.size))
+  );
+
+  const selectedVariant =
+    variants.find(
+      v => v.color === color && v.size === size
+    ) ?? null;
+
+  const isVariantSelected = !!selectedVariant;
+
+  const variantStock = selectedVariant?.stock ?? 0;
+
+  const isOutOfStock =
+    isVariantSelected &&
+    (variantStock <= 0 ||
+      product.status !== "active");
+
+  const canAdd =
+    isVariantSelected &&
+    variantStock > 0 &&
+    product.status === "active";
+
+  /* ---------------- HANDLE ADD ---------------- */
+
+  const handleAdd = () => {
+    if (!selectedVariant) return;
+
+    if (qty > variantStock) return;
+
+    addItem({
+      productId: product.id,
+      variantId: selectedVariant.id,
+      title: product.title,
+      price: product.price,
+      image: product.images?.[0] ?? "/1.png",
+      color,
+      size,
+      qty,
+    });
+
+    openCart();
+  };
 
   const images = product.images ?? [];
 
@@ -81,7 +120,8 @@ export default function ProductPage() {
       <Header />
 
       <div className="max-w-7xl mx-auto px-6 py-12 grid md:grid-cols-2 gap-16">
-        {/* IMAGE SLIDER */}
+
+        {/* IMAGE SECTION */}
         <div className="space-y-4">
           <div className="relative aspect-[4/5] rounded-2xl overflow-hidden bg-gray-100">
             <Image
@@ -93,22 +133,28 @@ export default function ProductPage() {
           </div>
 
           <div className="flex gap-3">
-            {images.map((img: string, i: number) => (
+            {images.map((img, i) => (
               <div
                 key={i}
                 onClick={() => setSelectedImage(i)}
-                className={`relative w-20 h-24 rounded-xl overflow-hidden cursor-pointer border ${selectedImage === i
-                  ? "border-black"
-                  : "border-gray-200"
-                  }`}
+                className={`relative w-20 h-24 rounded-xl overflow-hidden cursor-pointer border ${
+                  selectedImage === i
+                    ? "border-black"
+                    : "border-gray-200"
+                }`}
               >
-                <Image src={img} alt="" fill className="object-cover" />
+                <Image
+                  src={img}
+                  alt=""
+                  fill
+                  className="object-cover"
+                />
               </div>
             ))}
           </div>
         </div>
 
-        {/* PRODUCT INFO */}
+        {/* INFO SECTION */}
         <div className="space-y-8">
           <div>
             <h1 className="text-3xl font-light">
@@ -127,24 +173,31 @@ export default function ProductPage() {
           {/* COLORS */}
           <div>
             <p className="text-sm mb-2">Choose Color:</p>
+
             <div className="flex gap-3 flex-wrap">
-              {availableColors.map((c) => {
-                const hasStock = product.variants.some(
-                  (v: any) => v.color === c && v.stock > 0
+              {allColors.map(c => {
+                const hasStockForColor = variants.some(
+                  v =>
+                    v.color === c &&
+                    (v.stock ?? 0) > 0
                 );
 
                 return (
                   <button
                     key={c}
-                    disabled={!hasStock}
-                    onClick={() => setColor(c)}
-                    className={`px-4 py-2 rounded-lg border text-sm ${color === c
-                      ? "bg-purple-300 text-white"
-                      : "border-gray-300"
-                      } ${!hasStock
-                        ? "opacity-40 cursor-not-allowed"
+                    onClick={() => {
+                      setColor(c);
+                      setSize("");
+                    }}
+                    className={`px-4 py-2 rounded-lg border text-sm ${
+                      color === c
+                        ? "bg-purple-300 text-white"
+                        : "border-gray-300"
+                    } ${
+                      !hasStockForColor
+                        ? "opacity-50"
                         : ""
-                      }`}
+                    }`}
                   >
                     {c}
                   </button>
@@ -156,27 +209,33 @@ export default function ProductPage() {
           {/* SIZES */}
           <div>
             <p className="text-sm mb-2">Choose Size:</p>
+
             <div className="flex gap-3 flex-wrap">
-              {availableSizes.map((s) => {
-                const hasStock = product.variants.some(
-                  (v: any) =>
-                    v.size === s &&
-                    (!color || v.color === color) &&
-                    v.stock > 0
+              {allSizes.map(s => {
+                const variantForSize = variants.find(
+                  v =>
+                    v.color === color &&
+                    v.size === s
                 );
+
+                const stock =
+                  variantForSize?.stock ?? 0;
+
+                const hasStock = stock > 0;
 
                 return (
                   <button
                     key={s}
-                    disabled={!hasStock}
                     onClick={() => setSize(s)}
-                    className={`px-4 py-2 rounded-lg border text-sm ${size === s
-                      ? "bg-purple-300 text-white"
-                      : "border-gray-300"
-                      } ${!hasStock
-                        ? "opacity-40 cursor-not-allowed"
+                    className={`px-4 py-2 rounded-lg border text-sm ${
+                      size === s
+                        ? "bg-purple-300 text-white"
+                        : "border-gray-300"
+                    } ${
+                      !hasStock
+                        ? "opacity-50"
                         : ""
-                      }`}
+                    }`}
                   >
                     {s}
                   </button>
@@ -190,34 +249,31 @@ export default function ProductPage() {
             <QuantitySelector
               value={qty}
               onChange={setQty}
+              max={variantStock}
             />
 
             <button
               disabled={!canAdd}
-              onClick={() => {
-                if (!validVariant) return;
-
-                addItem({
-                  productId: product.id,
-                  variantId: validVariant.id,
-                  title: product.title,
-                  price: product.price,
-                  image: images[0],
-                  color,
-                  size,
-                  qty,
-                });
-
-                openCart();
-              }}
-              className={`flex-1 rounded-full py-3 text-sm ${canAdd
-                ? "bg-purple-300 hover:bg-purple-400 text-white"
-                : "bg-gray-200 text-gray-400 cursor-not-allowed"
-                }`}
+              onClick={handleAdd}
+              className={`flex-1 rounded-full py-3 text-sm ${
+                canAdd
+                  ? "bg-purple-300 hover:bg-purple-400 text-white"
+                  : "bg-gray-200 text-gray-500"
+              }`}
             >
-              {canAdd ? "Add to Bag" : "Out of Stock"}
+              {!isVariantSelected
+                ? "Select Options"
+                : isOutOfStock
+                ? "Out of Stock"
+                : `Add to Bag`}
             </button>
           </div>
+
+          {isVariantSelected && variantStock > 0 && (
+            <p className="text-xs text-gray-400">
+              {variantStock} left in stock
+            </p>
+          )}
         </div>
       </div>
 

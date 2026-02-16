@@ -11,6 +11,7 @@ import { useCart } from "../../context/CartContext";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { OrderItem } from "../../data/order";
+import { useState } from "react";
 
 export default function CheckoutPage() {
   const { items, clearCart } = useCart();
@@ -23,6 +24,7 @@ export default function CheckoutPage() {
       items,
     }));
   }, [items, setOrder]);
+  const [serverError, setServerError] = useState("");
 
   const isFormValid =
     !!order.contact.email &&
@@ -54,13 +56,15 @@ export default function CheckoutPage() {
 
     setErrors({});
 
-    const orderItems: OrderItem[] = order.items.map((item) => ({
+    const orderItems = order.items.map((item) => ({
       productId: item.productId,
+      variantId: item.variantId, // ✅ ADD THIS
       title: item.title,
       price: item.price,
       qty: item.qty,
       image: item.image,
-      variant: `${item.color} / ${item.size}`,
+      color: item.color,
+      size: item.size,
     }));
 
     const subtotal = orderItems.reduce(
@@ -70,30 +74,32 @@ export default function CheckoutPage() {
 
     const shipping = 50;
     const total = subtotal + shipping;
-
-    const orderRef = await addDoc(collection(db, "orders"), {
-      items: orderItems,
-      customer: {
-        email: order.contact.email,
-        phone: order.delivery.phone,
+    const response = await fetch("/api/orders", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-      delivery: order.delivery,
-      payment: {
-        method: order.payment,
-        paid: false,
-      },
-      totals: {
-        subtotal,
-        shipping,
-        total,
-      },
-      status: "pending",
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
+      body: JSON.stringify({
+        items: orderItems,
+        customer: {
+          email: order.contact.email,
+          phone: order.delivery.phone,
+        },
+        delivery: order.delivery,
+        payment: order.payment,
+      }),
     });
 
+    const data = await response.json();
+
+    if (!response.ok) {
+      setServerError(data.error);
+      return;
+    }
+
     clearCart();
-    router.push(`/confirmation/${orderRef.id}`);
+    router.push(`/confirmation/${data.orderId}`);
+
   };
 
   return (
@@ -107,10 +113,9 @@ export default function CheckoutPage() {
           onClick={submitOrder}
           disabled={!isFormValid}
           className={`w-full rounded-full py-4 font-medium transition
-            ${
-              isFormValid
-                ? "bg-purple-300 hover:bg-purple-400 text-white"
-                : "bg-gray-200 text-gray-400 cursor-not-allowed"
+            ${isFormValid
+              ? "bg-purple-300 hover:bg-purple-400 text-white"
+              : "bg-gray-200 text-gray-400 cursor-not-allowed"
             }`}
         >
           Save and Proceed
@@ -122,6 +127,11 @@ export default function CheckoutPage() {
           </p>
         )}
       </div>
+      {serverError && (
+        <div className="bg-red-100 text-red-600 p-3 rounded mb-4">
+          {serverError}
+        </div>
+      )}
 
       <OrderSummary />
     </section>

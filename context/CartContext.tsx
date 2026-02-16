@@ -1,30 +1,39 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
-import { CartItem } from "../data/cart";
-import { getDoc, doc } from "firebase/firestore";
-import { db } from "../lib/firebase";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import type { CartItem } from "@/data/cart";
+
 type CartContextType = {
   items: CartItem[];
   addItem: (item: CartItem) => void;
   removeItem: (productId: string, variantId: string) => void;
   clearCart: () => void;
   subtotal: number;
-
   isOpen: boolean;
   openCart: () => void;
   closeCart: () => void;
 };
 
-const CartContext = createContext<CartContextType | null>(null);
+const CartContext = createContext<CartContextType | null>(
+  null
+);
 
 const STORAGE_KEY = "hedoomyy_cart";
 
-export function CartProvider({ children }: { children: React.ReactNode }) {
+export function CartProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isOpen, setIsOpen] = useState(false);
 
-  /* ---------------- LOAD FROM LOCAL STORAGE ---------------- */
+  /* LOAD */
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
@@ -32,41 +41,49 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  /* ---------------- SAVE TO LOCAL STORAGE ---------------- */
+  /* SAVE */
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(items)
+    );
   }, [items]);
 
-  /* ---------------- ADD ITEM ---------------- */
-const addItem = (item: CartItem) => {
-  setItems(prev => {
-    const existing = prev.find(
-      i =>
-        i.productId === item.productId &&
-        i.variantId === item.variantId
-    );
-
-    if (existing) {
-      return prev.map(i =>
-        i.productId === item.productId &&
-        i.variantId === item.variantId
-          ? { ...i, qty: i.qty + item.qty }
-          : i
+  /* ADD ITEM (SYNC + FAST) */
+  const addItem = (item: CartItem) => {
+    setItems(prev => {
+      const existing = prev.find(
+        i =>
+          i.productId === item.productId &&
+          i.variantId === item.variantId
       );
-    }
 
-    return [...prev, item];
-  });
+      if (existing) {
+        return prev.map(i =>
+          i.productId === item.productId &&
+          i.variantId === item.variantId
+            ? { ...i, qty: i.qty + item.qty }
+            : i
+        );
+      }
 
-  setIsOpen(true);
-};
+      return [...prev, item];
+    });
 
-  const removeItem = (productId: string, variantId: string) => {
+    setIsOpen(true);
+  };
+
+  const removeItem = (
+    productId: string,
+    variantId: string
+  ) => {
     setItems(prev =>
       prev.filter(
         i =>
-          !(i.productId === productId &&
-            i.variantId === variantId)
+          !(
+            i.productId === productId &&
+            i.variantId === variantId
+          )
       )
     );
   };
@@ -104,6 +121,9 @@ const addItem = (item: CartItem) => {
 
 export function useCart() {
   const ctx = useContext(CartContext);
-  if (!ctx) throw new Error("useCart must be used inside CartProvider");
+  if (!ctx)
+    throw new Error(
+      "useCart must be used inside CartProvider"
+    );
   return ctx;
 }
