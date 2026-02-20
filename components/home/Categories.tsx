@@ -1,31 +1,18 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "../../lib/firebase";
 import CategoryCard from "./CategoryCard";
-import { Category } from "../../data/category";
 
-export default function Categories() {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
+type Category = {
+  id: string;
+  name: string;
+  slug: string;
+  image?: string;
+};
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      const snap = await getDocs(collection(db, "categories"));
-      const data = snap.docs.map(doc => ({
-        id: doc.id,
-        ...(doc.data() as Omit<Category, "id">),
-      }));
+interface Props {
+  categories: Category[];
+}
 
-      setCategories(data);
-      setLoading(false);
-    };
-
-    fetchCategories();
-  }, []);
-
-  if (loading) return null;
+export default function Categories({ categories }: Props) {
+  if (categories.length === 0) return null;
 
   return (
     <section className="pb-20">

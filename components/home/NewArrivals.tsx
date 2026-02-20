@@ -1,59 +1,12 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Product } from "@/data/product";
-import {
-  collection,
-  getDocs,
-  query,
-  where,
-  orderBy,
-  limit,
-} from "firebase/firestore";
-import { db } from "@/lib/firebase";
 
-export default function NewArrivals() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+interface Props {
+  products: Product[];
+}
 
-  useEffect(() => {
-    const fetchNewArrivals = async () => {
-      const q = query(
-        collection(db, "products"),
-        where("status", "==", "active"),
-        orderBy("createdAt", "desc"),
-        limit(5)
-      );
-
-      const snap = await getDocs(q);
-
-      const mapped: Product[] = snap.docs.map(doc => {
-        const data = doc.data();
-
-        return {
-          id: doc.id,
-          title: data.title,
-          description: data.description ?? "",
-          category: data.category,
-          price: data.price,
-          status: data.status,
-          isBestSeller: data.isBestSeller ?? false,
-          images: data.images ?? [],
-          variants: data.variants ?? [],
-          createdAt: data.createdAt ?? null,
-          updatedAt: data.updatedAt ?? null,
-        };
-      });
-
-      setProducts(mapped);
-      setLoading(false);
-    };
-
-    fetchNewArrivals();
-  }, []);
-
-  if (loading || products.length === 0) return null;
+export default function NewArrivals({ products }: Props) {
+  if (products.length === 0) return null;
 
   const [bigProduct, ...smallProducts] = products;
 
@@ -72,6 +25,8 @@ export default function NewArrivals() {
             alt={bigProduct.title}
             width={800}
             height={1000}
+            priority
+            sizes="(max-width: 768px) 100vw, 66vw"
             className="w-full h-full object-cover rounded-lg"
           />
 
@@ -100,6 +55,7 @@ export default function NewArrivals() {
                   alt={product.title}
                   width={400}
                   height={500}
+                  sizes="(max-width: 768px) 50vw, 17vw"
                   className="w-full h-full object-cover rounded-lg"
                 />
 
