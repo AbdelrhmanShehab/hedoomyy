@@ -14,7 +14,7 @@ export async function POST(req: Request) {
   try {
     console.log("🛒 [API/Orders] New order request received");
     const body = await req.json();
-    const { items, customer, delivery, payment } = body;
+    const { userId, items, customer, delivery, payment } = body;
 
     // 1. Validation
     if (!items || items.length === 0) {
@@ -81,6 +81,7 @@ export async function POST(req: Request) {
     // 3. Save Order
     console.log("💾 [API/Orders] saving order to Firestore...");
     const orderRef = await addDoc(collection(db, "orders"), {
+      userId,
       items,
       customer,
       delivery,

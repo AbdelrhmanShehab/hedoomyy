@@ -2,21 +2,28 @@
 
 import { auth } from "../../lib/firebase";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { useRouter } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import loginImg from "../../public/login.png";
 import heartIcon from "../../public/heartLoginIcon.svg";
+import { Suspense } from "react";
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect") || "/";
 
   const loginWithGoogle = async () => {
     try {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
-      router.push("/checkout");
-    } catch (error) {
-      console.error(error);
+      router.push(redirectTo);
+    } catch (error: any) {
+      if (error.code === "auth/cancelled-popup-request") {
+        // User closed the popup, no action needed
+        return;
+      }
+      console.error("Login Error:", error);
     }
   };
 
@@ -86,5 +93,17 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-gray-500 animate-pulse">Loading...</p>
+      </div>
+    }>
+      <LoginContent />
+    </Suspense>
   );
 }

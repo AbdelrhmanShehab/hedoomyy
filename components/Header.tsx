@@ -7,9 +7,12 @@ import useCategories from "../usecategories";
 import callIcon from "../public/calIIcon.svg";
 import instagramIcon from "../public/instagramIcon.svg";
 import { useCart } from "@/context/CartContext";
+import { useAuth } from "@/context/AuthContext";
+
 export default function Header() {
   const { categories } = useCategories();
   const { items } = useCart();
+  const { user } = useAuth();
 
   const cartCount = items.reduce(
     (sum, item) => sum + item.qty,
@@ -56,17 +59,27 @@ export default function Header() {
           </nav>
 
           <div className="flex items-center gap-5">
-            <Link href="/account">
-              <User className="w-5 h-5" />
+            <Link href="/account" className="flex items-center justify-center">
+              {user ? (
+                <div className="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center shadow-sm">
+                  <span className="text-gray-700 font-bold text-sm uppercase">
+                    {(user.displayName || user.email || "?")[0]}
+                  </span>
+                </div>
+              ) : (
+                <User className="w-5 h-5 text-gray-700 hover:text-black transition-colors" />
+              )}
             </Link>
-            <Link href="/cart">
-              <ShoppingBag className="w-5 h-5 cart-icon" />
+            <div className="relative">
+              <Link href="/cart">
+                <ShoppingBag className="w-5 h-5 cart-icon" />
+              </Link>
               {cartCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-purple-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                <span className="absolute -top-2 -right-2 bg-gray-800 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full pointer-events-none">
                   {cartCount}
                 </span>
               )}
-            </Link>
+            </div>
           </div>
         </div>
       </div>

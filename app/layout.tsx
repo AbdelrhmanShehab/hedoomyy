@@ -1,7 +1,9 @@
 import "./globals.css";
 import { CheckoutProvider } from "../context/CheckoutContext";
-import  { CartProvider } from "../context/CartContext";
+import { CartProvider } from "../context/CartContext";
 import { CartSidebar } from "../components/CardSiderbar";
+import { AuthProvider } from "../context/AuthContext";
+
 export default function RootLayout({
   children,
 }: {
@@ -10,12 +12,14 @@ export default function RootLayout({
   return (
     <html>
       <body>
-        <CartProvider>
-          <CheckoutProvider>
-            <main>{children}</main>
-            <CartSidebar />
-          </CheckoutProvider>
-        </CartProvider>
+        <AuthProvider>
+          <CartProvider>
+            <CheckoutProvider>
+              <main>{children}</main>
+              <CartSidebar />
+            </CheckoutProvider>
+          </CartProvider>
+        </AuthProvider>
       </body>
     </html>
   );

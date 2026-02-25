@@ -4,19 +4,47 @@ import ContactForm from "../../components/checkout/ContactForm";
 import DeliveryForm from "../../components/checkout/DeliveryForm";
 import PaymentMethod from "../../components/checkout/PaymentMethod";
 import OrderSummary from "../../components/checkout/OrderSummary";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { db } from "../../lib/firebase";
+import { auth, db } from "../../lib/firebase";
+import { doc, getDoc } from "firebase/firestore";
 import { useCheckout } from "../../context/CheckoutContext";
 import { useCart } from "../../context/CartContext";
+import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { OrderItem } from "../../data/order";
-import { useState } from "react";
 
 export default function CheckoutPage() {
   const { items, clearCart } = useCart();
   const { order, setOrder, setErrors } = useCheckout();
+  const { user, userData, loading: authLoading } = useAuth();
   const router = useRouter();
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (user) {
+      setUserId(user.uid);
+
+      // If we have userData from global AuthContext, prefer it
+      if (userData) {
+        setOrder(prev => ({
+          ...prev,
+          contact: {
+            email: prev.contact.email || userData.email || user.email || ""
+          },
+          delivery: {
+            address: prev.delivery.address || userData.address || "",
+            phone: prev.delivery.phone || userData.phone || "",
+            firstName: prev.delivery.firstName || userData.firstName || "",
+            lastName: prev.delivery.lastName || userData.lastName || "",
+            city: prev.delivery.city || userData.city || "",
+            government: prev.delivery.government || userData.government || "",
+            apartment: prev.delivery.apartment || userData.apartment || "",
+            secondPhone: prev.delivery.secondPhone || userData.secondPhone || "",
+          }
+        }));
+      }
+    }
+  }, [user, userData, setOrder]);
 
   useEffect(() => {
     setOrder((prev) => ({
@@ -80,6 +108,7 @@ export default function CheckoutPage() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
+        userId,
         items: orderItems,
         customer: {
           email: order.contact.email,

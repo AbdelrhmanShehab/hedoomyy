@@ -69,7 +69,7 @@ export default function ProfileOverview() {
         <div className="space-y-10">
             {/* Header section */}
             <div className="flex items-center gap-5">
-                <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center overflow-hidden border-2 border-purple-200">
+                <div className="w-20 h-20 bg-purple-800 rounded-full flex items-center justify-center overflow-hidden border-2 border-purple-200">
                     {user?.photoURL ? (
                         <img src={user.photoURL} alt="Profile" className="w-full h-full object-cover" />
                     ) : (
