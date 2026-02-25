@@ -3,6 +3,9 @@
 import { auth } from "../../lib/firebase";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+import loginImg from "../../public/login.png";
+import heartIcon from "../../public/heartLoginIcon.svg";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -14,24 +17,73 @@ export default function LoginPage() {
       router.push("/checkout");
     } catch (error) {
       console.error(error);
-      alert("Login failed");
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
-      <div className="w-full max-w-sm space-y-6 text-center">
-        <h1 className="text-2xl font-light">
-          Login to continue
-        </h1>
+    <div className="min-h-screen flex relative">
+      {/* ================= LEFT SIDE ================= */}
+      <div className="hidden md:flex w-1/2 relative">
+        <Image
+          src={loginImg}
+          alt="login_background_image"
+          fill
+          className="object-cover"
+          priority
+        />
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-black/30"></div>
 
-        <button
-          onClick={loginWithGoogle}
-          className="w-full border py-3 rounded flex items-center justify-center gap-3 hover:bg-gray-50"
-        >
-          <img src="/google.svg" alt="google" className="w-5 h-5" />
-          Continue with Google
-        </button>
+        {/* Text */}
+        <div className="absolute bottom-16 left-12 text-white z-10">
+          <h2 className="text-4xl font-light leading-snug">
+            Enter.
+            <br />
+            Explore.
+            <br />
+            Express yourself.
+          </h2>
+        </div>
+      </div>
+      {/* ================= RIGHT SIDE ================= */}
+      <div className="flex w-full md:w-1/2 items-center justify-center bg-[#f8f6f9] px-6">
+        <div className="w-full max-w-md space-y-8 text-center bg-white p-10 rounded-3xl shadow-sm">
+
+          {/* Welcome */}
+          <div className="space-y-2">
+            <div className="flex justify-center items-center gap-2">
+              <h1 className="text-3xl font-medium text-gray-700">
+                Welcome Back!
+              </h1>
+              <Image
+                src={heartIcon}
+                alt="heart"
+                width={28}
+                height={28}
+              />
+            </div>
+            <p className="text-sm text-gray-500">
+              Enter your credentials to login
+            </p>
+          </div>
+
+          {/* Input */}
+          <div className="space-y-4">
+            <input
+              type="email"
+              placeholder="example@gmail.com"
+              className="w-full border border-gray-200 p-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-300 transition bg-gray-50/50"
+            />
+          </div>
+
+          {/* Button */}
+          <button
+            onClick={loginWithGoogle}
+            className="w-full bg-purple-400 hover:bg-purple-500 text-white font-medium py-4 rounded-xl transition duration-300 shadow-md hover:shadow-lg"
+          >
+            Login with Google
+          </button>
+        </div>
       </div>
     </div>
   );
