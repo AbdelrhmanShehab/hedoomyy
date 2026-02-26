@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { User, ShoppingBag } from "lucide-react";
+import { useState } from "react";
+import { User, ShoppingBag, Menu, X } from "lucide-react";
 import useCategories from "../usecategories";
 import callIcon from "../public/calIIcon.svg";
 import instagramIcon from "../public/instagramIcon.svg";
@@ -11,22 +12,26 @@ import { useAuth } from "@/context/AuthContext";
 
 export default function Header() {
   const { categories } = useCategories();
-  const { items } = useCart();
+  const { items, openCart } = useCart();
   const { user } = useAuth();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const cartCount = items.reduce(
     (sum, item) => sum + item.qty,
     0
   );
+
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+
   return (
-    <header className="w-full border-b border-gray-200">
+    <header className="w-full border-b border-gray-200 bg-white sticky top-0 z-40">
       {/* Top Bar */}
       <div className="bg-gray-400 text-white text-sm">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-4 py-2">
           <div className="flex items-center gap-6">
             <span className="flex items-center gap-2">
               <Image src={callIcon} alt="Call" />
-              <span>+01141088386</span>
+              <span className="hidden sm:inline">+01141088386</span>
             </span>
 
             <span className="flex items-center gap-2">
@@ -42,20 +47,29 @@ export default function Header() {
       {/* Main Nav */}
       <div className="bg-white">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-4 py-6">
-          <nav className="flex items-center gap-6 text-sm font-medium">
-            <Link href="/">Home</Link>
-            <Link href="/products">All Items</Link>
+          {/* Mobile Menu Button */}
+          <button
+            className="md:hidden p-2 -ml-2 text-gray-700"
+            onClick={toggleMenu}
+            aria-label="Toggle Menu"
+          >
+            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+
+          {/* Desktop Nav */}
+          <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
+            <Link href="/" className="hover:text-black transition-colors">Home</Link>
+            <Link href="/products" className="hover:text-black transition-colors">All Items</Link>
 
             {categories.map(cat => (
               <Link
                 key={cat.id}
                 href={`/products?category=${cat.slug}`}
-                className="capitalize text-gray-700 hover:text-black"
+                className="capitalize text-gray-700 hover:text-black transition-colors"
               >
                 {cat.name}
               </Link>
             ))}
-
           </nav>
 
           <div className="flex items-center gap-5">
@@ -71,11 +85,15 @@ export default function Header() {
               )}
             </Link>
             <div className="relative">
-              <Link href="/cart">
-                <ShoppingBag className="w-5 h-5 cart-icon" />
-              </Link>
+              <button
+                onClick={openCart}
+                className="p-1 hover:bg-gray-100 rounded-full transition-all active:scale-95"
+                aria-label="Open Cart"
+              >
+                <ShoppingBag className="w-5 h-5 cart-icon text-gray-700 hover:text-black" />
+              </button>
               {cartCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-gray-800 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full pointer-events-none">
+                <span className="absolute -top-1 -right-1 bg-gray-800 text-white text-[10px] w-4.5 h-4.5 flex items-center justify-center rounded-full pointer-events-none">
                   {cartCount}
                 </span>
               )}
@@ -83,6 +101,44 @@ export default function Header() {
           </div>
         </div>
       </div>
+
+      {/* Mobile Menu Overlay */}
+      {isMenuOpen && (
+        <>
+          <div
+            className="fixed inset-0 top-[116px] bg-black/40 z-30 md:hidden backdrop-blur-[2px]"
+            onClick={() => setIsMenuOpen(false)}
+          />
+          <div className="absolute top-full left-0 w-full bg-white border-b border-gray-200 shadow-xl z-40 md:hidden">
+            <nav className="flex flex-col p-6 gap-5">
+              <Link
+                href="/"
+                className="text-lg font-medium text-gray-900 border-b border-gray-50 pb-2"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Home
+              </Link>
+              <Link
+                href="/products"
+                className="text-lg font-medium text-gray-900 border-b border-gray-50 pb-2"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                All Items
+              </Link>
+              {categories.map(cat => (
+                <Link
+                  key={cat.id}
+                  href={`/products?category=${cat.slug}`}
+                  className="capitalize text-lg font-medium text-gray-700 hover:text-black border-b border-gray-50 pb-2"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {cat.name}
+                </Link>
+              ))}
+            </nav>
+          </div>
+        </>
+      )}
     </header>
   );
 }

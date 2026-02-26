@@ -27,7 +27,7 @@ export default async function Home() {
       <Header />
       <Image
         src={hedoomyybanner}
-        className="md:h-[70vh] h-[76vh] w-full md:object-cover"
+        className="   h-[35vh] md:h-[60vh] lg:h-[70vh]  w-full object-fit "
         alt="Hedoomyy banner"
         priority
         sizes="100vw"

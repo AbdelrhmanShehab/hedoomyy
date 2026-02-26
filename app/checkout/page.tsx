@@ -4,19 +4,16 @@ import ContactForm from "../../components/checkout/ContactForm";
 import DeliveryForm from "../../components/checkout/DeliveryForm";
 import PaymentMethod from "../../components/checkout/PaymentMethod";
 import OrderSummary from "../../components/checkout/OrderSummary";
-import { auth, db } from "../../lib/firebase";
-import { doc, getDoc } from "firebase/firestore";
 import { useCheckout } from "../../context/CheckoutContext";
 import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { OrderItem } from "../../data/order";
 
 export default function CheckoutPage() {
-  const { items, clearCart } = useCart();
+  const { items } = useCart();
   const { order, setOrder, setErrors } = useCheckout();
-  const { user, userData, loading: authLoading } = useAuth();
+  const { user, userData } = useAuth();
   const router = useRouter();
   const [userId, setUserId] = useState<string | null>(null);
 
@@ -52,8 +49,6 @@ export default function CheckoutPage() {
       items,
     }));
   }, [items, setOrder]);
-  const [serverError, setServerError] = useState("");
-
   const isFormValid =
     !!order.contact.email &&
     !!order.delivery.address &&
@@ -65,7 +60,7 @@ export default function CheckoutPage() {
     !!order.payment &&
     order.items.length > 0;
 
-  const submitOrder = async () => {
+  const proceedToPayment = () => {
     const newErrors: Record<string, string> = {};
 
     if (!order.contact.email) newErrors.email = "Email is required";
@@ -83,52 +78,8 @@ export default function CheckoutPage() {
     }
 
     setErrors({});
-
-    const orderItems = order.items.map((item) => ({
-      productId: item.productId,
-      variantId: item.variantId, // ✅ ADD THIS
-      title: item.title,
-      price: item.price,
-      qty: item.qty,
-      image: item.image,
-      color: item.color,
-      size: item.size,
-    }));
-
-    const subtotal = orderItems.reduce(
-      (sum, item) => sum + item.price * item.qty,
-      0
-    );
-
-    const shipping = 50;
-    const total = subtotal + shipping;
-    const response = await fetch("/api/orders", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        userId,
-        items: orderItems,
-        customer: {
-          email: order.contact.email,
-          phone: order.delivery.phone,
-        },
-        delivery: order.delivery,
-        payment: order.payment,
-      }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      setServerError(data.error);
-      return;
-    }
-
-    clearCart();
-    router.push(`/confirmation/${data.orderId}`);
-
+    // Route to upload page — order is submitted there after attaching photo
+    router.push("/checkout/payment-upload");
   };
 
   return (
@@ -139,7 +90,7 @@ export default function CheckoutPage() {
         <PaymentMethod />
 
         <button
-          onClick={submitOrder}
+          onClick={proceedToPayment}
           disabled={!isFormValid}
           className={`w-full rounded-full py-4 font-medium transition
             ${isFormValid
@@ -147,7 +98,7 @@ export default function CheckoutPage() {
               : "bg-gray-200 text-gray-400 cursor-not-allowed"
             }`}
         >
-          Save and Proceed
+          Save and Proceed →
         </button>
 
         {!isFormValid && (
@@ -156,11 +107,6 @@ export default function CheckoutPage() {
           </p>
         )}
       </div>
-      {serverError && (
-        <div className="bg-red-100 text-red-600 p-3 rounded mb-4">
-          {serverError}
-        </div>
-      )}
 
       <OrderSummary />
     </section>

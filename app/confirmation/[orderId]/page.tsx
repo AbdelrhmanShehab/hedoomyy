@@ -45,7 +45,7 @@ export default function ConfirmationPage() {
         </div>
 
         <p className="text-sm text-gray-500">
-          Thank you <strong>{delivery.firstName}</strong> for your order.  
+          Thank you <strong>{delivery.firstName}</strong> for your order.
           Please check your email for confirmation.
         </p>
 
@@ -79,7 +79,7 @@ export default function ConfirmationPage() {
           <div>
             <h4 className="font-medium mb-1">Pick-up Time</h4>
             <p className="text-gray-500">
-              From 1 to 5 working days  
+              From 1 to 5 working days
               <br />
               <span className="text-xs">
                 (excluding Friday & Saturday)
@@ -93,8 +93,69 @@ export default function ConfirmationPage() {
             <p className="text-gray-600">
               {payment.method === "cod"
                 ? "Cash on Delivery (COD)"
-                : "Online Payment"}
+                : "Online Payment (Instapay)"}
             </p>
+
+            {/* Deposit / payment details */}
+            {payment.depositType && (
+              <div className="mt-3 rounded-xl bg-purple-50 border border-purple-100 p-4 space-y-2 text-xs">
+                <p className="font-semibold text-purple-700">
+                  {payment.depositType === "deposit"
+                    ? "10% Deposit Paid"
+                    : "Full Amount Paid Online"}
+                </p>
+                {payment.depositAmount && (
+                  <p className="text-gray-600">
+                    Amount paid:{" "}
+                    <strong>EGP {payment.depositAmount.toLocaleString()}</strong>
+                  </p>
+                )}
+                {payment.depositType === "deposit" && payment.depositAmount && (
+                  <p className="text-gray-500">
+                    Remaining on delivery:{" "}
+                    <strong>
+                      EGP{" "}
+                      {(
+                        (totals?.total ?? 0) - payment.depositAmount
+                      ).toLocaleString()}
+                    </strong>
+                  </p>
+                )}
+                <div
+                  className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${payment.paid
+                      ? "bg-green-100 text-green-700"
+                      : "bg-amber-100 text-amber-700"
+                    }`}
+                >
+                  {payment.paid ? "✓ Confirmed" : "⏳ Awaiting confirmation"}
+                </div>
+              </div>
+            )}
+
+            {/* Payment screenshot */}
+            {payment.paymentPhotoUrl && (
+              <div className="mt-3 space-y-1">
+                <p className="text-xs text-gray-400 font-medium">Transaction Screenshot</p>
+                <a
+                  href={payment.paymentPhotoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block"
+                >
+                  <Image
+                    src={payment.paymentPhotoUrl}
+                    alt="Instapay receipt"
+                    width={200}
+                    height={140}
+                    className="rounded-xl object-cover border border-purple-100 hover:opacity-80 transition"
+                    unoptimized
+                  />
+                  <span className="text-xs text-purple-500 mt-1 block">
+                    Click to view full image
+                  </span>
+                </a>
+              </div>
+            )}
           </div>
 
           {/* Meta */}

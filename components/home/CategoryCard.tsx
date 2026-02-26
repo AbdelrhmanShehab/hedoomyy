@@ -13,7 +13,7 @@ export default function CategoryCard({ title, image, href }: Props) {
   return (
     <Link
       href={href}
-      className="group block w-[19%] flex-shrink-0"
+      className="group block w-[45vw] sm:w-[30vw] md:w-[19%] min-w-[150px] flex-shrink-0"
     >
       <div className="relative h-[360px] w-full overflow-hidden rounded-2xl bg-zinc-100">
         <Image

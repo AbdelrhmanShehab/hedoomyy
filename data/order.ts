@@ -26,6 +26,9 @@ export type Order = {
   payment: {
     method: "cod" | "online";
     paid: boolean;
+    depositType?: "deposit" | "full"; // COD → "deposit" (10%), online → "full" (total)
+    depositAmount?: number;            // amount to be collected/confirmed
+    paymentPhotoUrl?: string;          // Instapay screenshot URL (Firebase Storage)
   };
   totals: {
     subtotal: number;

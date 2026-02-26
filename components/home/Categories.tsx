@@ -15,12 +15,12 @@ export default function Categories({ categories }: Props) {
   if (categories.length === 0) return null;
 
   return (
-    <section className="pb-20">
-      <h2 className="mb-8 text-xl font-medium text-zinc-900">
+    <section className="py-10">
+      <h2 className="mb-6 text-xl font-medium text-zinc-900">
         Explore Categories
       </h2>
 
-      <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+      <div className="flex gap-4 overflow-x-auto pb-6 scrollbar-hide -mx-2 px-2 md:mx-0 md:px-0">
         {categories.map(cat => (
           <CategoryCard
             key={cat.id}

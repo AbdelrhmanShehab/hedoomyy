@@ -14,7 +14,7 @@ export async function POST(req: Request) {
   try {
     console.log("🛒 [API/Orders] New order request received");
     const body = await req.json();
-    const { userId, items, customer, delivery, payment } = body;
+    const { userId, items, customer, delivery, payment, depositType, depositAmount, paymentPhotoUrl } = body;
 
     // 1. Validation
     if (!items || items.length === 0) {
@@ -88,6 +88,9 @@ export async function POST(req: Request) {
       payment: {
         method: payment,
         paid: false,
+        ...(depositType && { depositType }),
+        ...(depositAmount && { depositAmount }),
+        ...(paymentPhotoUrl && { paymentPhotoUrl }),
       },
       totals: {
         subtotal,
@@ -140,7 +143,16 @@ Items:
 ${orderDetails}
 
 Total: ${total} EGP
-Payment: ${payment}
+Payment Method: ${payment}${depositType
+            ? `\nDeposit Type: ${depositType === "deposit" ? "10% Deposit" : "Full Amount"}`
+            : ""
+          }${depositAmount
+            ? `\nAmount Paid: EGP ${depositAmount}`
+            : ""
+          }${paymentPhotoUrl
+            ? `\nPayment Screenshot: ${paymentPhotoUrl}`
+            : ""
+          }
 `;
 
         // Send to Admin
