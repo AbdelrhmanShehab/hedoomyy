@@ -118,7 +118,7 @@ export default function ContactPage() {
           </Link>
 
           <h1 className="text-5xl font-light mt-6">
-            <span className="bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r font-medium from-purple-300 to-pink-300 bg-clip-text text-transparent">
               Contact{" "}
               Us
             </span>
@@ -129,12 +129,12 @@ export default function ContactPage() {
 
               <div >
                 <p className="text-gray-500">Submit Email:</p>
-                <p className="text-purple-400">Alaa@gmail.com</p>
+                <p className="text-purple-300 font-bold text-base">alaahesham01@gmail.com</p>
               </div>
 
               <div>
                 <p className="text-gray-500">Call us:</p>
-                <p className="text-purple-400">01023202564</p>
+                <p className="text-purple-300 font-bold text-base">01023202564</p>
               </div>
             </div>
 
@@ -158,7 +158,7 @@ export default function ContactPage() {
                 onClick={() => setActivePolicy(key)}
                 className={`px-4 py-2 rounded-full transition cursor-pointer ${activePolicy === key
                   ? "bg-purple-300 font-bold text-white"
-                  : "text-gray-500 hover:text-purple-500"
+                  : "text-gray-500 hover:text-purple-300"
                   }`}
               >
                 {POLICIES[key].title}
@@ -170,10 +170,10 @@ export default function ContactPage() {
           <div className="space-y-8">
             {POLICIES[activePolicy].faqs.map((faq, index) => (
               <div key={index} className="border-b pb-6">
-                <h3 className="text-purple-400 font-medium">
+                <h3 className="text-purple-300 font-bold">
                   {faq.q}
                 </h3>
-                <div className="text-gray-600 text-sm mt-2">
+                <div className="text-gray-700 text-sm mt-2">
                   {faq.a}
                 </div>
               </div>

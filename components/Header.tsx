@@ -3,12 +3,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { User, ShoppingBag, Menu, X } from "lucide-react";
+import { User, ShoppingBag, Menu, X, Heart } from "lucide-react";
 import useCategories from "../usecategories";
 import callIcon from "../public/calIIcon.svg";
 import instagramIcon from "../public/instagramIcon.svg";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
+import { useFavorites } from "@/context/FavoritesContext";
 
 export default function Header() {
   const { categories } = useCategories();
@@ -26,8 +27,7 @@ export default function Header() {
   return (
     <header className="w-full border-b border-gray-200 bg-white sticky top-0 z-40">
       {/* Top Bar */}
-      {/* Top Bar */}
-      <div className="bg-gray-400 text-white text-sm font-medium">
+      <div className="bg-gray-400 text-white text-sm font-bold">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-4 py-2">
 
           {/* Left Side */}
@@ -39,7 +39,7 @@ export default function Header() {
 
             <span className="flex items-center gap-2">
               <Image src={instagramIcon} alt="Instagram" width={16} height={16} />
-              <span className="font-medium">Hedoomyy</span>
+              <span className="font-bold">Hedoomyy</span>
             </span>
           </div>
 
@@ -100,6 +100,11 @@ export default function Header() {
                 <User className="w-5 h-5 text-gray-700 hover:text-black transition-colors" />
               )}
             </Link>
+
+            <Link href="/favorites" className="relative p-1 hover:bg-gray-100 rounded-full transition-all">
+              <Heart className="w-5 h-5 text-gray-700 hover:text-pink-400 transition-colors" />
+            </Link>
+
             <div className="relative">
               <button
                 onClick={openCart}

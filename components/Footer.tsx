@@ -16,7 +16,7 @@ export default function Footer() {
               className=" h-28 w-34"
               alt="Picture of the author"
             />
-            <p className="text-sm text-zinc-600">
+            <p className="text-base font-semibold text-zinc-600">
               Designed for Her, Inspired by Her.
             </p>
           </div>

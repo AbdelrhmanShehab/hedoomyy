@@ -1,4 +1,4 @@
-import ProductGrid from "../../components/ProductGrid";
+import ProductSlider from "../../components/ProductSlider";
 import { Product } from "../../data/product";
 
 interface Props {
@@ -11,7 +11,7 @@ export default function BestSeller({ products }: Props) {
       <h2 className="mb-6 text-2xl font-medium">
         Explore Best Seller
       </h2>
-      <ProductGrid products={products} />
+      <ProductSlider products={products} />
     </section>
   );
 }

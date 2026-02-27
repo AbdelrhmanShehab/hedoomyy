@@ -1,5 +1,7 @@
 "use client";
 
+import { Minus, Plus } from "lucide-react";
+
 type Props = {
   value: number;
   onChange: (val: number) => void;
@@ -20,10 +22,20 @@ export default function QuantitySelector({
   };
 
   return (
-    <div className="flex items-center border rounded-full px-4 py-2 gap-4">
-      <button onClick={decrease}>−</button>
-      <span className="text-sm">{value}</span>
-      <button onClick={increase}>+</button>
+    <div className="flex items-center border border-gray-300 rounded-full px-4 py-2 gap-6 min-w-[120px] justify-between">
+      <button
+        onClick={decrease}
+        className="text-gray-500 hover:text-black transition-colors"
+      >
+        <Minus size={18} />
+      </button>
+      <span className="text-lg font-medium w-4 text-center">{value}</span>
+      <button
+        onClick={increase}
+        className="text-gray-500 hover:text-black transition-colors"
+      >
+        <Plus size={18} />
+      </button>
     </div>
   );
 }

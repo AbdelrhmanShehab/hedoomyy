@@ -3,7 +3,7 @@ import Link from "next/link";
 export default function Hero() {
   return (
     <section className="flex flex-col items-center justify-center px-4 py-24 text-center">
-      <h1 className="max-w-2xl text-3xl font-medium leading-snug text-zinc-900 md:text-4xl">
+      <h1 className=" lg:w-[1200px] text-3xl font-medium leading-snug text-zinc-900 md:text-5xl">
         Because looking good shouldn’t cost a fortune
       </h1>
 

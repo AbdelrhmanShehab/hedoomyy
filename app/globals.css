@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+@theme {
+  --color-pink-400: #DE9DE5;
+  --font-quicksand: "Quicksand", sans-serif;
+}
+
+:root {
+  font-family: var(--font-quicksand);
+}
+
 .container {
   /* to make padding works even in mobile size screens */
   padding-right: 6px;
@@ -13,3 +22,13 @@
   position: relative;
 }
 
+
+/* Hide scrollbar everywhere */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

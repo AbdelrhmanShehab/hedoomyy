@@ -7,6 +7,13 @@ import Image from "next/image";
 import loginImg from "../../public/login.png";
 import heartIcon from "../../public/heartLoginIcon.svg";
 import { Suspense } from "react";
+import { Kaushan_Script } from "next/font/google";
+
+const kaushanScript = Kaushan_Script({
+  weight: "400",
+  subsets: ["latin"],
+  display: "swap",
+});
 
 function LoginContent() {
   const router = useRouter();
@@ -30,7 +37,7 @@ function LoginContent() {
   return (
     <div className="min-h-screen flex relative">
       {/* ================= LEFT SIDE ================= */}
-      <div className="hidden md:flex w-1/2 relative">
+      <div className="hidden md:flex w-1/3 relative">
         <Image
           src={loginImg}
           alt="login_background_image"
@@ -53,13 +60,13 @@ function LoginContent() {
         </div>
       </div>
       {/* ================= RIGHT SIDE ================= */}
-      <div className="flex w-full md:w-1/2 items-center justify-center bg-[#f8f6f9] px-6">
+      <div className="flex w-full md:w-1/2 items-center justify-center px-6">
         <div className="w-full max-w-md space-y-8 text-center bg-white p-10 rounded-3xl shadow-sm">
 
           {/* Welcome */}
           <div className="space-y-2">
             <div className="flex justify-center items-center gap-2">
-              <h1 className="text-3xl font-medium text-gray-700">
+              <h1 className={`${kaushanScript.className} text-4xl text-gray-700`}>
                 Welcome Back!
               </h1>
               <Image

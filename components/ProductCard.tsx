@@ -5,6 +5,8 @@ import Link from "next/link";
 import { Product } from "../data/product";
 import { useState } from "react";
 import QuickAddModal from "./product/QuickAddModal";
+import { Heart } from "lucide-react";
+import { useFavorites } from "@/context/FavoritesContext";
 
 type Props = {
   product: Product;
@@ -12,6 +14,9 @@ type Props = {
 
 export default function ProductCard({ product }: Props) {
   const [open, setOpen] = useState(false);
+  const { toggleFavorite, isFavorite } = useFavorites();
+
+  const isFavorited = isFavorite(product.id);
 
   const variants = Array.isArray(product.variants)
     ? product.variants
@@ -39,11 +44,25 @@ export default function ProductCard({ product }: Props) {
           </div>
         )}
 
+        {/* FAVORITES TOGGLE */}
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            toggleFavorite(product.id);
+          }}
+          className="absolute top-3 right-3 bg-white/80 backdrop-blur-sm p-2 rounded-full z-10 transition hover:bg-white shadow-sm"
+          aria-label={isFavorited ? "Remove from favorites" : "Add to favorites"}
+        >
+          <Heart
+            className={`w-5 h-5 transition-colors ${isFavorited ? "text-pink-400 fill-pink-400" : "text-gray-400"}`}
+          />
+        </button>
+
         <Link
           href={`/product/${product.id}`}
           className="w-full flex flex-col items-center"
         >
-          <div className="w-[260px] h-[380px] relative rounded-2xl overflow-hidden">
+          <div className="w-[270px] h-[390px] relative rounded-2xl overflow-hidden">
             <Image
               src={imageSrc}
               alt={product.title}
@@ -58,14 +77,15 @@ export default function ProductCard({ product }: Props) {
               </div>
             )}
           </div>
+          <div className="" >
+            <p className="mt-4 text-sm text-center">
+              {product.title}
+            </p>
 
-          <p className="mt-4 text-sm text-center">
-            {product.title}
-          </p>
-
-          <p className="text-sm text-pink-400">
-            {product.price} EGP
-          </p>
+            <p className="text-sm text-pink-400">
+              {product.price} EGP
+            </p>
+          </div>
         </Link>
 
         <button
