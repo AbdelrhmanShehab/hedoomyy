@@ -61,7 +61,7 @@ export function CartProvider({
       if (existing) {
         return prev.map(i =>
           i.productId === item.productId &&
-          i.variantId === item.variantId
+            i.variantId === item.variantId
             ? { ...i, qty: i.qty + item.qty }
             : i
         );

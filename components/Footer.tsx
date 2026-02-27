@@ -40,7 +40,7 @@ export default function Footer() {
             </h3>
             <ul className="space-y-2 text-sm text-zinc-600">
               <li><Link href="/about">About Us</Link></li>
-              <li><Link href="/contact">Contact Us</Link></li>
+              <li><Link href="/policy">Contact Us</Link></li>
             </ul>
           </div>
 
@@ -51,8 +51,8 @@ export default function Footer() {
             </h3>
             <ul className="space-y-2 text-sm text-zinc-600">
               <li><Link href="/policy">Policy</Link></li>
-              <li><Link href="/track-order">Track Your Order</Link></li>
-              <li><Link href="/faqs">FAQs</Link></li>
+              <li><Link href="/account">Track Your Order</Link></li>
+              <li><Link href="/policy">FAQs</Link></li>
             </ul>
           </div>
         </div>

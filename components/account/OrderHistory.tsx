@@ -79,8 +79,8 @@ export default function OrderHistory() {
                 </div>
                 <div className="flex flex-col items-end gap-2">
                   <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${order.status === 'delivered' ? 'bg-green-100 text-green-700' :
-                      order.status === 'pending' ? 'bg-amber-100 text-amber-700' :
-                        'bg-blue-100 text-blue-700'
+                    order.status === 'pending' ? 'bg-amber-100 text-amber-700' :
+                      'bg-blue-100 text-blue-700'
                     }`}>
                     {order.status}
                   </span>

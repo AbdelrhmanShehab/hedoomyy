@@ -26,21 +26,37 @@ export default function Header() {
   return (
     <header className="w-full border-b border-gray-200 bg-white sticky top-0 z-40">
       {/* Top Bar */}
-      <div className="bg-gray-400 text-white text-sm">
+      {/* Top Bar */}
+      <div className="bg-gray-400 text-white text-sm font-medium">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-4 py-2">
+
+          {/* Left Side */}
           <div className="flex items-center gap-6">
             <span className="flex items-center gap-2">
-              <Image src={callIcon} alt="Call" />
+              <Image src={callIcon} alt="Call" width={16} height={16} />
               <span className="hidden sm:inline">+01141088386</span>
             </span>
 
             <span className="flex items-center gap-2">
-              <Image src={instagramIcon} alt="Instagram" />
+              <Image src={instagramIcon} alt="Instagram" width={16} height={16} />
               <span className="font-medium">Hedoomyy</span>
             </span>
           </div>
 
-          <span className="hidden md:block">Enjoy your shopping :)</span>
+          {/* Center Text */}
+          <span className="hidden md:block text-s ">
+            Enjoy your shopping :)
+          </span>
+
+          {/* Right Side */}
+          <div className="hidden md:flex items-center gap-3 text-s">
+            <a href="/policy" className="hover:underline">FAQs</a>
+            <span className="text-white/60">|</span>
+            <a href="/policy" className="hover:underline">Return & Exchange</a>
+            <span className="text-white/60">|</span>
+            <a href="/policy" className="hover:underline">Delivery</a>
+          </div>
+
         </div>
       </div>
 

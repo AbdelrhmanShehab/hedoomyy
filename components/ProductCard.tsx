@@ -72,10 +72,9 @@ export default function ProductCard({ product }: Props) {
           disabled={!hasStock}
           onClick={() => setOpen(true)}
           className={`mt-3 px-6 py-2 rounded-full text-sm
-            ${
-              hasStock
-                ? "border border-black hover:bg-black hover:text-white"
-                : "bg-gray-200 text-gray-400 cursor-not-allowed"
+            ${hasStock
+              ? "border border-black hover:bg-black hover:text-white"
+              : "bg-gray-200 text-gray-400 cursor-not-allowed"
             }
           `}
         >
