@@ -1,28 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "../../lib/firebase";
-import { Product } from "../../data/product";
-import ProductGrid from "../../components/ProductGrid";
-import { useRouter, useSearchParams } from "next/navigation";
-import Header from "../../components/Header";
-import Footer from "../../components/Footer";
-import { where, query } from "firebase/firestore";
+import { Suspense, useEffect, useMemo, useState } from "react";
+// ... (rest of imports)
 
-/* ---------------- TYPES ---------------- */
-
-type SortType = "" | "new" | "best" | "price-high" | "price-low";
-
-type Category = {
-  id: string;
-  name: string;
-  slug: string;
-};
-
-/* ---------------- PAGE ---------------- */
-
-export default function ProductsPage() {
+function ProductsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -67,9 +48,6 @@ export default function ProductsPage() {
           updatedAt: data.updatedAt ?? null,
         };
       });
-
-
-
 
       // Categories
       const categoriesSnap = await getDocs(collection(db, "categories"));
@@ -143,63 +121,71 @@ export default function ProductsPage() {
   }
 
   return (
+    <section className="px-6 py-12 max-w-7xl mx-auto">
+      {/* TITLE */}
+      <h1 className="text-center text-3xl tracking-[0.35em] font-light uppercase mb-10">
+        {title}
+      </h1>
+
+      {/* FILTER BAR */}
+      <div className="flex justify-center gap-4 mb-12 flex-wrap">
+        {/* CATEGORY FILTER */}
+        <select
+          value={filterCategory ?? ""}
+          onChange={e =>
+            setFilterCategory(
+              e.target.value || null
+            )
+          }
+          className="border px-4 py-2 rounded-full text-sm"
+        >
+          <option value="">All Categories</option>
+          {categories.map(cat => (
+            <option key={cat.id} value={cat.slug}>
+              {cat.name}
+            </option>
+          ))}
+        </select>
+
+        {/* SORT */}
+        <select
+          value={sort}
+          onChange={e =>
+            setSort(e.target.value as SortType)
+          }
+          className="border px-4 py-2 rounded-full text-sm"
+        >
+          <option value="">Sort By</option>
+          <option value="new">New Arrivals</option>
+          <option value="best">Best Selling</option>
+          <option value="price-high">
+            Price: High → Low
+          </option>
+          <option value="price-low">
+            Price: Low → High
+          </option>
+        </select>
+      </div>
+
+      {/* PRODUCTS */}
+      {visibleProducts.length === 0 ? (
+        <p className="text-center text-gray-500">
+          No products found.
+        </p>
+      ) : (
+        <ProductGrid products={visibleProducts} />
+      )}
+    </section>
+  );
+}
+
+export default function ProductsPage() {
+  return (
     <>
       <Header />
-      <section className="px-6 py-12 max-w-7xl mx-auto">
-        {/* TITLE */}
-        <h1 className="text-center text-3xl tracking-[0.35em] font-light uppercase mb-10">
-          {title}
-        </h1>
-
-        {/* FILTER BAR */}
-        <div className="flex justify-center gap-4 mb-12 flex-wrap">
-          {/* CATEGORY FILTER */}
-          <select
-            value={filterCategory ?? ""}
-            onChange={e =>
-              setFilterCategory(
-                e.target.value || null
-              )
-            }
-            className="border px-4 py-2 rounded-full text-sm"
-          >
-            <option value="">All Categories</option>
-            {categories.map(cat => (
-              <option key={cat.id} value={cat.slug}>
-                {cat.name}
-              </option>
-            ))}
-          </select>
-
-          {/* SORT */}
-          <select
-            value={sort}
-            onChange={e =>
-              setSort(e.target.value as SortType)
-            }
-            className="border px-4 py-2 rounded-full text-sm"
-          >
-            <option value="">Sort By</option>
-            <option value="new">New Arrivals</option>
-            <option value="best">Best Selling</option>
-            <option value="price-high">
-              Price: High → Low
-            </option>
-            <option value="price-low">
-              Price: Low → High
-            </option>
-          </select>
-        </div>
-
-        {/* PRODUCTS */}
-        {visibleProducts.length === 0 ? (
-          <p className="text-center text-gray-500">
-            No products found.
-          </p>
-        ) : (
-          <ProductGrid products={visibleProducts} />
-        )}
-      </section>
+      <Suspense fallback={<p className="text-center mt-20">Loading…</p>}>
+        <ProductsContent />
+      </Suspense>
       <Footer />
     </>
   );
