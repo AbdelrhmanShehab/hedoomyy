@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../lib/firebase";
 import { Product } from "../../data/product";
@@ -20,9 +20,9 @@ type Category = {
   slug: string;
 };
 
-/* ---------------- PAGE ---------------- */
+/* ---------------- CONTENT ---------------- */
 
-export default function ProductsPage() {
+function ProductsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -200,5 +200,15 @@ export default function ProductsPage() {
       </section>
       <Footer />
     </>
+  );
+}
+
+/* ---------------- PAGE ---------------- */
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={<p className="text-center mt-20">Loading products...</p>}>
+      <ProductsContent />
+    </Suspense>
   );
 }
