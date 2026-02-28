@@ -49,8 +49,8 @@ function LoginContent() {
         <div className="absolute inset-0 bg-black/30"></div>
 
         {/* Text */}
-        <div className="absolute bottom-16 left-12 text-white z-10">
-          <h2 className="text-4xl font-light leading-snug">
+        <div className="absolute bottom-[25%] left-16 text-white z-10">
+          <h2 className="text-4xl font-medium leading-snug">
             Enter.
             <br />
             Explore.
@@ -77,18 +77,18 @@ function LoginContent() {
               />
             </div>
             <p className="text-sm text-gray-500">
-              Enter your credentials to login
+              Add your google account to login
             </p>
           </div>
 
-          {/* Input */}
+          {/* Input
           <div className="space-y-4">
             <input
               type="email"
               placeholder="example@gmail.com"
               className="w-full border border-gray-200 p-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-300 transition bg-gray-50/50"
             />
-          </div>
+          </div> */}
 
           {/* Button */}
           <button

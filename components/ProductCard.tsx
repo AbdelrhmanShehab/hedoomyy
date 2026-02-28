@@ -78,11 +78,11 @@ export default function ProductCard({ product }: Props) {
             )}
           </div>
           <div className="" >
-            <p className="mt-4 text-sm text-center">
+            <p className="mt-4 text-sm font-medium text-center">
               {product.title}
             </p>
 
-            <p className="text-sm text-pink-400">
+            <p className="text-sm font-bold text-pink-400">
               {product.price} EGP
             </p>
           </div>
@@ -91,14 +91,14 @@ export default function ProductCard({ product }: Props) {
         <button
           disabled={!hasStock}
           onClick={() => setOpen(true)}
-          className={`mt-3 px-6 py-2 rounded-full text-sm
+          className={`mt-3 px-6 py-4 rounded-full text-sm
             ${hasStock
-              ? "border border-black hover:bg-black hover:text-white"
+              ? "border text-[#DE9DE5] font-medium border-[#DE9DE5] border-2 hover:bg-[#DE9DE5] hover:text-white"
               : "bg-gray-200 text-gray-400 cursor-not-allowed"
             }
           `}
         >
-          Add to Cart
+          Quick Add
         </button>
       </div>
 
