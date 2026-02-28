@@ -1,7 +1,25 @@
 "use client";
 
 import { Suspense, useEffect, useMemo, useState } from "react";
-// ... (rest of imports)
+import { collection, getDocs, where, query } from "firebase/firestore";
+import { db } from "../../lib/firebase";
+import { Product } from "../../data/product";
+import ProductGrid from "../../components/ProductGrid";
+import { useRouter, useSearchParams } from "next/navigation";
+import Header from "../../components/Header";
+import Footer from "../../components/Footer";
+
+/* ---------------- TYPES ---------------- */
+
+type SortType = "" | "new" | "best" | "price-high" | "price-low";
+
+type Category = {
+  id: string;
+  name: string;
+  slug: string;
+};
+
+/* ---------------- COMPONENT ---------------- */
 
 function ProductsContent() {
   const router = useRouter();
