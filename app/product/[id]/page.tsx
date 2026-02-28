@@ -248,7 +248,7 @@ export default function ProductPage() {
               {/* SIZES */}
               <div>
                 <p className="text-lg font-normal text-gray-600 mb-1">Choose Size</p>
-                <p className="text-sm font-light text-gray-400 mb-4">fit up to:</p>
+                <p className="text-sm  text-gray-400 mb-4">fit up to:</p>
                 <div className="flex gap-3 flex-wrap">
                   {allSizes.map(s => {
                     const variantForSize = variants.find(v => v.color === color && v.size === s);
@@ -312,15 +312,15 @@ export default function ProductPage() {
         {/* DETAILED INFO SECTION */}
         <div className="grid md:grid-cols-1 gap-12 mb-24 max-w-4xl">
           <section>
-            <h2 className="text-xl font-medium text-[#262626] mb-4">Description</h2>
-            <div className="text-gray-600 font-light leading-relaxed whitespace-pre-line text-sm">
+            <h2 className="text-xl font-bold text-[#262626] mb-4">Description</h2>
+            <div className="text-gray-600  leading-relaxed whitespace-pre-line text-base ">
               {product.description || "No description available."}
             </div>
           </section>
 
           <section>
-            <h2 className="text-xl font-medium text-[#262626] mb-4">Promises</h2>
-            <p className="text-gray-600 font-light leading-relaxed text-sm">
+            <h2 className="text-xl font-bold text-[#262626] mb-4">Promises</h2>
+            <p className="text-gray-600 leading-relaxed text-base">
               If it&apos;s not exactly like the photo, simply refuse delivery at your door. No hassle, no questions.
             </p>
           </section>
