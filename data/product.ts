@@ -22,6 +22,9 @@ export interface Product {
   status: ProductStatus;
   isBestSeller: boolean;
 
+  originalPrice?: number;
+  offerId?: string;
+
   images: string[];
 
   variants: ProductVariant[];

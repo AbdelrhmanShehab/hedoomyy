@@ -18,11 +18,14 @@ export async function GET() {
       status: data.status ?? "active",
       isBestSeller: data.isBestSeller ?? false,
 
+      originalPrice: data.originalPrice,
+      offerId: data.offerId,
+
       images: data.images
         ? data.images
         : data.imageUrl
-        ? [data.imageUrl]
-        : [],
+          ? [data.imageUrl]
+          : [],
 
       variants: data.variants ?? [],
 

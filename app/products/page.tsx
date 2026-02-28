@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../lib/firebase";
 import { Product } from "../../data/product";
@@ -20,9 +20,9 @@ type Category = {
   slug: string;
 };
 
-/* ---------------- CONTENT ---------------- */
+/* ---------------- PAGE ---------------- */
 
-function ProductsContent() {
+export default function ProductsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -59,6 +59,8 @@ function ProductsContent() {
           price: Number(data.price ?? 0),
           status: data.status ?? "inactive",
           isBestSeller: data.isBestSeller ?? false,
+          originalPrice: data.originalPrice,
+          offerId: data.offerId,
           images: Array.isArray(data.images) ? data.images : [],
           variants: Array.isArray(data.variants) ? data.variants : [],
           createdAt: data.createdAt ?? null,
@@ -200,15 +202,5 @@ function ProductsContent() {
       </section>
       <Footer />
     </>
-  );
-}
-
-/* ---------------- PAGE ---------------- */
-
-export default function ProductsPage() {
-  return (
-    <Suspense fallback={<p className="text-center mt-20">Loading products...</p>}>
-      <ProductsContent />
-    </Suspense>
   );
 }

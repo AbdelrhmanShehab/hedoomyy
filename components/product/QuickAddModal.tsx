@@ -67,9 +67,21 @@ export default function QuickAddModal({
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-white w-[400px] p-6 rounded-2xl">
-        <h3 className="text-lg font-medium mb-4">
-          Select Options
-        </h3>
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-medium">
+            Select Options
+          </h3>
+          <div className="text-right">
+            {product.originalPrice && product.originalPrice > product.price ? (
+              <div className="flex flex-col items-end">
+                <span className="text-[10px] text-gray-400 line-through">Old: {product.originalPrice} EGP</span>
+                <span className="text-sm font-bold text-red-500">New: {product.price} EGP</span>
+              </div>
+            ) : (
+              <span className="text-sm font-bold text-pink-400">{product.price} EGP</span>
+            )}
+          </div>
+        </div>
 
         {/* COLORS */}
         <div className="mb-4">
@@ -91,15 +103,13 @@ export default function QuickAddModal({
                     setSelectedSize("");
                   }}
                   className={`px-3 py-2 border rounded text-sm
-                    ${
-                      selectedColor === color
-                        ? "bg-black text-white"
-                        : ""
+                    ${selectedColor === color
+                      ? "bg-black text-white"
+                      : ""
                     }
-                    ${
-                      !hasStock
-                        ? "opacity-40 cursor-not-allowed"
-                        : ""
+                    ${!hasStock
+                      ? "opacity-40 cursor-not-allowed"
+                      : ""
                     }
                   `}
                 >
@@ -133,15 +143,13 @@ export default function QuickAddModal({
                       setSelectedSize(size)
                     }
                     className={`px-3 py-2 border rounded text-sm
-                      ${
-                        selectedSize === size
-                          ? "bg-black text-white"
-                          : ""
+                      ${selectedSize === size
+                        ? "bg-black text-white"
+                        : ""
                       }
-                      ${
-                        !hasStock
-                          ? "opacity-40 cursor-not-allowed"
-                          : ""
+                      ${!hasStock
+                        ? "opacity-40 cursor-not-allowed"
+                        : ""
                       }
                     `}
                   >
@@ -157,10 +165,9 @@ export default function QuickAddModal({
           disabled={isOutOfStock}
           onClick={handleAdd}
           className={`w-full py-3 rounded-full
-            ${
-              !selectedVariant
-                ? "bg-gray-200 text-gray-400"
-                : isOutOfStock
+            ${!selectedVariant
+              ? "bg-gray-200 text-gray-400"
+              : isOutOfStock
                 ? "bg-gray-300 text-gray-500"
                 : "bg-black text-white"
             }
@@ -169,8 +176,8 @@ export default function QuickAddModal({
           {!selectedVariant
             ? "Select Options"
             : isOutOfStock
-            ? "Out of Stock"
-            : "Add to Cart"}
+              ? "Out of Stock"
+              : "Add to Cart"}
         </button>
 
         <button

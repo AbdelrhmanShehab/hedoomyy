@@ -41,7 +41,14 @@ export default function NewArrivals({ products }: Props) {
           {/* HOVER OVERLAY */}
           {!isSold && (
             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center text-white p-4">
-              <p className="text-2xl font-semibold mb-4">{product.price} EGP</p>
+              <div className="flex items-center gap-3 mb-4">
+                <p className="text-2xl font-semibold">{product.price} EGP</p>
+                {product.originalPrice && (
+                  <p className="text-lg text-white/70 line-through">
+                    {product.originalPrice} EGP
+                  </p>
+                )}
+              </div>
               <button
                 onClick={(e) => {
                   e.preventDefault();

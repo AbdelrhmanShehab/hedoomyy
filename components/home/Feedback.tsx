@@ -1,5 +1,5 @@
 import Image from "next/image";
-import feedbacks from "../../data/feedback";   
+import feedbacks from "../../data/feedback";
 export default function Feedback() {
     return (
         <section className="relative w-full min-h-[900px] flex flex-col justify-center items-center py-40">

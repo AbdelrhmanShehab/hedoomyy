@@ -9,7 +9,7 @@
   font-family: var(--font-quicksand);
 }
 
-.container {
+.mainContainer {
   /* to make padding works even in mobile size screens */
   padding-right: 6px;
   padding-left: 6px;
@@ -18,7 +18,7 @@
   margin-left: auto;
   /* set the width for the container */
   /* width: calc( 100% - 200px );  */
-  width: 100%;
+  width: 84%;
   position: relative;
 }
 

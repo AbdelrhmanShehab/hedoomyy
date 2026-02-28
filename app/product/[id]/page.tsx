@@ -217,9 +217,28 @@ export default function ProductPage() {
               </button>
             </div>
 
-            <p className="text-2xl font-normal text-gray-800 mb-10">
-              EGP {product.price}
-            </p>
+            <div className="flex flex-col gap-2 mb-10">
+              {product.originalPrice ? (
+                <>
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm text-gray-500 font-medium uppercase tracking-wider">Old Price:</span>
+                    <p className="text-xl text-gray-400 line-through font-light">
+                      EGP {product.originalPrice}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm text-red-500 font-bold uppercase tracking-wider">New Price:</span>
+                    <p className="text-3xl font-bold text-red-600">
+                      EGP {product.price}
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <p className="text-2xl font-normal text-gray-800">
+                  EGP {product.price}
+                </p>
+              )}
+            </div>
 
             <div className="space-y-10">
               {/* COLORS */}

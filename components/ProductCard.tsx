@@ -37,12 +37,19 @@ export default function ProductCard({ product }: Props) {
     <>
       <div className="group flex flex-col items-center transition hover:-translate-y-1 relative">
 
-        {/* BEST SELLER BADGE */}
-        {product.isBestSeller && (
-          <div className="absolute top-3 left-3 bg-black text-white text-xs px-3 py-1 rounded-full z-10">
-            BEST SELLER
-          </div>
-        )}
+        {/* BADGES */}
+        <div className="absolute top-3 left-3 flex flex-col gap-2 z-10">
+          {product.isBestSeller && (
+            <div className="bg-black text-white text-xs px-3 py-1 rounded-full w-max">
+              BEST SELLER
+            </div>
+          )}
+          {product.originalPrice && product.originalPrice > product.price && (
+            <div className="bg-red-500 text-white text-xs px-3 py-1 rounded-full w-max">
+              SALE
+            </div>
+          )}
+        </div>
 
         {/* FAVORITES TOGGLE */}
         <button
@@ -82,9 +89,28 @@ export default function ProductCard({ product }: Props) {
               {product.title}
             </p>
 
-            <p className="text-sm font-bold text-pink-400">
-              {product.price} EGP
-            </p>
+            <div className="flex flex-col items-center justify-center gap-1 mt-1">
+              {product.originalPrice && product.originalPrice > product.price ? (
+                <>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-gray-400 font-medium uppercase">Old:</span>
+                    <p className="text-xs text-gray-400 line-through font-medium">
+                      {product.originalPrice} EGP
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-red-500 font-bold uppercase">New:</span>
+                    <p className="text-sm font-bold text-red-500">
+                      {product.price} EGP
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <p className="text-sm font-bold text-pink-400">
+                  {product.price} EGP
+                </p>
+              )}
+            </div>
           </div>
         </Link>
 

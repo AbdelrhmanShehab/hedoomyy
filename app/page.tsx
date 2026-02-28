@@ -32,7 +32,7 @@ export default async function Home() {
         priority
         sizes="100vw"
       />
-      <main className="flex-grow container">
+      <main className="mainContainer">
         <Hero />
         <Categories categories={categories} />
         <NewArrivals products={newArrivals as Product[]} />

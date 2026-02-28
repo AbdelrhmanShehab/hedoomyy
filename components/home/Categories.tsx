@@ -16,12 +16,12 @@ export default function Categories({ categories }: Props) {
 
   return (
     <section className="py-10">
-      <h2 className="mb-6 text-xl font-medium text-zinc-900">
+      <h2 className="mb-6 text-2xl font-medium text-zinc-900">
         Explore Categories
       </h2>
 
-      <div className="flex gap-4 overflow-x-auto pb-6 scrollbar-hide -mx-2 px-2 md:mx-0 md:px-0">
-        {categories.map(cat => (
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6 w-full">
+        {categories.slice(0, 5).map(cat => (
           <CategoryCard
             key={cat.id}
             title={`Shop ${cat.name}`}
