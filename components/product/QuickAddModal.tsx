@@ -52,13 +52,16 @@ export default function QuickAddModal({
 
     addItem({
       productId: product.id,
-      variantId: selectedVariant.id,
+      variantId:
+        selectedVariant.id ||
+        `${selectedVariant.color}-${selectedVariant.size}`,
       title: product.title,
       price: product.price,
       image: product.images?.[0] ?? "/1.png",
       color: selectedVariant.color,
       size: selectedVariant.size,
       qty: 1,
+      stock: selectedVariant.stock,
     });
 
     onClose();

@@ -37,7 +37,11 @@ export function CartProvider({
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
-      setItems(JSON.parse(saved));
+      const parsed = JSON.parse(saved) as CartItem[];
+      setItems(parsed.map(item => ({
+        ...item,
+        variantId: item.variantId || `${item.color}-${item.size}`
+      })));
     }
   }, []);
 
@@ -59,15 +63,28 @@ export function CartProvider({
       );
 
       if (existing) {
-        return prev.map(i =>
-          i.productId === item.productId &&
+        return prev.map(i => {
+          if (
+            i.productId === item.productId &&
             i.variantId === item.variantId
-            ? { ...i, qty: i.qty + item.qty }
-            : i
-        );
+          ) {
+            const newQty = i.qty + item.qty;
+            const cappedQty =
+              item.stock !== undefined
+                ? Math.min(newQty, item.stock)
+                : newQty;
+            return { ...i, qty: cappedQty };
+          }
+          return i;
+        });
       }
 
-      return [...prev, item];
+      const newItemQty =
+        item.stock !== undefined
+          ? Math.min(item.qty, item.stock)
+          : item.qty;
+
+      return [...prev, { ...item, qty: newItemQty }];
     });
 
     setIsOpen(true);

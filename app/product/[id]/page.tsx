@@ -15,6 +15,7 @@ import { ChevronLeft, ChevronRight, Heart, Truck, ShoppingBag } from "lucide-rea
 import ProductSlider from "@/components/ProductSlider";
 import { Benne } from "next/font/google";
 import { useFavorites } from "@/context/FavoritesContext";
+import useEmblaCarousel from "embla-carousel-react";
 
 const benne = Benne({
   weight: "400",
@@ -38,6 +39,26 @@ export default function ProductPage() {
   const [qty, setQty] = useState(1);
   const { toggleFavorite, isFavorite } = useFavorites();
   const isWishlisted = isFavorite(id);
+
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
+
+  useEffect(() => {
+    if (emblaApi) {
+      emblaApi.scrollTo(selectedImage);
+    }
+  }, [selectedImage, emblaApi]);
+
+  useEffect(() => {
+    if (emblaApi) {
+      const onSelect = () => {
+        setSelectedImage(emblaApi.selectedScrollSnap());
+      };
+      emblaApi.on("select", onSelect);
+      return () => {
+        emblaApi.off("select", onSelect);
+      }
+    }
+  }, [emblaApi]);
 
   /* ---------------- FETCH PRODUCT & RELATED ---------------- */
 
@@ -139,24 +160,30 @@ export default function ProductPage() {
 
     addItem({
       productId: product.id,
-      variantId: selectedVariant.id,
+      variantId: selectedVariant.id || `${color}-${size}`,
       title: product.title,
       price: product.price,
       image: product.images?.[0] ?? "/1.png",
       color,
       size,
       qty,
+      stock: variantStock,
     });
 
     openCart();
   };
 
-  const nextImage = () => {
-    setSelectedImage((prev) => (prev + 1) % (product.images?.length || 1));
+  const prevImage = () => {
+    if (emblaApi) emblaApi.scrollPrev();
   }
 
-  const prevImage = () => {
-    setSelectedImage((prev) => (prev - 1 + (product.images?.length || 1)) % (product.images?.length || 1));
+  const nextImage = () => {
+    if (emblaApi) emblaApi.scrollNext();
+  }
+
+  const scrollTo = (index: number) => {
+    setSelectedImage(index);
+    if (emblaApi) emblaApi.scrollTo(index);
   }
 
   const images = product.images ?? ["/1.png"];
@@ -170,34 +197,59 @@ export default function ProductPage() {
 
           {/* IMAGE SECTION */}
           <div className="space-y-6">
-            <div className="relative group aspect-[3/4] rounded-3xl overflow-hidden bg-gray-50 shadow-sm border border-gray-100">
-              <Image
-                src={images[selectedImage]}
-                alt={product.title}
-                fill
-                className="object-cover"
-                priority
-              />
+            <div className="relative group">
+              <div className="overflow-hidden rounded-3xl bg-gray-50 shadow-sm border border-gray-100" ref={emblaRef}>
+                <div className="flex">
+                  {images.map((img, index) => (
+                    <div key={index} className="flex-[0_0_100%] min-w-0 relative aspect-[3/4]">
+                      <Image
+                        src={img}
+                        alt={`${product.title} - ${index}`}
+                        fill
+                        className="object-cover"
+                        priority={index === 0}
+                      />
+                    </div>
+                  ))}
+                </div>
 
-              {/* SLIDER ARROWS */}
-              {images.length > 1 && (
-                <>
-                  <button
-                    onClick={prevImage}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 backdrop-blur-sm shadow-md rounded-full flex items-center justify-center text-gray-600 hover:bg-white transition-all scale-0 group-hover:scale-100 opacity-0 group-hover:opacity-100"
-                  >
-                    <ChevronLeft size={24} />
-                  </button>
-                  <button
-                    onClick={nextImage}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 backdrop-blur-sm shadow-md rounded-full flex items-center justify-center text-gray-600 hover:bg-white transition-all scale-0 group-hover:scale-100 opacity-0 group-hover:opacity-100"
-                  >
-                    <ChevronRight size={24} />
-                  </button>
-                </>
-              )}
+                {/* SLIDER ARROWS (Desktop only) */}
+                {images.length > 1 && (
+                  <>
+                    <button
+                      onClick={prevImage}
+                      className="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 backdrop-blur-sm shadow-md rounded-full items-center justify-center text-gray-600 hover:bg-white transition-all scale-0 group-hover:scale-100 opacity-0 group-hover:opacity-100 z-10"
+                    >
+                      <ChevronLeft size={24} />
+                    </button>
+                    <button
+                      onClick={nextImage}
+                      className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 backdrop-blur-sm shadow-md rounded-full items-center justify-center text-gray-600 hover:bg-white transition-all scale-0 group-hover:scale-100 opacity-0 group-hover:opacity-100 z-10"
+                    >
+                      <ChevronRight size={24} />
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
-            <p className={`${benne.className} text-center text-[#DE9DE5] text-4xl font-bold tracking-wide italic`}>
+
+            {/* THUMBNAILS */}
+            {images.length > 1 && (
+              <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar justify-center md:justify-start">
+                {images.map((img, index) => (
+                  <button
+                    key={index}
+                    onClick={() => scrollTo(index)}
+                    className={`relative w-20 aspect-[3/4] rounded-xl overflow-hidden border-2 transition-all flex-shrink-0 ${selectedImage === index ? "border-[#DE9DE5]" : "border-transparent"
+                      }`}
+                  >
+                    <Image src={img} alt="thumbnail" fill className="object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
+
+            <p className={`${benne.className} text-center md:text-left text-[#DE9DE5] text-4xl font-bold tracking-wide italic`}>
               Real people. Real clothes.
             </p>
           </div>
@@ -251,7 +303,7 @@ export default function ProductPage() {
                     return (
                       <button
                         key={c}
-                        onClick={() => { setColor(c); setSize(""); }}
+                        onClick={() => { setColor(c); setSize(""); setQty(1); }}
                         className={`min-w-[80px] h-12 rounded-xl border flex items-center justify-center px-4 transition-all
                           ${isActive ? "bg-[#DE9DE5] border-[#DE9DE5] text-white shadow-md" : "border-gray-300 text-gray-700 hover:border-[#DE9DE5]"}
                           ${!hasStockForColor ? "opacity-40 cursor-not-allowed" : ""}
@@ -276,7 +328,7 @@ export default function ProductPage() {
                     return (
                       <button
                         key={s}
-                        onClick={() => setSize(s)}
+                        onClick={() => { setSize(s); setQty(1); }}
                         className={`min-w-[80px] h-12 rounded-xl border flex items-center justify-center px-4 transition-all
                           ${isActive ? "bg-[#DE9DE5] border-[#DE9DE5] text-white shadow-md" : "border-gray-300 text-gray-700 hover:border-[#DE9DE5]"}
                           ${!hasStock ? "opacity-40 cursor-not-allowed" : ""}
@@ -287,6 +339,12 @@ export default function ProductPage() {
                     );
                   })}
                 </div>
+                {isVariantSelected && (
+                  <p className="mt-4 text-sm font-semibold text-[#DE9DE5] flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-[#DE9DE5] animate-pulse"></span>
+                    Only {variantStock} left in stock for this selection
+                  </p>
+                )}
               </div>
 
               {/* SHIPPING INFO */}
@@ -352,7 +410,7 @@ export default function ProductPage() {
             <ProductSlider products={relatedProducts} />
           </section>
         )}
-      </main>
+      </main >
 
       <Footer />
     </>
