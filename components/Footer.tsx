@@ -67,10 +67,10 @@ export default function Footer() {
           </p>
 
           <div className="flex items-center gap-4">
-            <Link href="https://instagram.com" target="_blank">
+            <Link href="https://www.instagram.com/hedoomyy/" target="_blank">
               <Instagram className="h-5 w-5" />
             </Link>
-            <Link href="https://tiktok.com" target="_blank">
+            <Link href="https://www.tiktok.com/@hedoomyy" target="_blank">
               <Music2 className="h-5 w-5" />
             </Link>
           </div>

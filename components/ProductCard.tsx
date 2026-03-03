@@ -69,7 +69,7 @@ export default function ProductCard({ product }: Props) {
           href={`/product/${product.id}`}
           className="w-full flex flex-col items-center"
         >
-          <div className="w-full h-[390px] relative rounded-2xl overflow-hidden">
+          <div className="w-full h-[390px] relative rounded-2xl overflow-hidden min-w-[260px]">
             <Image
               src={imageSrc}
               alt={product.title}

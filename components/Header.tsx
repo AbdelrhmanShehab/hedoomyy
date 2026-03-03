@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { User, ShoppingBag, Menu, X, Heart } from "lucide-react";
+import { User, ShoppingBag, Menu, X, Heart, Music2 } from "lucide-react";
 import useCategories from "../usecategories";
 import callIcon from "../public/calIIcon.svg";
 import instagramIcon from "../public/instagramIcon.svg";
@@ -36,11 +36,12 @@ export default function Header() {
               <Image src={callIcon} alt="Call" width={16} height={16} />
               <span className="hidden sm:inline">+01141088386</span>
             </span>
-
-            <span className="flex items-center gap-2">
-              <Image src={instagramIcon} alt="Instagram" width={16} height={16} />
-              <span className="font-bold">Hedoomyy</span>
-            </span>
+            <Link href="https://www.instagram.com/hedoomyy/" target="_blank">
+              <span className="flex items-center gap-2 ">
+                <Image src={instagramIcon} alt="Instagram" width={16} height={16} />
+                <span className="font-bold">Hedoomyy</span>
+              </span>
+            </Link>
           </div>
 
           {/* Center Text */}

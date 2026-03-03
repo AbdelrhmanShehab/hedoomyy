@@ -18,7 +18,7 @@ export default function CategoryCard({ title, image, href }: Props) {
       href={href}
       className="group flex flex-col items-center gap-2 w-full flex-shrink-0"
     >
-      <div className="relative aspect-square w-full overflow-hidden rounded-full bg-zinc-100 border-2 border-transparent group-hover:border-pink-200 transition-all duration-300">
+      <div className="relative aspect-square w-full overflow-hidden rounded-full bg-zinc-100 border-2 border-transparent group-hover:border-pink-200 transition-all duration-300 min-w-[100px]">
         <Image
           src={image}
           alt={title}

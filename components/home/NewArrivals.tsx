@@ -24,7 +24,7 @@ export default function NewArrivals({ products }: Props) {
     );
   };
 
-  const renderProduct = (product: Product, isBig: boolean = false) => {
+  const renderProduct = (product: Product) => {
     const totalStock = getStock(product);
     const isSold = totalStock === 0 || product.status !== "active";
     const hasDiscount =
@@ -32,14 +32,9 @@ export default function NewArrivals({ products }: Props) {
       product.originalPrice > product.price;
 
     return (
-      <div key={product.id} className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2">
         {/* IMAGE CARD */}
-        <div
-          className={`relative group overflow-hidden rounded-xl bg-zinc-100 ${isBig
-              ? "aspect-[4/5] md:aspect-auto md:h-full"
-              : "aspect-[4/5]"
-            }`}
-        >
+        <div className="relative group overflow-hidden rounded-xl bg-zinc-100 aspect-[4/5]">
           <Link
             href={`/product/${product.id}`}
             className="block w-full h-full"
@@ -48,12 +43,7 @@ export default function NewArrivals({ products }: Props) {
               src={product.images?.[0] ?? "/1.png"}
               alt={product.title}
               fill
-              priority={isBig}
-              sizes={
-                isBig
-                  ? "(max-width: 768px) 100vw, 50vw"
-                  : "(max-width: 768px) 50vw, 25vw"
-              }
+              sizes="(max-width: 768px) 50vw, 25vw"
               className="object-cover transition-transform duration-700 group-hover:scale-105"
             />
 
@@ -64,7 +54,7 @@ export default function NewArrivals({ products }: Props) {
               </div>
             )}
 
-            {/* MOBILE QUICK ADD BUTTON */}
+            {/* MOBILE QUICK ADD */}
             {!isSold && (
               <button
                 onClick={(e) => {
@@ -116,15 +106,23 @@ export default function NewArrivals({ products }: Props) {
 
   return (
     <section className="w-full px-5 py-10">
-      <h2 className="mb-6 text-2xl font-medium">
-        Explore New Arrivals
-      </h2>
+      <div className="flex items-baseline justify-between mb-6">
+        <h2 className="text-2xl font-medium">
+          Explore New Arrivals
+        </h2>
+        <Link
+          href="/products?sort=new"
+          className="text-sm font-medium text-zinc-600 hover:text-black transition-colors underline underline-offset-4"
+        >
+          See More
+        </Link>
+      </div>
 
-      {/* GRID LAYOUT */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 md:auto-rows-[1fr]">
+      {/* GRID */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
         {/* BIG PRODUCT */}
         <div className="col-span-2 row-span-2">
-          {renderProduct(bigProduct, true)}
+          {renderProduct(bigProduct)}
         </div>
 
         {/* SMALL PRODUCTS */}

@@ -25,13 +25,14 @@ function ProductsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const urlCategory = searchParams.get("category");
+  const urlCategory = searchParams.get("category") || null;
+  const urlSort = (searchParams.get("sort") || "") as SortType;
 
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const [sort, setSort] = useState<SortType>("");
+  const [sort, setSort] = useState<SortType>(urlSort);
   const [filterCategory, setFilterCategory] = useState<string | null>(
     urlCategory
   );
@@ -85,12 +86,13 @@ function ProductsContent() {
   /* ---------------- SYNC URL ---------------- */
 
   useEffect(() => {
-    if (filterCategory) {
-      router.push(`/products?category=${filterCategory}`);
-    } else {
-      router.push("/products");
-    }
-  }, [filterCategory, router]);
+    const params = new URLSearchParams();
+    if (filterCategory) params.set("category", filterCategory);
+    if (sort) params.set("sort", sort);
+
+    const queryString = params.toString();
+    router.push(queryString ? `/products?${queryString}` : "/products");
+  }, [filterCategory, sort, router]);
 
   /* ---------------- FILTER + SORT ---------------- */
 

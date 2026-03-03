@@ -48,7 +48,7 @@ export default function CategorySlider({ categories }: Props) {
             {/* Slider */}
             <div
                 ref={scrollRef}
-                className="flex gap-4 md:gap-6 overflow-x-auto md:overflow-hidden scroll-smooth no-scrollbar px-4 md:px-10"
+                className="flex gap-8 md:gap-6 overflow-x-auto md:overflow-hidden scroll-smooth no-scrollbar px-4 md:px-10"
             >
                 {categories.map((cat) => (
                     <div

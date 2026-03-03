@@ -11,8 +11,8 @@
 
 .mainContainer {
   /* to make padding works even in mobile size screens */
-  padding-right: 6px;
-  padding-left: 6px;
+  padding-right: 2px;
+  padding-left: 2px;
   /* to set all elements in the center vertically */
   margin-right: auto;
   margin-left: auto;
