@@ -47,7 +47,7 @@ export default function ProductSlider({ products }: Props) {
                 {products.map((product) => (
                     <div
                         key={product.id}
-                        className="min-w-[70%] sm:min-w-[45%] md:min-w-[260px] lg:min-w-[280px]"
+                        className="min-w-[70%] sm:min-w-[45%] md:min-w-[calc(25%-18px)] lg:min-w-[calc(20%-20px)] transition-all duration-300"
                     >
                         <ProductCard product={product} />
                     </div>

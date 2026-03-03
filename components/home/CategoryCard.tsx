@@ -10,22 +10,25 @@ type Props = {
 };
 
 export default function CategoryCard({ title, image, href }: Props) {
+  // Extract just the category name from "Shop CategoryName" if needed
+  const displayName = title.replace("Shop ", "");
+
   return (
     <Link
       href={href}
-      className="group block w-[45vw] sm:w-[30vw] md:w-[22%] min-w-[280px] flex-shrink-0"
+      className="group flex flex-col items-center gap-2 w-full flex-shrink-0"
     >
-      <div className="relative md:h-[420px] h-[360px] w-full overflow-hidden rounded-2xl bg-zinc-100">
+      <div className="relative aspect-square w-full overflow-hidden rounded-full bg-zinc-100 border-2 border-transparent group-hover:border-pink-200 transition-all duration-300">
         <Image
           src={image}
           alt={title}
           fill
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
+          className="object-cover transition-transform duration-500 group-hover:scale-110"
         />
       </div>
 
-      <p className="mt-3 text-sm text-zinc-700">
-        {title} →
+      <p className="text-[11px] md:text-sm font-medium text-zinc-600 text-center truncate w-full px-1">
+        {displayName}
       </p>
     </Link>
   );

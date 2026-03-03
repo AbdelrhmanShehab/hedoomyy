@@ -23,6 +23,13 @@
 }
 
 
+@media (max-width: 768px) {
+  .mainContainer {
+    width: 100%;
+  }
+}
+
+
 /* Hide scrollbar everywhere */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
