@@ -32,10 +32,10 @@ export default function Header() {
 
           {/* Left Side */}
           <div className="flex items-center gap-6">
-            <span className="flex items-center gap-2">
+            <a href="tel:+01141088386" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
               <Image src={callIcon} alt="Call" width={16} height={16} />
               <span className="hidden sm:inline">+01141088386</span>
-            </span>
+            </a>
             <Link href="https://www.instagram.com/hedoomyy/" target="_blank">
               <span className="flex items-center gap-2 ">
                 <Image src={instagramIcon} alt="Instagram" width={16} height={16} />
@@ -50,12 +50,19 @@ export default function Header() {
           </span>
 
           {/* Right Side */}
-          <div className="hidden md:flex items-center gap-3 text-s">
-            <a href="/policy" className="hover:underline">FAQs</a>
-            <span className="text-white/60">|</span>
-            <a href="/policy" className="hover:underline">Return & Exchange</a>
-            <span className="text-white/60">|</span>
-            <a href="/policy" className="hover:underline">Delivery</a>
+          <div className="flex items-center gap-3 text-s">
+            {/* Desktop Links */}
+            <div className="hidden md:flex items-center gap-3">
+              <a href="/policy" className="hover:underline">FAQs</a>
+              <span className="text-white/60">|</span>
+              <a href="/policy" className="hover:underline">Return & Exchange</a>
+              <span className="text-white/60">|</span>
+              <a href="/policy" className="hover:underline">Delivery</a>
+            </div>
+            {/* Mobile Link */}
+            <div className="md:hidden">
+              <Link href="/policy" className="hover:underline font-bold">Our Policy</Link>
+            </div>
           </div>
 
         </div>

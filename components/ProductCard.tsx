@@ -38,14 +38,14 @@ export default function ProductCard({ product }: Props) {
       <div className="group flex flex-col items-center transition hover:-translate-y-1 relative">
 
         {/* BADGES */}
-        <div className="absolute top-3 left-3 flex flex-col gap-2 z-10">
+        <div className="absolute top-2 left-2 md:top-3 md:left-3 flex flex-col gap-1.5 md:gap-2 z-10">
           {product.isBestSeller && (
-            <div className="bg-black text-white text-xs px-3 py-1 rounded-full w-max">
+            <div className="bg-black text-white text-[10px] md:text-xs px-2 md:px-3 py-0.5 md:py-1 rounded-full w-max font-medium">
               BEST SELLER
             </div>
           )}
           {product.originalPrice && product.originalPrice > product.price && (
-            <div className="bg-red-500 text-white text-xs px-3 py-1 rounded-full w-max">
+            <div className="bg-red-500 text-white text-[10px] md:text-xs px-2 md:px-3 py-0.5 md:py-1 rounded-full w-max font-medium">
               SALE
             </div>
           )}
@@ -57,11 +57,11 @@ export default function ProductCard({ product }: Props) {
             e.preventDefault();
             toggleFavorite(product.id);
           }}
-          className="absolute top-3 right-3 bg-white/80 backdrop-blur-sm p-2 rounded-full z-10 transition hover:bg-white shadow-sm"
+          className="absolute top-2 right-2 md:top-3 md:right-3 bg-white/80 backdrop-blur-sm p-1.5 md:p-2 rounded-full z-10 transition hover:bg-white shadow-sm"
           aria-label={isFavorited ? "Remove from favorites" : "Add to favorites"}
         >
           <Heart
-            className={`w-5 h-5 transition-colors ${isFavorited ? "text-pink-400 fill-pink-400" : "text-gray-400"}`}
+            className={`w-4 h-4 md:w-5 h-5 transition-colors ${isFavorited ? "text-pink-400 fill-pink-400" : "text-gray-400"}`}
           />
         </button>
 
@@ -69,44 +69,44 @@ export default function ProductCard({ product }: Props) {
           href={`/product/${product.id}`}
           className="w-full flex flex-col items-center"
         >
-          <div className="w-full h-[390px] relative rounded-2xl overflow-hidden min-w-[260px]">
+          <div className="w-full aspect-[3/4.2] relative rounded-2xl overflow-hidden">
             <Image
               src={imageSrc}
               alt={product.title}
               fill
-              sizes="(max-width:768px) 100vw, 260px"
+              sizes="(max-width:768px) 50vw, 300px"
               className="object-cover transition group-hover:scale-105"
             />
 
             {!hasStock && (
-              <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white">
+              <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white text-xs md:text-base">
                 Out of Stock
               </div>
             )}
           </div>
-          <div className="" >
-            <p className="mt-4 text-sm font-medium text-center">
+          <div className="w-full" >
+            <p className="mt-4 text-xs md:text-sm font-medium text-center truncate px-2">
               {product.title}
             </p>
 
-            <div className="flex flex-col items-center justify-center gap-1 mt-1">
+            <div className="flex flex-col items-center justify-center gap-0.5 md:gap-1 mt-1">
               {product.originalPrice && product.originalPrice > product.price ? (
                 <>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] text-gray-400 font-medium uppercase">Old:</span>
-                    <p className="text-xs text-gray-400 line-through font-medium">
+                  <div className="flex items-center gap-1.5 md:gap-2">
+                    <span className="text-[9px] md:text-[10px] text-gray-400 font-medium uppercase">Old:</span>
+                    <p className="text-[10px] md:text-xs text-gray-400 line-through font-medium">
                       {product.originalPrice} EGP
                     </p>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] text-red-500 font-bold uppercase">New:</span>
-                    <p className="text-sm font-bold text-red-500">
+                  <div className="flex items-center gap-1.5 md:gap-2">
+                    <span className="text-[9px] md:text-[10px] text-red-500 font-bold uppercase">New:</span>
+                    <p className="text-[12px] md:text-sm font-bold text-red-500">
                       {product.price} EGP
                     </p>
                   </div>
                 </>
               ) : (
-                <p className="text-sm font-bold text-pink-400">
+                <p className="text-[12px] md:text-sm font-bold text-pink-400">
                   {product.price} EGP
                 </p>
               )}
@@ -117,7 +117,7 @@ export default function ProductCard({ product }: Props) {
         <button
           disabled={!hasStock}
           onClick={() => setOpen(true)}
-          className={`mt-3 px-6 py-4 rounded-full text-sm
+          className={`mt-3 px-4 md:px-6 py-2.5 md:py-4 rounded-full text-[12px] md:text-sm
             ${hasStock
               ? "border text-[#DE9DE5] font-medium border-[#DE9DE5] border-2 hover:bg-[#DE9DE5] hover:text-white"
               : "bg-gray-200 text-gray-400 cursor-not-allowed"

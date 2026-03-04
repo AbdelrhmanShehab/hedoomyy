@@ -90,15 +90,11 @@ const POLICIES: Record<PolicyKey, { title: string; faqs: any[] }> = {
       },
       {
         q: "Is the deposit refundable?",
-        a: "Deposits are non-refundable once the order is confirmed, as production starts immediately.",
+        a: "Deposits are non-refundable once the order is confirmed, as production starts immediately. (unless there is a defect in the product).",
       },
       {
         q: "When do I pay the remaining balance?",
         a: "The remaining balance must be paid upon delivery.",
-      },
-      {
-        q: "What happens if I cancel my order?",
-        a: "If an order is canceled after confirmation, the deposit will not be refunded.",
       },
     ],
   },
@@ -141,8 +137,18 @@ export default function ContactPage() {
             <div>
               <p className="text-gray-500 mb-2">Our Social Media:</p>
               <div className="flex gap-4 text-gray-600">
-                <Instagram />
-                <Music2 />
+                <Link
+                  href="https://www.instagram.com/hedoomyy/"
+                  target="_blank"
+                >
+                  <Instagram className="hover:text-pink-600 transition-colors" />
+                </Link>
+                <Link
+                  href="https://www.tiktok.com/@hedoomyy?fbclid=PAZXh0bgNhZW0CMTEAc3J0YwZhcHBfaWQMMjU2MjgxMDQwNTU4AAGnJ6MOZl8F0cgrJZNUxe0oMtg5ex9HQ1yBzfOt1MpX5yvEOs_araEV3cm0m9I_aem_qQ7jxkVHYc2Tjeu0wMXlyA"
+                  target="_blank"
+                >
+                  <Music2 className="hover:text-black transition-colors" />
+                </Link>
               </div>
             </div>
           </div>

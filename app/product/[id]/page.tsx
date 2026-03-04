@@ -188,6 +188,27 @@ export default function ProductPage() {
 
   const images = product.images ?? ["/1.png"];
 
+  /* ---------------- SHARE ---------------- */
+
+  const handleShare = async () => {
+    const shareData = {
+      title: product.title,
+      text: `Check out this ${product.title} at Hedoomyy!`,
+      url: window.location.href,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(window.location.href);
+        alert("Link copied to clipboard!");
+      }
+    } catch (err) {
+      console.error("Error sharing:", err);
+    }
+  };
+
   return (
     <>
       <Header />
@@ -249,8 +270,8 @@ export default function ProductPage() {
               </div>
             )}
 
-            <p className={`${benne.className} text-center md:text-left text-[#DE9DE5] text-4xl font-bold tracking-wide italic`}>
-              Real people. Real clothes.
+            <p className={`${benne.className} text-center md:text-left text-[#DE9DE5] text-2xl font-bold tracking-wide italic`}>
+              Designed for Her, Inspired by Her.
             </p>
           </div>
 
@@ -376,8 +397,11 @@ export default function ProductPage() {
               {/* SHARE */}
               <div className="pt-2">
                 <p className="text-sm text-gray-500">
-                  Loved it?{" "}
-                  <button className="text-[#DE9DE5] underline decoration-[#DE9DE5]/40 underline-offset-4 hover:decoration-[#DE9DE5] transition-all">
+                  Loved it? {" "}
+                  <button
+                    onClick={handleShare}
+                    className="cursor-pointer text-[#DE9DE5] underline decoration-[#DE9DE5]/40 underline-offset-4 hover:decoration-[#DE9DE5] transition-all"
+                  >
                     Share with your friends
                   </button>
                 </p>
@@ -389,14 +413,14 @@ export default function ProductPage() {
         {/* DETAILED INFO SECTION */}
         <div className="grid md:grid-cols-1 gap-12 mb-24 max-w-4xl">
           <section>
-            <h2 className="text-xl font-bold text-[#262626] mb-4">Description</h2>
+            <h2 className="text-xl font-bold text-[#262626] mb-2">Description</h2>
             <div className="text-gray-600  leading-relaxed whitespace-pre-line text-base ">
               {product.description || "No description available."}
             </div>
           </section>
 
           <section>
-            <h2 className="text-xl font-bold text-[#262626] mb-4">Promises</h2>
+            <h2 className="text-xl font-bold text-[#262626] mb-2">Promises</h2>
             <p className="text-gray-600 leading-relaxed text-base">
               If it&apos;s not exactly like the photo, simply refuse delivery at your door. No hassle, no questions.
             </p>

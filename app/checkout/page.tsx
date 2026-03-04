@@ -57,6 +57,7 @@ export default function CheckoutPage() {
     !!order.delivery.lastName &&
     !!order.delivery.city &&
     !!order.delivery.government &&
+    !!order.delivery.apartment &&
     !!order.payment &&
     order.items.length > 0;
 
@@ -70,6 +71,7 @@ export default function CheckoutPage() {
     if (!order.delivery.lastName) newErrors.lastName = "Last name required";
     if (!order.delivery.city) newErrors.city = "City is required";
     if (!order.delivery.government) newErrors.government = "Government is required";
+    if (!order.delivery.apartment) newErrors.apartment = "Apartment is required";
     if (!order.payment) newErrors.payment = "Select payment method";
 
     if (Object.keys(newErrors).length > 0) {
@@ -94,7 +96,7 @@ export default function CheckoutPage() {
           disabled={!isFormValid}
           className={`w-full rounded-full py-4 font-medium transition
             ${isFormValid
-              ? "bg-purple-300 hover:bg-purple-400 text-white"
+              ? "bg-purple-400 hover:bg-purple-300 text-white"
               : "bg-gray-200 text-gray-400 cursor-not-allowed"
             }`}
         >

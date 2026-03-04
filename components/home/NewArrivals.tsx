@@ -24,7 +24,7 @@ export default function NewArrivals({ products }: Props) {
     );
   };
 
-  const renderProduct = (product: Product) => {
+  const renderProduct = (product: Product, isBig?: boolean) => {
     const totalStock = getStock(product);
     const isSold = totalStock === 0 || product.status !== "active";
     const hasDiscount =
@@ -32,9 +32,9 @@ export default function NewArrivals({ products }: Props) {
       product.originalPrice > product.price;
 
     return (
-      <div className="flex flex-col gap-2">
+      <div className={`flex flex-col gap-2 ${isBig ? "h-full" : ""}`}>
         {/* IMAGE CARD */}
-        <div className="relative group overflow-hidden rounded-xl bg-zinc-100 aspect-[4/5]">
+        <div className={`relative group overflow-hidden rounded-xl bg-zinc-100 ${isBig ? "flex-1 min-h-0" : "aspect-[5/5]"}`}>
           <Link
             href={`/product/${product.id}`}
             className="block w-full h-full"
@@ -43,9 +43,25 @@ export default function NewArrivals({ products }: Props) {
               src={product.images?.[0] ?? "/1.png"}
               alt={product.title}
               fill
-              sizes="(max-width: 768px) 50vw, 25vw"
+              sizes={isBig ? "(max-width: 768px) 100vw, 50vw" : "(max-width: 768px) 50vw, 25vw"}
               className="object-cover transition-transform duration-700 group-hover:scale-105"
             />
+
+            {/* QUICK ADD HOVER (DESKTOP) */}
+            {!isSold && (
+              <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 hidden md:flex items-center justify-center">
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setSelectedProduct(product);
+                  }}
+                  className="bg-white text-black px-6 py-2.5 rounded-full font-medium text-sm transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 hover:bg-zinc-100"
+                >
+                  Quick Add
+                </button>
+              </div>
+            )}
 
             {/* OUT OF STOCK OVERLAY */}
             {isSold && (
@@ -121,8 +137,8 @@ export default function NewArrivals({ products }: Props) {
       {/* GRID */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
         {/* BIG PRODUCT */}
-        <div className="col-span-2 row-span-2">
-          {renderProduct(bigProduct)}
+        <div className="col-span-2 row-span-2 h-full">
+          {renderProduct(bigProduct, true)}
         </div>
 
         {/* SMALL PRODUCTS */}

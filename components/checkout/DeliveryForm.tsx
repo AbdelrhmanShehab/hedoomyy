@@ -1,19 +1,51 @@
 "use client";
 
 import { useCheckout } from "../../context/CheckoutContext";
-import { egyptCites } from "../../data/egyptCities";
+import { useEffect, useState } from "react";
+import { db } from "../../lib/firebase";
+import { collection, getDocs } from "firebase/firestore";
 
 export default function DeliveryForm() {
-  const { order, setOrder, errors, setErrors } = useCheckout();
+  const { order, setOrder, errors, setErrors, setShippingFee } = useCheckout();
+  const [citiesData, setCitiesData] = useState<{ id: string; fee: number }[]>([]);
+
+  useEffect(() => {
+    const fetchCities = async () => {
+      try {
+        const snapshot = await getDocs(collection(db, "cities"));
+        const cities = snapshot.docs.map(doc => ({
+          id: doc.id,
+          fee: doc.data().fee || 0
+        }));
+        setCitiesData(cities);
+      } catch (error) {
+        console.error("Error fetching cities:", error);
+      }
+    };
+    fetchCities();
+  }, []);
 
   const updateDelivery = (field: string, value: string) => {
-    setOrder(prev => ({
-      ...prev,
-      delivery: {
-        ...prev.delivery,
-        [field]: value,
-      },
-    }));
+    setOrder(prev => {
+      const newOrder = {
+        ...prev,
+        delivery: {
+          ...prev.delivery,
+          [field]: value,
+        },
+      };
+
+      if (field === "city") {
+        const selectedCity = citiesData.find(c => c.id === value);
+        if (selectedCity) {
+          setShippingFee(selectedCity.fee);
+        } else {
+          setShippingFee(0);
+        }
+      }
+
+      return newOrder;
+    });
 
     setErrors(prev => ({ ...prev, [field]: undefined }));
   };
@@ -38,9 +70,8 @@ export default function DeliveryForm() {
         <input
           value={order.delivery.address}
           onChange={(e) => updateDelivery("address", e.target.value)}
-          className={`w-full border rounded-xl px-4 py-3 text-sm ${
-            errors.address ? "border-red-500" : "border-gray-300"
-          }`}
+          className={`w-full border rounded-xl px-4 py-3 text-sm ${errors.address ? "border-red-500" : "border-gray-300"
+            }`}
           placeholder="Street, building, area"
         />
         {errors.address && (
@@ -55,8 +86,12 @@ export default function DeliveryForm() {
           <input
             value={order.delivery.firstName}
             onChange={(e) => updateDelivery("firstName", e.target.value)}
-            className="w-full border rounded-xl px-4 py-3 text-sm"
+            className={`w-full border rounded-xl px-4 py-3 text-sm ${errors.firstName ? "border-red-500" : "border-gray-300"
+              }`}
           />
+          {errors.firstName && (
+            <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>
+          )}
         </div>
 
         <div>
@@ -64,8 +99,12 @@ export default function DeliveryForm() {
           <input
             value={order.delivery.lastName}
             onChange={(e) => updateDelivery("lastName", e.target.value)}
-            className="w-full border rounded-xl px-4 py-3 text-sm"
+            className={`w-full border rounded-xl px-4 py-3 text-sm ${errors.lastName ? "border-red-500" : "border-gray-300"
+              }`}
           />
+          {errors.lastName && (
+            <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>
+          )}
         </div>
       </div>
 
@@ -78,9 +117,8 @@ export default function DeliveryForm() {
             onChange={(e) => updateDelivery("phone", e.target.value)}
             onBlur={() => validatePhone(order.delivery.phone)}
             placeholder="01xxxxxxxxx"
-            className={`w-full border rounded-xl px-4 py-3 text-sm ${
-              errors.phone ? "border-red-500" : "border-gray-300"
-            }`}
+            className={`w-full border rounded-xl px-4 py-3 text-sm ${errors.phone ? "border-red-500" : "border-gray-300"
+              }`}
           />
           {errors.phone && (
             <p className="text-red-500 text-xs mt-1">{errors.phone}</p>
@@ -108,35 +146,37 @@ export default function DeliveryForm() {
           <select
             value={order.delivery.city}
             onChange={(e) => updateDelivery("city", e.target.value)}
-            className="w-full border rounded-xl px-4 py-3 text-sm"
+            className={`w-full border rounded-xl px-4 py-3 text-sm ${errors.city ? "border-red-500" : "border-gray-300"
+              }`}
           >
             <option value="">Select City</option>
-            {egyptCites.map(city => (
-              <option key={city} value={city}>
-                {city}
+            {citiesData.map(city => (
+              <option key={city.id} value={city.id}>
+                {city.id}
               </option>
             ))}
           </select>
+          {errors.city && (
+            <p className="text-red-500 text-xs mt-1">{errors.city}</p>
+          )}
         </div>
 
-        <div>
-          <label className="block text-xs mb-1">Government *</label>
-          <input
-            value={order.delivery.government}
-            onChange={(e) => updateDelivery("government", e.target.value)}
-            className="w-full border rounded-xl px-4 py-3 text-sm"
-          />
-        </div>
+
       </div>
 
       {/* Apartment */}
       <div>
-        <label className="block text-xs mb-1">Apartment</label>
+        <label className="block text-xs mb-1">Apartment *</label>
         <input
           value={order.delivery.apartment}
           onChange={(e) => updateDelivery("apartment", e.target.value)}
-          className="w-full border rounded-xl px-4 py-3 text-sm"
+          className={`w-full border rounded-xl px-4 py-3 text-sm ${errors.apartment ? "border-red-500" : "border-gray-300"
+            }`}
+          placeholder="Apt, floor, etc."
         />
+        {errors.apartment && (
+          <p className="text-red-500 text-xs mt-1">{errors.apartment}</p>
+        )}
       </div>
     </div>
   );

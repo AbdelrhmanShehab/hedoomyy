@@ -9,7 +9,7 @@ export default function Hero() {
 
       <Link
         href="/products"
-        className="mt-8 inline-flex items-center justify-center rounded-full bg-[#E3A5E7] px-10 py-3 text-sm font-medium text-white transition hover:opacity-90"
+        className="mt-8 inline-flex text-lg items-center justify-center rounded-full bg-[#E3A5E7] px-10 py-5 text-sm font-bold text-white transition hover:opacity-90"
       >
         Shop All
       </Link>

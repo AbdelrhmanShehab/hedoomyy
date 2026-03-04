@@ -75,7 +75,12 @@ export async function POST(req: Request) {
       });
     }
 
-    const shipping = 50;
+    // Fetch shipping fee from cities collection
+    console.log(`🚚 [API/Orders] Fetching shipping fee for city: ${delivery.city}`);
+    const cityRef = doc(db, "cities", delivery.city);
+    const citySnap = await getDoc(cityRef);
+    const shipping = citySnap.exists() ? (citySnap.data().fee || 0) : 50; // Fallback to 50 if city not found
+
     const total = subtotal + shipping;
 
     // 3. Save Order

@@ -123,8 +123,8 @@ export default function ConfirmationPage() {
                 )}
                 <div
                   className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${payment.paid
-                      ? "bg-green-100 text-green-700"
-                      : "bg-amber-100 text-amber-700"
+                    ? "bg-green-100 text-green-700"
+                    : "bg-amber-100 text-amber-700"
                     }`}
                 >
                   {payment.paid ? "✓ Confirmed" : "⏳ Awaiting confirmation"}
@@ -158,9 +158,14 @@ export default function ConfirmationPage() {
             )}
           </div>
 
-          {/* Meta */}
-          <div className="text-xs text-gray-400">
-            Order ID: {orderId}
+          {/* Order Meta */}
+          <div className="pt-4 border-t border-gray-100 flex flex-wrap gap-x-8 gap-y-2 text-xs text-gray-400">
+            <div>
+              <span className="font-medium text-gray-500">Order ID:</span> {orderId}
+            </div>
+            <div>
+              <span className="font-medium text-gray-500">Order Date:</span> {createdAt ? new Date(createdAt.seconds * 1000).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : 'N/A'}
+            </div>
           </div>
         </div>
       </div>
@@ -190,12 +195,17 @@ export default function ConfirmationPage() {
 
               <div className="flex-1 text-sm">
                 <p className="font-medium">{item.title}</p>
-                {item.variant && (
-                  <p className="text-gray-400">{item.variant}</p>
-                )}
+                <div className="flex flex-col gap-0.5 mt-1">
+                  {item.variant && (
+                    <p className="text-gray-400 text-xs">{item.variant}</p>
+                  )}
+                  <p className="text-gray-400 text-[11px]">
+                    {item.qty} x EGP {item.price}
+                  </p>
+                </div>
               </div>
 
-              <p className="text-sm">
+              <p className="text-sm font-medium">
                 EGP {item.price * item.qty}
               </p>
             </div>

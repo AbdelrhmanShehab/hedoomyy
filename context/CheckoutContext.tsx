@@ -28,6 +28,8 @@ const CheckoutContext = createContext<{
   setOrder: React.Dispatch<React.SetStateAction<CheckoutOrder>>;
   errors: Errors;
   setErrors: React.Dispatch<React.SetStateAction<Errors>>;
+  shippingFee: number;
+  setShippingFee: React.Dispatch<React.SetStateAction<number>>;
 } | null>(null);
 
 export function CheckoutProvider({ children }: { children: React.ReactNode }) {
@@ -39,6 +41,7 @@ export function CheckoutProvider({ children }: { children: React.ReactNode }) {
   });
 
   const [errors, setErrors] = useState<Errors>({});
+  const [shippingFee, setShippingFee] = useState<number>(0);
 
   // 🔥 SAVE TO LOCAL STORAGE ON CHANGE
   useEffect(() => {
@@ -47,7 +50,7 @@ export function CheckoutProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <CheckoutContext.Provider
-      value={{ order, setOrder, errors, setErrors }}
+      value={{ order, setOrder, errors, setErrors, shippingFee, setShippingFee }}
     >
       {children}
     </CheckoutContext.Provider>

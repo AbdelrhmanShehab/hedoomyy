@@ -4,14 +4,14 @@ import { useCheckout } from "../../context/CheckoutContext";
 import Image from "next/image";
 
 export default function OrderSummary() {
-  const { order } = useCheckout();
+  const { order, shippingFee } = useCheckout();
 
   const subtotal = order.items.reduce(
     (sum, item) => sum + item.price * item.qty,
     0
   );
 
-  const shipping = 50;
+  const shipping = shippingFee;
   const total = subtotal + shipping;
 
   if (order.items.length === 0) {
@@ -40,7 +40,9 @@ export default function OrderSummary() {
               <p className="text-gray-500">
                 {item.color} / {item.size}
               </p>
-              <p className="text-xs">Qty: {item.qty}</p>
+              <p className="text-xs text-gray-500">
+                EGP {item.price.toLocaleString()} x {item.qty}
+              </p>
             </div>
           </div>
 

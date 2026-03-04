@@ -9,7 +9,7 @@ import { storage } from "../../../lib/firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 export default function PaymentUploadPage() {
-    const { order } = useCheckout();
+    const { order, shippingFee } = useCheckout();
     const { clearCart } = useCart();
     const { user } = useAuth();
     const router = useRouter();
@@ -24,7 +24,7 @@ export default function PaymentUploadPage() {
         (sum, item) => sum + item.price * item.qty,
         0
     );
-    const shipping = 50;
+    const shipping = shippingFee;
     const total = subtotal + shipping;
 
     // COD  → 10% deposit (mandatory)

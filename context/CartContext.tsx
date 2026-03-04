@@ -12,6 +12,7 @@ type CartContextType = {
   items: CartItem[];
   addItem: (item: CartItem) => void;
   removeItem: (productId: string, variantId: string) => void;
+  updateQty: (productId: string, variantId: string, delta: number) => void;
   clearCart: () => void;
   subtotal: number;
   isOpen: boolean;
@@ -105,6 +106,24 @@ export function CartProvider({
     );
   };
 
+  const updateQty = (
+    productId: string,
+    variantId: string,
+    delta: number
+  ) => {
+    setItems(prev =>
+      prev.map(i => {
+        if (i.productId === productId && i.variantId === variantId) {
+          const newQty = Math.max(1, i.qty + delta);
+          const cappedQty =
+            i.stock !== undefined ? Math.min(newQty, i.stock) : newQty;
+          return { ...i, qty: cappedQty };
+        }
+        return i;
+      })
+    );
+  };
+
   const clearCart = () => {
     setItems([]);
     setIsOpen(false);
@@ -124,6 +143,7 @@ export function CartProvider({
         items,
         addItem,
         removeItem,
+        updateQty,
         clearCart,
         subtotal,
         isOpen,
