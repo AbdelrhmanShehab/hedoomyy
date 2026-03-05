@@ -34,7 +34,6 @@ export default function CheckoutPage() {
             firstName: prev.delivery.firstName || userData.firstName || "",
             lastName: prev.delivery.lastName || userData.lastName || "",
             city: prev.delivery.city || userData.city || "",
-            government: prev.delivery.government || userData.government || "",
             apartment: prev.delivery.apartment || userData.apartment || "",
             secondPhone: prev.delivery.secondPhone || userData.secondPhone || "",
           }
@@ -56,7 +55,6 @@ export default function CheckoutPage() {
     !!order.delivery.firstName &&
     !!order.delivery.lastName &&
     !!order.delivery.city &&
-    !!order.delivery.government &&
     !!order.delivery.apartment &&
     !!order.payment &&
     order.items.length > 0;
@@ -70,7 +68,6 @@ export default function CheckoutPage() {
     if (!order.delivery.firstName) newErrors.firstName = "First name required";
     if (!order.delivery.lastName) newErrors.lastName = "Last name required";
     if (!order.delivery.city) newErrors.city = "City is required";
-    if (!order.delivery.government) newErrors.government = "Government is required";
     if (!order.delivery.apartment) newErrors.apartment = "Apartment is required";
     if (!order.payment) newErrors.payment = "Select payment method";
 

@@ -60,7 +60,7 @@ export default function ConfirmationPage() {
               {delivery.address}
               {delivery.apartment && `, Apt ${delivery.apartment}`}
               <br />
-              {delivery.city}, {delivery.government}
+              {delivery.city}{delivery.government ? `, ${delivery.government}` : ''}
             </p>
           </div>
 

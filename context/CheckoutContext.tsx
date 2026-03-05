@@ -16,7 +16,6 @@ const initialOrder: CheckoutOrder = {
     firstName: "",
     lastName: "",
     city: "",
-    government: "",
     apartment: "",
     secondPhone: "",
   },

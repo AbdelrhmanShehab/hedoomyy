@@ -128,7 +128,7 @@ export default function OrderHistory() {
                     <div className="text-xs text-zinc-600 space-y-1.5 bg-white p-4 rounded-2xl border border-zinc-100">
                       <p className="font-bold text-zinc-800">{order.delivery?.firstName} {order.delivery?.lastName}</p>
                       <p className="flex items-center gap-2"><span className="text-xs text-gray-400">📍</span> {order.delivery?.address}{order.delivery?.apartment ? `, Apt ${order.delivery.apartment}` : ''}</p>
-                      <p className="ml-5">{order.delivery?.city}, {order.delivery?.government}</p>
+                      <p className="ml-5">{order.delivery?.city}{order.delivery?.government ? `, ${order.delivery.government}` : ''}</p>
                       <p className="flex items-center gap-2 pt-1 font-medium"><span className="text-xs text-gray-400">📞</span> {order.delivery?.phone}</p>
                     </div>
                   </div>

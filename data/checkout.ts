@@ -17,7 +17,6 @@ export type CheckoutOrder = {
     secondPhone?: string;
 
     city: string;
-    government: string;
     apartment?: string;
   };
 

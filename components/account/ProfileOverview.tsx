@@ -18,7 +18,6 @@ export default function ProfileOverview() {
         address: "",
         apartment: "",
         city: "",
-        government: "",
     });
 
     useEffect(() => {
@@ -172,18 +171,6 @@ export default function ProfileOverview() {
                             <option key={city} value={city}>{city}</option>
                         ))}
                     </select>
-                </div>
-
-                <div className="space-y-2">
-                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Government</label>
-                    <input
-                        type="text"
-                        name="government"
-                        value={formData.government}
-                        onChange={handleChange}
-                        className="w-full border-b border-gray-200 focus:border-purple-500 outline-none py-2 transition-colors"
-                        placeholder="Cairo"
-                    />
                 </div>
             </div>
 
