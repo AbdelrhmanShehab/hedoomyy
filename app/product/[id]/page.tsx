@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useState, useMemo, useRef } from "react";
 import { doc, getDoc, collection, query, limit, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { trackEvent } from "@/lib/trackEvent";
 
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -80,6 +81,7 @@ export default function ProductPage() {
         } as Product;
 
         setProduct(productData);
+        trackEvent(id, "view");
 
         // Fetch related products (just first 8 for now)
         const q = query(collection(db, "products"), limit(8));

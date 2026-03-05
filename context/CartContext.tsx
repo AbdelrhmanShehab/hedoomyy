@@ -7,6 +7,7 @@ import {
   useState,
 } from "react";
 import type { CartItem } from "@/data/cart";
+import { trackEvent } from "@/lib/trackEvent";
 
 type CartContextType = {
   items: CartItem[];
@@ -56,6 +57,7 @@ export function CartProvider({
 
   /* ADD ITEM (SYNC + FAST) */
   const addItem = (item: CartItem) => {
+    trackEvent(item.productId, "cart");
     setItems(prev => {
       const existing = prev.find(
         i =>

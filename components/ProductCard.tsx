@@ -7,6 +7,7 @@ import { useState } from "react";
 import QuickAddModal from "./product/QuickAddModal";
 import { Heart } from "lucide-react";
 import { useFavorites } from "@/context/FavoritesContext";
+import { trackEvent } from "@/lib/trackEvent";
 
 type Props = {
   product: Product;
@@ -68,6 +69,7 @@ export default function ProductCard({ product }: Props) {
         <Link
           href={`/product/${product.id}`}
           className="w-full flex flex-col items-center"
+          onClick={() => trackEvent(product.id, "click")}
         >
           <div className="w-full aspect-[3/4.2] relative rounded-2xl overflow-hidden">
             <Image

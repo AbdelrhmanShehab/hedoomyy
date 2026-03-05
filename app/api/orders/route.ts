@@ -8,6 +8,8 @@ import {
   collection,
   addDoc,
   serverTimestamp,
+  setDoc,
+  increment,
 } from "firebase/firestore";
 
 export async function POST(req: Request) {
@@ -108,6 +110,18 @@ export async function POST(req: Request) {
     });
     console.log(`✅ [API/Orders] Order saved successfully. ID: ${orderRef.id}`);
 
+    // Track purchases + revenue per product (fire-and-forget)
+    for (const item of items) {
+      const statsRef = doc(db, "productStats", item.productId);
+      setDoc(
+        statsRef,
+        {
+          purchases: increment(item.qty),
+          revenue: increment(item.price * item.qty),
+        },
+        { merge: true }
+      ).catch(() => { });
+    }
     // 4. Send Emails (Non-blocking)
     const sendEmails = async () => {
       try {
