@@ -25,6 +25,15 @@ export default function DeliveryForm() {
     fetchCities();
   }, []);
 
+  useEffect(() => {
+    if (order.delivery.city && citiesData.length > 0) {
+      const selectedCity = citiesData.find(c => c.id === order.delivery.city);
+      if (selectedCity) {
+        setShippingFee(selectedCity.fee);
+      }
+    }
+  }, [order.delivery.city, citiesData, setShippingFee]);
+
   const updateDelivery = (field: string, value: string) => {
     setOrder(prev => {
       const newOrder = {

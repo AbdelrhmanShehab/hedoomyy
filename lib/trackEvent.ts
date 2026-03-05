@@ -1,5 +1,5 @@
 import { db } from "@/lib/firebase";
-import { doc, setDoc, updateDoc, increment } from "firebase/firestore";
+import { doc, setDoc, updateDoc, increment, serverTimestamp } from "firebase/firestore";
 
 export type TrackableEvent = "click" | "view" | "cart";
 
@@ -10,18 +10,33 @@ const fieldMap: Record<TrackableEvent, string> = {
 };
 
 /**
- * Fire-and-forget client-side event tracker.
- * Writes to Firestore `productStats/{productId}` atomically.
- * Never throws — errors are swallowed so the UI is never blocked.
+ * userInfo: { email?: string; name?: string }
  */
-export function trackEvent(productId: string, event: TrackableEvent): void {
+export function trackEvent(
+    productId: string,
+    event: TrackableEvent,
+    userInfo?: { email?: string; name?: string }
+): void {
     if (!productId) return;
 
     const field = fieldMap[event];
-    const ref = doc(db, "productStats", productId);
+    const statsRef = doc(db, "productStats", productId);
 
-    // Use setDoc with merge so the document is auto-created on first event
-    setDoc(ref, { [field]: increment(1) }, { merge: true }).catch(() => {
-        // Silently ignore — analytics must never break the app
-    });
+    // 1. Update Aggregate Stats (Atomic increment)
+    setDoc(statsRef, { [field]: increment(1) }, { merge: true }).catch(() => { });
+
+    // 2. Log to Leads collection for user journey / Retargeting
+    if (userInfo?.email && (event === "cart" || event === "view")) {
+        const leadId = `${userInfo.email}_${productId}`;
+        const leadRef = doc(db, "leads", leadId);
+
+        setDoc(leadRef, {
+            email: userInfo.email,
+            name: userInfo.name || "",
+            productId,
+            lastActivity: serverTimestamp(),
+            status: "pending", // Status will be updated to "converted" on purchase
+            eventType: event // "view" or "cart"
+        }, { merge: true }).catch(() => { });
+    }
 }
