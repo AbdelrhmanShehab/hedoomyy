@@ -48,12 +48,12 @@ export default function CategorySlider({ categories }: Props) {
             {/* Slider */}
             <div
                 ref={scrollRef}
-                className="flex gap-8 md:gap-6 overflow-x-auto md:overflow-hidden scroll-smooth no-scrollbar px-4 md:px-10"
+                className="flex gap-6 overflow-x-auto md:overflow-hidden scroll-smooth no-scrollbar px-4 md:px-10"
             >
                 {categories.map((cat) => (
                     <div
                         key={cat.id}
-                        className="min-w-[20%] sm:min-w-[18%] md:min-w-[calc(25%-18px)] lg:min-w-[calc(20%-20px)] transition-all duration-300"
+                        className="min-w-[calc(50%-12px)] sm:min-w-[calc(33.33%-16px)] lg:min-w-[calc(25%-18px)] transition-all duration-300"
                     >
                         <CategoryCard
                             title={`Shop ${cat.name}`}

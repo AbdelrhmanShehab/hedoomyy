@@ -71,7 +71,7 @@ export default function ProductCard({ product }: Props) {
           className="w-full flex flex-col items-center"
           onClick={() => trackEvent(product.id, "click")}
         >
-          <div className="w-full aspect-[3/4.2] relative rounded-2xl overflow-hidden">
+          <div className="w-full aspect-[3/4.2] relative rounded-2xl overflow-hidden ">
             <Image
               src={imageSrc}
               alt={product.title}

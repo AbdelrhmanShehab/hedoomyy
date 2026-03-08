@@ -7,6 +7,7 @@ import NewArrivals from "@/components/home/NewArrivals";
 import hedoomyybanner from "../public/hedoomyybanner.png";
 import BestSeller from "@/components/home/BestSeller";
 import Feedback from "@/components/home/Feedback";
+import InstagramFeed from "@/components/InstagramFeed";
 import {
   fetchCategories,
   fetchNewArrivals,
@@ -38,6 +39,7 @@ export default async function Home() {
         <NewArrivals products={newArrivals as Product[]} />
         <BestSeller products={bestSellers as Product[]} />
         <Feedback />
+        <InstagramFeed />
       </main>
       <Footer />
     </div>

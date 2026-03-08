@@ -42,12 +42,12 @@ export default function ProductSlider({ products }: Props) {
             {/* Slider */}
             <div
                 ref={scrollRef}
-                className="flex gap-12 md:gap-6 overflow-x-auto md:overflow-hidden scroll-smooth no-scrollbar px-4 md:px-10"
+                className="flex gap-6 overflow-x-auto md:overflow-hidden scroll-smooth no-scrollbar px-4 md:px-10"
             >
                 {products.map((product) => (
                     <div
                         key={product.id}
-                        className="min-w-[70%] sm:min-w-[45%] md:min-w-[calc(25%-18px)] lg:min-w-[calc(20%-20px)] transition-all duration-300"
+                        className="min-w-[calc(50%-12px)] sm:min-w-[calc(33.33%-16px)] lg:min-w-[calc(25%-18px)] transition-all duration-300"
                     >
                         <ProductCard product={product} />
                     </div>
