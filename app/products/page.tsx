@@ -94,6 +94,13 @@ function ProductsContent() {
     router.push(queryString ? `/products?${queryString}` : "/products");
   }, [filterCategory, sort, router]);
 
+  /* ---------------- SYNC STATE FROM URL ---------------- */
+
+  useEffect(() => {
+    setFilterCategory(urlCategory);
+    setSort(urlSort);
+  }, [urlCategory, urlSort]);
+
   /* ---------------- FILTER + SORT ---------------- */
 
   const visibleProducts = useMemo(() => {

@@ -1,10 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
 import { onAuthStateChanged, User as FirebaseUser } from "firebase/auth";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, collection, getDocs } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import { User, Save, Loader2 } from "lucide-react";
-import { egyptCites } from "@/data/egyptCities";
 
 export default function ProfileOverview() {
     const [user, setUser] = useState<FirebaseUser | null>(null);
@@ -19,6 +18,7 @@ export default function ProfileOverview() {
         apartment: "",
         city: "",
     });
+    const [citiesData, setCitiesData] = useState<string[]>([]);
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -37,6 +37,19 @@ export default function ProfileOverview() {
             setLoading(false);
         });
         return () => unsubscribe();
+    }, []);
+
+    useEffect(() => {
+        const fetchCities = async () => {
+            try {
+                const snapshot = await getDocs(collection(db, "cities"));
+                const cities = snapshot.docs.map(doc => doc.id);
+                setCitiesData(cities);
+            } catch (error) {
+                console.error("Error fetching cities:", error);
+            }
+        };
+        fetchCities();
     }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -167,7 +180,7 @@ export default function ProfileOverview() {
                         className="w-full border-b border-gray-200 focus:border-purple-500 outline-none py-2 transition-colors bg-white cursor-pointer"
                     >
                         <option value="">Select City</option>
-                        {egyptCites.map(city => (
+                        {citiesData.map(city => (
                             <option key={city} value={city}>{city}</option>
                         ))}
                     </select>
