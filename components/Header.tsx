@@ -3,20 +3,18 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { User, ShoppingBag, Menu, X, Heart, Music2, Bell } from "lucide-react";
+import { User, ShoppingBag, Menu, X, Heart, Music2 } from "lucide-react";
 import useCategories from "../usecategories";
 import callIcon from "../public/calIIcon.svg";
 import instagramIcon from "../public/instagramIcon.svg";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { useFavorites } from "@/context/FavoritesContext";
-import { useNotifications } from "@/context/NotificationContext";
 
 export default function Header() {
   const { categories } = useCategories();
   const { items, openCart } = useCart();
   const { user } = useAuth();
-  const { unreadCount, markAllAsRead } = useNotifications();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const cartCount = items.reduce(
@@ -114,21 +112,6 @@ export default function Header() {
             <Link href="/favorites" className="relative p-1 hover:bg-gray-100 rounded-full transition-all">
               <Heart className="w-5 h-5 text-gray-700 hover:text-pink-400 transition-colors" />
             </Link>
-
-            <div className="relative">
-              <button
-                onClick={markAllAsRead}
-                className="p-1 hover:bg-gray-100 rounded-full transition-all active:scale-95"
-                aria-label="Notifications"
-              >
-                <Bell className={`w-5 h-5 text-gray-700 hover:text-black ${unreadCount > 0 ? "text-purple-600 animate-pulse" : ""}`} />
-              </button>
-              {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-purple-600 text-white text-[10px] w-4.5 h-4.5 flex items-center justify-center rounded-full pointer-events-none">
-                  {unreadCount}
-                </span>
-              )}
-            </div>
 
             <div className="relative">
               <button
