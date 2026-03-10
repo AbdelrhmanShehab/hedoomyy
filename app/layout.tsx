@@ -5,6 +5,7 @@ import { CartSidebar } from "../components/CardSiderbar";
 import { AuthProvider } from "../context/AuthContext";
 import { FavoritesProvider } from "../context/FavoritesContext";
 import { Quicksand } from "next/font/google";
+import NotificationManager from "../components/NotificationManager";
 
 const quicksand = Quicksand({
   subsets: ["latin"],
@@ -23,6 +24,7 @@ export default function RootLayout({
           <FavoritesProvider>
             <CartProvider>
               <CheckoutProvider>
+                <NotificationManager />
                 <main>{children}</main>
                 <CartSidebar />
               </CheckoutProvider>

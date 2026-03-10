@@ -1,4 +1,5 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
+import { getMessaging } from "firebase/messaging";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
@@ -22,3 +23,6 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 // 📦 Storage
 export const storage = getStorage(app);
+
+// 💬 Messaging
+export const messaging = typeof window !== "undefined" ? getMessaging(app) : null;

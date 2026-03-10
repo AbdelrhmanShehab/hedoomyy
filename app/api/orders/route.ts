@@ -143,56 +143,86 @@ export async function POST(req: Request) {
           },
         });
 
-        const orderDetails = items
-          .map(
-            (i: any) =>
-              `• ${i.title} (${i.color} / ${i.size}) x${i.qty}`
-          )
-          .join("\n");
+        // 📧 Professional HTML Email Template
+        const generateHTML = (isCustomer = false) => `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <style>
+                body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; }
+                .container { max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px; }
+                .header { text-align: center; padding-bottom: 20px; border-bottom: 2px solid #a855f7; }
+                .header h1 { color: #a855f7; margin: 0; }
+                .order-summary { margin: 20px 0; background: #f9f9f9; padding: 15px; border-radius: 8px; }
+                .item { display: flex; justify-content: space-between; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px dotted #ccc; }
+                .total { font-size: 1.2em; font-weight: bold; color: #a855f7; text-align: right; margin-top: 15px; }
+                .details { margin-top: 20px; font-size: 0.9em; }
+                .footer { text-align: center; margin-top: 30px; font-size: 0.8em; color: #777; }
+                .btn { display: inline-block; padding: 10px 20px; background: #a855f7; color: #fff; text-decoration: none; border-radius: 5px; margin-top: 20px; }
+              </style>
+            </head>
+            <body>
+              <div class="container">
+                <div class="header">
+                  <h1>Hedoomyy Store</h1>
+                  <p>${isCustomer ? 'Thank you for your order!' : '🎉 New Order Received'}</p>
+                </div>
+                
+                <div class="order-summary">
+                  <h3>Order ID: #${orderRef.id.slice(0, 8).toUpperCase()}</h3>
+                  ${items.map((i: any) => `
+                    <div class="item">
+                      <span>${i.title} (${i.color} / ${i.size}) x${i.qty}</span>
+                      <span>${i.price * i.qty} EGP</span>
+                    </div>
+                  `).join('')}
+                  <div class="total">Total: ${total} EGP</div>
+                </div>
 
-        const emailText = `
-New Order Received
+                <div class="details">
+                  <p><strong>Customer:</strong> ${delivery.firstName} ${delivery.lastName}</p>
+                  <p><strong>Phone:</strong> ${delivery.phone}</p>
+                  <p><strong>Address:</strong> ${delivery.city}, ${delivery.address}, Apt ${delivery.apartment}</p>
+                  <p><strong>Payment Method:</strong> ${payment.toUpperCase()}</p>
+                  ${paymentPhotoUrl ? `<p><strong>Payment Proof:</strong> <a href="${paymentPhotoUrl}">View Here</a></p>` : ''}
+                </div>
 
-Order ID: ${orderRef.id}
+                ${isCustomer ? `
+                  <div style="text-align: center;">
+                    <a href="${process.env.NEXT_PUBLIC_BASE_URL || 'https://hedoomyy.com'}/account" class="btn">View My Orders</a>
+                  </div>
+                ` : ''}
 
-Customer: ${delivery.firstName} ${delivery.lastName}
-Phone: ${delivery.phone}
-
-Items:
-${orderDetails}
-
-Total: ${total} EGP
-Payment Method: ${payment}${depositType
-            ? `\nDeposit Type: ${depositType === "deposit" ? "10% Deposit" : "Full Amount"}`
-            : ""
-          }${depositAmount
-            ? `\nAmount Paid: EGP ${depositAmount}`
-            : ""
-          }${paymentPhotoUrl
-            ? `\nPayment Screenshot: ${paymentPhotoUrl}`
-            : ""
-          }
-`;
+                <div class="footer">
+                  <p>&copy; ${new Date().getFullYear()} Hedoomyy Store. All rights reserved.</p>
+                </div>
+              </div>
+            </body>
+          </html>
+        `;
 
         // Send to Admin
         console.log(`📧 [API/Orders] Sending admin email to ${adminEmail}...`);
         await transporter.sendMail({
-          from: `"Hedoomyy" <${gmailUser}>`,
+          from: `"Hedoomyy Admin" <${gmailUser}>`,
           to: adminEmail,
-          subject: "🛒 New Order Received",
-          text: emailText,
+          subject: `🛒 New Order #${orderRef.id.slice(0, 6).toUpperCase()}`,
+          html: generateHTML(false),
+          text: `New order from ${delivery.firstName}. Total: ${total} EGP.`,
         });
 
         // Send to Customer
         if (customer.email) {
           console.log(`📧 [API/Orders] Sending customer email to ${customer.email}...`);
           await transporter.sendMail({
-            from: `"Hedoomyy" <${gmailUser}>`,
+            from: `"Hedoomyy Store" <${gmailUser}>`,
             to: customer.email,
-            subject: "Your Order Confirmation",
-            text: `Thank you for your order!\n\n${emailText}`,
+            subject: "Your Order Confirmation - Hedoomyy",
+            html: generateHTML(true),
+            text: `Thank you for your order, ${delivery.firstName}! Your order ID is ${orderRef.id}.`,
           });
         }
+        console.log("✅ [API/Orders] All emails sent successfully.");
         console.log("✅ [API/Orders] All emails sent successfully.");
       } catch (emailError) {
         console.error("❌ [API/Orders] Email sending failed:", emailError);
