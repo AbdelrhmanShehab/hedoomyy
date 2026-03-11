@@ -107,7 +107,7 @@ export default function ProfileOverview() {
                         value={formData.firstName}
                         onChange={handleChange}
                         className="w-full border-b border-gray-200 focus:border-purple-500 outline-none py-2 transition-colors"
-                        placeholder="John"
+                        placeholder="Mariem"
                     />
                 </div>
 
@@ -119,7 +119,7 @@ export default function ProfileOverview() {
                         value={formData.lastName}
                         onChange={handleChange}
                         className="w-full border-b border-gray-200 focus:border-purple-500 outline-none py-2 transition-colors"
-                        placeholder="Doe"
+                        placeholder="Ahmed"
                     />
                 </div>
 

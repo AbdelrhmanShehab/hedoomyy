@@ -27,14 +27,21 @@ export default function NewArrivals({ products }: Props) {
   const renderProduct = (product: Product, isBig?: boolean) => {
     const totalStock = getStock(product);
     const isSold = totalStock === 0 || product.status !== "active";
+
     const hasDiscount =
       product.originalPrice &&
       product.originalPrice > product.price;
 
     return (
       <div className={`flex flex-col gap-2 ${isBig ? "h-full" : ""}`}>
+
         {/* IMAGE CARD */}
-        <div className={`relative group overflow-hidden rounded-xl bg-zinc-100 ${isBig ? "flex-1 min-h-0" : "aspect-[5/5]"}`}>
+        <div
+          className={`relative group overflow-hidden rounded-xl bg-zinc-100 
+          ${isBig
+              ? "aspect-[4/5] md:flex-1 md:min-h-0 md:aspect-auto"
+              : "aspect-[5/5]"}`}
+        >
           <Link
             href={`/product/${product.id}`}
             className="block w-full h-full"
@@ -43,11 +50,15 @@ export default function NewArrivals({ products }: Props) {
               src={product.images?.[0] ?? "/1.png"}
               alt={product.title}
               fill
-              sizes={isBig ? "(max-width: 768px) 100vw, 50vw" : "(max-width: 768px) 50vw, 25vw"}
+              sizes={
+                isBig
+                  ? "(max-width: 768px) 100vw, 50vw"
+                  : "(max-width: 768px) 50vw, 25vw"
+              }
               className="object-cover transition-transform duration-700 group-hover:scale-105"
             />
 
-            {/* QUICK ADD HOVER (DESKTOP) */}
+            {/* QUICK ADD (DESKTOP) */}
             {!isSold && (
               <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 hidden md:flex items-center justify-center">
                 <button
@@ -63,7 +74,7 @@ export default function NewArrivals({ products }: Props) {
               </div>
             )}
 
-            {/* OUT OF STOCK OVERLAY */}
+            {/* OUT OF STOCK */}
             {isSold && (
               <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white text-sm font-medium">
                 Out of Stock
@@ -87,7 +98,8 @@ export default function NewArrivals({ products }: Props) {
             {/* DISCOUNT BADGE */}
             {hasDiscount && !isSold && (
               <div className="absolute top-3 left-3 bg-red-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm">
-                -{Math.round(
+                -
+                {Math.round(
                   ((product.originalPrice! - product.price) /
                     product.originalPrice!) *
                   100
@@ -122,10 +134,13 @@ export default function NewArrivals({ products }: Props) {
 
   return (
     <section className="w-full px-5 py-10">
+
+      {/* HEADER */}
       <div className="flex items-baseline justify-between mb-6">
         <h2 className="text-2xl font-medium">
           Explore New Arrivals
         </h2>
+
         <Link
           href="/products?sort=new"
           className="text-sm font-medium text-zinc-600 hover:text-black transition-colors underline underline-offset-4"
@@ -135,9 +150,10 @@ export default function NewArrivals({ products }: Props) {
       </div>
 
       {/* GRID */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
+
         {/* BIG PRODUCT */}
-        <div className="col-span-2 row-span-2 h-full">
+        <div className="col-span-2 md:row-span-2">
           {renderProduct(bigProduct, true)}
         </div>
 

@@ -27,10 +27,19 @@ export default function PaymentUploadPage() {
     const shipping = shippingFee;
     const total = subtotal + shipping;
 
-    // COD  → 10% deposit (mandatory)
+    // COD  → Tiered deposit
     // Online → full amount
     const isCOD = order.payment === "cod";
-    const amountDue = isCOD ? Math.ceil(total * 0.1) : total;
+    
+    const calculateDeposit = (total: number) => {
+        if (total < 500) return 150;
+        if (total < 1000) return 200;
+        if (total < 2000) return 250;
+        if (total < 4000) return 500;
+        return Math.ceil(total * 0.5);
+    };
+
+    const amountDue = isCOD ? calculateDeposit(total) : total;
     const remainingOnDelivery = isCOD ? total - amountDue : 0;
 
     // Redirect back if cart is empty
@@ -143,7 +152,7 @@ export default function PaymentUploadPage() {
                         </h1>
                         <p className="text-sm text-gray-500 leading-relaxed">
                             {isCOD
-                                ? "A 10% deposit is required to confirm your Cash on Delivery order. Transfer it via Instapay and attach the screenshot below."
+                                ? "A mandatory deposit is required to confirm your Cash on Delivery order based on the total amount. Transfer it via Instapay and attach the screenshot below."
                                 : "Transfer the full order amount via Instapay and attach your transaction screenshot below."}
                         </p>
                     </div>
@@ -159,7 +168,7 @@ export default function PaymentUploadPage() {
                             className={`font-semibold text-base ${isCOD ? "text-amber-800" : "text-purple-800"
                                 }`}
                         >
-                            {isCOD ? "Required Deposit — 10%" : "Full Payment Amount"}
+                            {isCOD ? "Required Deposit" : "Full Payment Amount"}
                         </p>
 
                         <div className="space-y-1.5">
@@ -193,13 +202,13 @@ export default function PaymentUploadPage() {
                     {/* ── Instapay account card ── */}
                     <div className="bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl p-5 space-y-1.5 text-sm">
                         <p className="text-xs font-semibold uppercase tracking-widest text-purple-500 mb-2">
-                            Instapay Account
+                            Instapay Account or Vodafone Cash
                         </p>
                         <p className="font-semibold text-gray-800 text-base">Hedoomyy Store</p>
                         <p className="text-gray-600">
-                            Account:{" "}
+                            Number:{" "}
                             <span className="font-mono font-bold text-purple-700 text-base">
-                                01141088386
+                                01023202564
                             </span>
                         </p>
                         <p className="text-gray-500 text-xs pt-1">

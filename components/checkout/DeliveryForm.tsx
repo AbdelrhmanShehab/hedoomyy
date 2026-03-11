@@ -1,12 +1,14 @@
 "use client";
 
 import { useCheckout } from "../../context/CheckoutContext";
+import { useAuth } from "../../context/AuthContext";
 import { useEffect, useState } from "react";
 import { db } from "../../lib/firebase";
 import { collection, getDocs } from "firebase/firestore";
 
 export default function DeliveryForm() {
   const { order, setOrder, errors, setErrors, setShippingFee } = useCheckout();
+  const { userData } = useAuth();
   const [citiesData, setCitiesData] = useState<{ id: string; fee: number }[]>([]);
 
   useEffect(() => {
@@ -71,7 +73,24 @@ export default function DeliveryForm() {
 
   return (
     <div className="space-y-8">
-      <h2 className="text-base font-medium">Delivery Information</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-base font-medium">Delivery Information</h2>
+        {userData && (
+          <span className="flex items-center gap-1.5 px-3 py-1 bg-purple-50 text-purple-600 text-[10px] font-bold uppercase tracking-wider rounded-full border border-purple-100 animate-in fade-in zoom-in duration-500">
+            <span className="w-1.5 h-1.5 bg-purple-400 rounded-full animate-pulse" />
+            Profile Synced
+          </span>
+        )}
+      </div>
+
+      {!userData?.address && (
+        <div className="bg-amber-50 border border-amber-100 rounded-2xl p-4 flex gap-3 items-start">
+          <span className="text-lg">💡</span>
+          <p className="text-xs text-amber-800 leading-relaxed">
+            Filling your <a href="/account" className="font-bold underline">profile details</a> saves time! We&apos;ll auto-fill them for all your future checkouts.
+          </p>
+        </div>
+      )}
 
       {/* Address */}
       <div>

@@ -2,10 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { User, ShoppingBag, Menu, X, Heart, Bell } from "lucide-react";
-import { collection, query, orderBy, limit, onSnapshot } from "firebase/firestore";
+import { User, ShoppingBag, Menu, X, Heart } from "lucide-react";
 import { db } from "@/lib/firebase";
-import { useEffect, useMemo, useState, memo } from "react";
+import { useEffect, useState, memo } from "react";
 import useCategories from "../usecategories";
 import callIcon from "../public/calIIcon.svg";
 import instagramIcon from "../public/instagramIcon.svg";
@@ -15,10 +14,6 @@ import { useFavorites } from "@/context/FavoritesContext";
 
 interface Order {
   id: string;
-  status: string;
-  createdAt: any;
-  totals?: { total: number };
-  delivery?: { city: string; firstName: string; lastName: string; phone: string };
 }
 
 export default function Header() {
@@ -27,98 +22,7 @@ export default function Header() {
   const { user, userData } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  /* --- NOTIFICATION LOGIC --- */
-  const [showNotifications, setShowNotifications] = useState(false);
-  const [lastSeen, setLastSeen] = useState(0);
-  const [notifications, setNotifications] = useState<Order[]>([]);
-
-  const isAdmin = userData?.role === "admin";
-
-  // Audio Unlock for Mobile
-  useEffect(() => {
-    const unlockAudio = () => {
-      const audio = new Audio("/notification.mp3");
-      audio.volume = 0.01; 
-      audio.play().then(() => {
-        setTimeout(() => { audio.pause(); audio.currentTime = 0; }, 100);
-        window.removeEventListener("click", unlockAudio, true);
-        window.removeEventListener("touchstart", unlockAudio, true);
-      }).catch(() => {});
-    };
-    window.addEventListener("click", unlockAudio, true);
-    window.addEventListener("touchstart", unlockAudio, true);
-    return () => {
-      window.removeEventListener("click", unlockAudio, true);
-      window.removeEventListener("touchstart", unlockAudio, true);
-    };
-  }, []);
-
-  // Initialize Last Seen
-  useEffect(() => {
-    const saved = localStorage.getItem("lastSeenOrderTime");
-    if (saved) setLastSeen(parseInt(saved));
-    else {
-      const now = Date.now();
-      setLastSeen(now);
-      localStorage.setItem("lastSeenOrderTime", now.toString());
-    }
-  }, []);
-
-  // Real-time Orders Listener (Admins Only)
-  useEffect(() => {
-    if (!user || !isAdmin) return;
-
-    const q = query(
-      collection(db, "orders"),
-      orderBy("createdAt", "desc"),
-      limit(5)
-    );
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const newNotifs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Order));
-      setNotifications(newNotifs);
-
-      if (newNotifs.length > 0 && lastSeen > 0) {
-        const newest = newNotifs[0];
-        const createdAt = newest.createdAt?.toMillis() || 0;
-        if (createdAt > lastSeen) {
-          // Play Sound
-          const audio = new Audio("/notification.mp3");
-          audio.play().catch(() => {});
-
-          // Browser Notification
-          if ("Notification" in window && Notification.permission === "granted") {
-            new Notification("🛒 New Order", {
-              body: `Order #${newest.id.slice(0, 6).toUpperCase()}\nTotal: ${newest.totals?.total || 0} EGP`,
-              icon: "/icons/sidebar-icon.svg",
-            });
-          }
-        }
-      }
-    });
-
-    return () => unsubscribe();
-  }, [user, isAdmin, lastSeen]);
-
-  const pendingCount = useMemo(() => {
-    return notifications.filter(n => {
-      const isPending = n.status === "pending";
-      const createdAt = n.createdAt?.toMillis() || 0;
-      return isPending && createdAt > lastSeen;
-    }).length;
-  }, [notifications, lastSeen]);
-
-  const handleToggleNotifications = () => {
-    const newest = notifications[0]?.createdAt?.toMillis() || Date.now();
-    if (!showNotifications) {
-      setShowNotifications(true);
-      setLastSeen(newest);
-      localStorage.setItem("lastSeenOrderTime", newest.toString());
-    } else {
-      setShowNotifications(false);
-    }
-  };
-  /* --- END NOTIFICATION LOGIC --- */
+  /* --- NOTIFICATION LOGIC REMOVED --- */
 
   const cartCount = items.reduce(
     (sum, item) => sum + item.qty,
@@ -161,6 +65,8 @@ export default function Header() {
               <a href="/policy" className="hover:underline">Return & Exchange</a>
               <span className="text-white/60">|</span>
               <a href="/policy" className="hover:underline">Delivery</a>
+              <span className="text-white/60">|</span>
+              <a href="/about" className="hover:underline">About Us</a>
             </div>
             {/* Mobile Link */}
             <div className="md:hidden">
@@ -186,6 +92,7 @@ export default function Header() {
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
             <Link href="/" className="hover:text-black transition-colors">Home</Link>
+            <Link href="/about" className="hover:text-black transition-colors">About Us</Link>
             <Link href="/products" className="hover:text-black transition-colors">All Items</Link>
 
             {categories.map(cat => (
@@ -212,58 +119,6 @@ export default function Header() {
               )}
             </Link>
 
-            {isAdmin && (
-              <div className="relative">
-                <button
-                  onClick={handleToggleNotifications}
-                  className="p-1 hover:bg-gray-100 rounded-full transition-all relative"
-                  aria-label="Notifications"
-                >
-                  <Bell className="w-5 h-5 text-gray-700 hover:text-purple-500 transition-colors" />
-                  {pendingCount > 0 && (
-                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-pulse">
-                      {pendingCount}
-                    </span>
-                  )}
-                </button>
-
-                {showNotifications && (
-                  <>
-                    <div className="fixed inset-0 z-0" onClick={() => setShowNotifications(false)} />
-                    <div className="absolute right-0 mt-2 w-72 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-                      <div className="px-4 py-2 border-b border-gray-100 flex justify-between items-center">
-                        <h3 className="font-bold text-sm text-gray-900">Recent Orders</h3>
-                        {pendingCount > 0 && <span className="text-[10px] font-bold text-rose-500 uppercase">{pendingCount} New</span>}
-                      </div>
-                      <div className="max-h-80 overflow-y-auto">
-                        {notifications.length === 0 ? (
-                          <div className="p-6 text-center text-gray-400 text-xs">No recent orders</div>
-                        ) : (
-                          notifications.map(notif => (
-                            <Link
-                              key={notif.id}
-                              href="/account"
-                              onClick={() => setShowNotifications(false)}
-                              className="block px-4 py-3 hover:bg-gray-50 border-b border-gray-50 last:border-none transition-colors"
-                            >
-                              <div className="flex justify-between items-start mb-1">
-                                <span className="text-[10px] font-bold text-gray-900">#{notif.id.slice(0, 6).toUpperCase()}</span>
-                                <span className={`text-[8px] font-black uppercase px-1.5 py-0.5 rounded ${notif.status === 'pending' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'}`}>
-                                  {notif.status}
-                                </span>
-                              </div>
-                              <p className="text-[10px] text-gray-500 truncate">
-                                ${notif.totals?.total} EGP — ${notif.delivery?.city}
-                              </p>
-                            </Link>
-                          ))
-                        )}
-                      </div>
-                    </div>
-                  </>
-                )}
-              </div>
-            )}
 
             <Link href="/favorites" className="relative p-1 hover:bg-gray-100 rounded-full transition-all">
               <Heart className="w-5 h-5 text-gray-700 hover:text-pink-400 transition-colors" />
@@ -303,6 +158,7 @@ export default function Header() {
               >
                 Home
               </Link>
+
               <Link
                 href="/products"
                 className="text-lg font-medium text-gray-900 border-b border-gray-50 pb-2"

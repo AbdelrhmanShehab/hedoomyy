@@ -101,7 +101,7 @@ export default function ConfirmationPage() {
               <div className="mt-3 rounded-xl bg-purple-50 border border-purple-100 p-4 space-y-2 text-xs">
                 <p className="font-semibold text-purple-700">
                   {payment.depositType === "deposit"
-                    ? "10% Deposit Paid"
+                    ? "Deposit Paid"
                     : "Full Amount Paid Online"}
                 </p>
                 {payment.depositAmount && (

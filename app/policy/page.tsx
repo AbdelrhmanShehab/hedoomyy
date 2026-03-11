@@ -125,12 +125,12 @@ export default function ContactPage() {
 
               <div >
                 <p className="text-gray-500">Submit Email:</p>
-                <p className="text-purple-300 font-bold text-base">alaahesham01@gmail.com</p>
+                <p className="text-purple-300 font-bold text-base">hedoomyy@outlook.com</p>
               </div>
 
               <div>
                 <p className="text-gray-500">Call us:</p>
-                <p className="text-purple-300 font-bold text-base">01023202564</p>
+                <p className="text-purple-300 font-bold text-base">01141088386</p>
               </div>
             </div>
 

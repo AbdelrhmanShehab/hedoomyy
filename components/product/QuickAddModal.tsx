@@ -35,6 +35,7 @@ export default function QuickAddModal({
     useState<string>("");
   const [selectedSize, setSelectedSize] =
     useState<string>("");
+  const [qty, setQty] = useState<number>(1);
 
   const selectedVariant = variants.find(
     v =>
@@ -60,7 +61,7 @@ export default function QuickAddModal({
       image: product.images?.[0] ?? "/1.png",
       color: selectedVariant.color,
       size: selectedVariant.size,
-      qty: 1,
+      qty: qty,
       stock: selectedVariant.stock,
     });
 
@@ -160,6 +161,33 @@ export default function QuickAddModal({
                   </button>
                 );
               })}
+            </div>
+          </div>
+        )}
+        {/* QUANTITY */}
+        {selectedSize && (
+          <div className="mb-6">
+            <p className="text-sm mb-2">Quantity</p>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center border rounded-full px-2 py-1">
+                <button
+                  onClick={() => setQty(Math.max(1, qty - 1))}
+                  className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded-full transition"
+                >
+                  −
+                </button>
+                <span className="w-10 text-center font-medium">{qty}</span>
+                <button
+                  onClick={() => setQty(prev => (selectedVariant?.stock && prev < selectedVariant.stock) ? prev + 1 : prev)}
+                  disabled={selectedVariant?.stock !== undefined && qty >= selectedVariant.stock}
+                  className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded-full transition disabled:opacity-30"
+                >
+                  +
+                </button>
+              </div>
+              <p className="text-xs text-gray-400">
+                {selectedVariant?.stock} in stock
+              </p>
             </div>
           </div>
         )}

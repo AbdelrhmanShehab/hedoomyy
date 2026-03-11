@@ -54,7 +54,7 @@ export default function InstagramFeed() {
               href={post?.permalink || '#'}
               target="_blank"
               rel="noopener noreferrer"
-              className="relative aspect-square overflow-hidden"
+              className={`relative aspect-square overflow-hidden ${i >= 6 ? 'hidden md:block' : 'block'}`}
             >
               {loading ? (
                 <div className="w-full h-full bg-gray-100 animate-pulse" />
@@ -72,9 +72,9 @@ export default function InstagramFeed() {
         </div>
 
         {/* Section Overlay */}
-        <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center pointer-events-none">
+        <div className="absolute inset-0 bg-black/40 md:bg-black/30 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition duration-300 flex items-center justify-center pointer-events-none">
 
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center scale-90 md:scale-100">
 
             <div className=" rounded-2xl">
               <Image src="/instagram.png" alt="Hedoomyy" width={85} height={85} />

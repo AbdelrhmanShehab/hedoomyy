@@ -13,7 +13,7 @@ import { useEffect, useState } from "react";
 export default function CheckoutPage() {
   const { items } = useCart();
   const { order, setOrder, setErrors } = useCheckout();
-  const { user, userData } = useAuth();
+  const { user, userData, loading } = useAuth();
   const router = useRouter();
   const [userId, setUserId] = useState<string | null>(null);
 
@@ -80,6 +80,35 @@ export default function CheckoutPage() {
     // Route to upload page — order is submitted there after attaching photo
     router.push("/checkout/payment-upload");
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-[70vh] flex flex-col items-center justify-center px-6 text-center">
+        <div className="w-20 h-20 bg-purple-50 rounded-full flex items-center justify-center mb-6 text-3xl">
+          🔒
+        </div>
+        <h1 className="text-2xl font-light mb-4">Login Required</h1>
+        <p className="text-gray-500 max-w-md mb-8">
+          To provide you with a secure shopping experience and auto-fill your details, 
+          please login to your account before proceeding to checkout.
+        </p>
+        <button
+          onClick={() => router.push("/account")}
+          className="bg-gray-900 text-white px-10 py-4 rounded-full font-medium hover:bg-purple-500 transition-all shadow-xl shadow-purple-100"
+        >
+          Login or Create Account
+        </button>
+      </div>
+    );
+  }
 
   return (
     <section className="max-w-7xl mx-auto px-6 py-14 grid lg:grid-cols-[1fr_420px] gap-16">
