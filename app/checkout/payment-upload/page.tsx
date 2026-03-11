@@ -31,15 +31,15 @@ export default function PaymentUploadPage() {
     // Online → full amount
     const isCOD = order.payment === "cod";
     
-    const calculateDeposit = (total: number) => {
-        if (total < 500) return 150;
-        if (total < 1000) return 200;
-        if (total < 2000) return 250;
-        if (total < 4000) return 500;
-        return Math.ceil(total * 0.5);
+    const calculateDeposit = (amount: number) => {
+        if (amount < 500) return 150;
+        if (amount < 1000) return 200;
+        if (amount < 2000) return 250;
+        if (amount < 4000) return 500;
+        return Math.ceil(amount * 0.5);
     };
 
-    const amountDue = isCOD ? calculateDeposit(total) : total;
+    const amountDue = isCOD ? calculateDeposit(subtotal) : total;
     const remainingOnDelivery = isCOD ? total - amountDue : 0;
 
     // Redirect back if cart is empty
@@ -152,7 +152,7 @@ export default function PaymentUploadPage() {
                         </h1>
                         <p className="text-sm text-gray-500 leading-relaxed">
                             {isCOD
-                                ? "A mandatory deposit is required to confirm your Cash on Delivery order based on the total amount. Transfer it via Instapay and attach the screenshot below."
+                                ? "A mandatory deposit is required to confirm your order based on the products subtotal. Transfer it via Instapay and attach the screenshot below."
                                 : "Transfer the full order amount via Instapay and attach your transaction screenshot below."}
                         </p>
                     </div>
