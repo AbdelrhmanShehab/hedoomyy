@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import nodemailer from "nodemailer";
 import { db } from "@/lib/firebase";
 import {
   doc,
@@ -11,6 +10,7 @@ import {
   setDoc,
   increment,
 } from "firebase/firestore";
+import { sendOrderConfirmationEmail, sendOrderStatusUpdateEmail } from "@/lib/email-service";
 
 export async function POST(req: Request) {
   try {
@@ -81,13 +81,13 @@ export async function POST(req: Request) {
     console.log(`🚚 [API/Orders] Fetching shipping fee for city: ${delivery.city}`);
     const cityRef = doc(db, "cities", delivery.city);
     const citySnap = await getDoc(cityRef);
-    const shipping = citySnap.exists() ? (citySnap.data().fee || 0) : 50; // Fallback to 50 if city not found
+    const shipping = citySnap.exists() ? (citySnap.data().fee || 0) : 50; 
 
     const total = subtotal + shipping;
 
     // 3. Save Order
     console.log("💾 [API/Orders] saving order to Firestore...");
-    const orderRef = await addDoc(collection(db, "orders"), {
+    const orderData = {
       userId,
       items,
       customer,
@@ -107,7 +107,9 @@ export async function POST(req: Request) {
       status: "pending",
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
-    });
+    };
+
+    const orderRef = await addDoc(collection(db, "orders"), orderData);
     console.log(`✅ [API/Orders] Order saved successfully. ID: ${orderRef.id}`);
 
     // Track purchases + revenue per product (fire-and-forget)
@@ -122,116 +124,12 @@ export async function POST(req: Request) {
         { merge: true }
       ).catch(() => { });
     }
+
     // 4. Send Emails (Non-blocking)
-    const sendEmails = async () => {
-      try {
-        const gmailUser = process.env.GMAIL_USER;
-        const gmailPass = process.env.GMAIL_PASS;
-        const adminEmail = process.env.ADMIN_EMAIL;
-
-        if (!gmailUser || !gmailPass || !adminEmail) {
-          console.warn("⚠️ [API/Orders] Email environment variables are missing. Skipping email notification.");
-          return;
-        }
-
-        console.log("📧 [API/Orders] Initializing Nodemailer...");
-        const transporter = nodemailer.createTransport({
-          service: "gmail",
-          auth: {
-            user: gmailUser,
-            pass: gmailPass,
-          },
-        });
-
-        // 📧 Professional HTML Email Template
-        const generateHTML = (isCustomer = false) => `
-          <!DOCTYPE html>
-          <html>
-            <head>
-              <style>
-                body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; }
-                .container { max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px; }
-                .header { text-align: center; padding-bottom: 20px; border-bottom: 2px solid #a855f7; }
-                .header h1 { color: #a855f7; margin: 0; }
-                .order-summary { margin: 20px 0; background: #f9f9f9; padding: 15px; border-radius: 8px; }
-                .item { display: flex; justify-content: space-between; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px dotted #ccc; }
-                .total { font-size: 1.2em; font-weight: bold; color: #a855f7; text-align: right; margin-top: 15px; }
-                .details { margin-top: 20px; font-size: 0.9em; }
-                .footer { text-align: center; margin-top: 30px; font-size: 0.8em; color: #777; }
-                .btn { display: inline-block; padding: 10px 20px; background: #a855f7; color: #fff; text-decoration: none; border-radius: 5px; margin-top: 20px; }
-              </style>
-            </head>
-            <body>
-              <div class="container">
-                <div class="header">
-                  <h1>Hedoomyy Store</h1>
-                  <p>${isCustomer ? 'Thank you for your order!' : '🎉 New Order Received'}</p>
-                </div>
-                
-                <div class="order-summary">
-                  <h3>Order ID: #${orderRef.id.slice(0, 8).toUpperCase()}</h3>
-                  ${items.map((i: any) => `
-                    <div class="item">
-                      <span>${i.title} (${i.color} / ${i.size}) x${i.qty}</span>
-                      <span>${i.price * i.qty} EGP</span>
-                    </div>
-                  `).join('')}
-                  <div class="total">Total: ${total} EGP</div>
-                </div>
-
-                <div class="details">
-                  <p><strong>Customer:</strong> ${delivery.firstName} ${delivery.lastName}</p>
-                  <p><strong>Phone:</strong> ${delivery.phone}</p>
-                  <p><strong>Address:</strong> ${delivery.city}, ${delivery.address}, Apt ${delivery.apartment}</p>
-                  <p><strong>Payment Method:</strong> ${payment.toUpperCase()}</p>
-                  ${paymentPhotoUrl ? `<p><strong>Payment Proof:</strong> <a href="${paymentPhotoUrl}">View Here</a></p>` : ''}
-                </div>
-
-                ${isCustomer ? `
-                  <div style="text-align: center;">
-                    <a href="${process.env.NEXT_PUBLIC_BASE_URL || 'https://hedoomyy.com'}/account" class="btn">View My Orders</a>
-                  </div>
-                ` : ''}
-
-                <div class="footer">
-                  <p>&copy; ${new Date().getFullYear()} Hedoomyy Store. All rights reserved.</p>
-                </div>
-              </div>
-            </body>
-          </html>
-        `;
-
-        // Send to Admin
-        console.log(`📧 [API/Orders] Sending admin email to ${adminEmail}...`);
-        await transporter.sendMail({
-          from: `"Hedoomyy Admin" <${gmailUser}>`,
-          to: adminEmail,
-          subject: `🛒 New Order #${orderRef.id.slice(0, 6).toUpperCase()}`,
-          html: generateHTML(false),
-          text: `New order from ${delivery.firstName}. Total: ${total} EGP.`,
-        });
-
-        // Send to Customer
-        if (customer.email) {
-          console.log(`📧 [API/Orders] Sending customer email to ${customer.email}...`);
-          await transporter.sendMail({
-            from: `"Hedoomyy Store" <${gmailUser}>`,
-            to: customer.email,
-            subject: "Your Order Confirmation - Hedoomyy",
-            html: generateHTML(true),
-            text: `Thank you for your order, ${delivery.firstName}! Your order ID is ${orderRef.id}.`,
-          });
-        }
-        console.log("✅ [API/Orders] All emails sent successfully.");
-        console.log("✅ [API/Orders] All emails sent successfully.");
-      } catch (emailError) {
-        console.error("❌ [API/Orders] Email sending failed:", emailError);
-        // We don't throw here to keep the main request successful
-      }
-    };
-
-    // Trigger email process without awaiting it to speed up response
-    sendEmails();
+    console.log(`📧 [API/Orders] Triggering confirmation emails for order: ${orderRef.id}`);
+    sendOrderConfirmationEmail({ id: orderRef.id, ...orderData }).catch(err => {
+        console.error("❌ [API/Orders] Failed to trigger confirmation emails:", err);
+    });
 
     return NextResponse.json({
       success: true,
@@ -239,6 +137,63 @@ export async function POST(req: Request) {
     });
   } catch (error: any) {
     console.error("❌ [API/Orders] Critical server error:", error);
+    return NextResponse.json(
+      { error: "Server error", details: error.message },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PATCH(req: Request) {
+  try {
+    const { orderId, status } = await req.json();
+    console.log(`🔄 [API/Orders] PATCH requested for Order: ${orderId}, Status: ${status}`);
+
+    if (!orderId || !status) {
+      return NextResponse.json(
+        { error: "Missing orderId or status" },
+        { status: 400 }
+      );
+    }
+
+    const validStatuses = ["pending", "confirmed", "shipped", "delivered", "cancelled"];
+    if (!validStatuses.includes(status)) {
+      return NextResponse.json(
+        { error: "Invalid status value" },
+        { status: 400 }
+      );
+    }
+
+    const orderRef = doc(db, "orders", orderId);
+    const orderSnap = await getDoc(orderRef);
+
+    if (!orderSnap.exists()) {
+      console.warn(`⚠️ [API/Orders] Order not found: ${orderId}`);
+      return NextResponse.json(
+        { error: "Order not found" },
+        { status: 404 }
+      );
+    }
+
+    console.log(`🔄 [API/Orders] Updating Firestore for Order: ${orderId}`);
+    await updateDoc(orderRef, {
+      status,
+      updatedAt: serverTimestamp(),
+    });
+
+    // Trigger status update email (Non-blocking)
+    const updatedOrder = { id: orderSnap.id, ...orderSnap.data(), status };
+    console.log(`📧 [API/Orders] Triggering status update email for Order: ${orderId}`);
+    sendOrderStatusUpdateEmail(updatedOrder).catch(err => {
+        console.error(`❌ [API/Orders] Failed to trigger status update email for ${orderId}:`, err);
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: `Order status updated to ${status}`,
+    });
+  } catch (error: any) {
+    console.error("❌ [API/Orders] PATCH error:", error);
     return NextResponse.json(
       { error: "Server error", details: error.message },
       { status: 500 }

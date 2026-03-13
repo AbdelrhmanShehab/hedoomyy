@@ -7,6 +7,7 @@ import { useState } from "react";
 import QuickAddModal from "./product/QuickAddModal";
 import { Heart } from "lucide-react";
 import { useFavorites } from "@/context/FavoritesContext";
+import { useAuth } from "@/context/AuthContext";
 import { trackEvent } from "@/lib/trackEvent";
 
 type Props = {
@@ -16,6 +17,7 @@ type Props = {
 export default function ProductCard({ product }: Props) {
   const [open, setOpen] = useState(false);
   const { toggleFavorite, isFavorite } = useFavorites();
+  const { user } = useAuth();
 
   const isFavorited = isFavorite(product.id);
 
@@ -56,6 +58,10 @@ export default function ProductCard({ product }: Props) {
         <button
           onClick={(e) => {
             e.preventDefault();
+            if (!user) {
+              alert("Please login to add to favorites ❤️");
+              return;
+            }
             toggleFavorite(product.id);
           }}
           className="absolute top-2 right-2 md:top-3 md:right-3 bg-white/80 backdrop-blur-sm p-1.5 md:p-2 rounded-full z-10 transition hover:bg-white shadow-sm"

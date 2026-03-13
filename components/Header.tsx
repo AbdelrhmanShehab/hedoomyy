@@ -92,7 +92,6 @@ export default function Header() {
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
             <Link href="/" className="hover:text-black transition-colors">Home</Link>
-            <Link href="/about" className="hover:text-black transition-colors">About Us</Link>
             <Link href="/products" className="hover:text-black transition-colors">All Items</Link>
 
             {categories.map(cat => (

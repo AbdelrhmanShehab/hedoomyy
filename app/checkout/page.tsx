@@ -89,27 +89,6 @@ export default function CheckoutPage() {
     );
   }
 
-  if (!user) {
-    return (
-      <div className="min-h-[70vh] flex flex-col items-center justify-center px-6 text-center">
-        <div className="w-20 h-20 bg-purple-50 rounded-full flex items-center justify-center mb-6 text-3xl">
-          🔒
-        </div>
-        <h1 className="text-2xl font-light mb-4">Login Required</h1>
-        <p className="text-gray-500 max-w-md mb-8">
-          To provide you with a secure shopping experience and auto-fill your details, 
-          please login to your account before proceeding to checkout.
-        </p>
-        <button
-          onClick={() => router.push("/account")}
-          className="bg-gray-900 text-white px-10 py-4 rounded-full font-medium hover:bg-purple-500 transition-all shadow-xl shadow-purple-100"
-        >
-          Login or Create Account
-        </button>
-      </div>
-    );
-  }
-
   return (
     <section className="max-w-7xl mx-auto px-6 py-14 grid lg:grid-cols-[1fr_420px] gap-16">
       <div className="space-y-10">

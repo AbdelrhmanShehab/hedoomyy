@@ -83,11 +83,11 @@ export default function DeliveryForm() {
         )}
       </div>
 
-      {!userData?.address && (
+      {!userData && (
         <div className="bg-amber-50 border border-amber-100 rounded-2xl p-4 flex gap-3 items-start">
           <span className="text-lg">💡</span>
           <p className="text-xs text-amber-800 leading-relaxed">
-            Filling your <a href="/account" className="font-bold underline">profile details</a> saves time! We&apos;ll auto-fill them for all your future checkouts.
+            <a href="/account" className="font-bold underline">Login</a> to make your data filled every order!
           </p>
         </div>
       )}

@@ -185,9 +185,11 @@ export default function QuickAddModal({
                   +
                 </button>
               </div>
-              <p className="text-xs text-gray-400">
-                {selectedVariant?.stock} in stock
-              </p>
+              {selectedVariant?.stock !== undefined && selectedVariant.stock <= 10 && (
+                <p className="text-xs text-amber-500 font-medium">
+                  Only {selectedVariant.stock} left in stock
+                </p>
+              )}
             </div>
           </div>
         )}

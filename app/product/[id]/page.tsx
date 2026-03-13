@@ -16,6 +16,7 @@ import { ChevronLeft, ChevronRight, Heart, Truck, ShoppingBag } from "lucide-rea
 import ProductSlider from "@/components/ProductSlider";
 import { Benne } from "next/font/google";
 import { useFavorites } from "@/context/FavoritesContext";
+import { useAuth } from "@/context/AuthContext";
 import useEmblaCarousel from "embla-carousel-react";
 
 const benne = Benne({
@@ -39,6 +40,7 @@ export default function ProductPage() {
   const [size, setSize] = useState("");
   const [qty, setQty] = useState(1);
   const { toggleFavorite, isFavorite } = useFavorites();
+  const { user } = useAuth();
   const isWishlisted = isFavorite(id);
 
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
@@ -284,7 +286,13 @@ export default function ProductPage() {
                 {product.title}
               </h1>
               <button
-                onClick={() => toggleFavorite(id)}
+                onClick={() => {
+                  if (!user) {
+                    alert("Please login to add to favorites ❤️");
+                    return;
+                  }
+                  toggleFavorite(id);
+                }}
                 className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${isWishlisted ? "bg-[#DE9DE5]/10 text-[#DE9DE5]" : "bg-gray-100 text-gray-400 hover:bg-gray-200"
                   }`}
               >
@@ -362,9 +370,9 @@ export default function ProductPage() {
                     );
                   })}
                 </div>
-                {isVariantSelected && (
-                  <p className="mt-4 text-sm font-semibold text-[#DE9DE5] flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-[#DE9DE5] animate-pulse"></span>
+                {isVariantSelected && variantStock > 0 && variantStock <= 10 && (
+                  <p className="mt-4 text-sm font-semibold text-amber-600 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
                     Only {variantStock} left in stock for this selection
                   </p>
                 )}
