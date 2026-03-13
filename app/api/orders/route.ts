@@ -123,6 +123,16 @@ export async function POST(req: Request) {
         },
         { merge: true }
       ).catch(() => { });
+
+      // Mark lead as converted if it exists
+      if (customer?.email) {
+        const leadId = `${customer.email}_${item.productId}`;
+        const leadRef = doc(db, "leads", leadId);
+        updateDoc(leadRef, {
+          status: "converted",
+          updatedAt: serverTimestamp()
+        }).catch(() => { }); // Ignore if lead doesn't exist
+      }
     }
 
     // 4. Send Emails (Non-blocking)

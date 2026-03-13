@@ -19,6 +19,7 @@ function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirect") || "/";
+  const message = searchParams.get("message");
 
   const loginWithGoogle = async () => {
     try {
@@ -62,6 +63,12 @@ function LoginContent() {
       {/* ================= RIGHT SIDE ================= */}
       <div className="flex w-full md:w-1/2 items-center justify-center px-6">
         <div className="w-full max-w-md space-y-8 text-center bg-white p-10 rounded-3xl shadow-sm">
+          
+          {message && (
+            <div className="bg-purple-50 border border-purple-100 text-purple-700 px-4 py-3 rounded-xl text-sm font-medium animate-in fade-in slide-in-from-top-4 duration-500">
+              {message}
+            </div>
+          )}
 
           {/* Welcome */}
           <div className="space-y-2">

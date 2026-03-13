@@ -75,7 +75,7 @@ export default function ProductCard({ product }: Props) {
         <Link
           href={`/product/${product.id}`}
           className="w-full flex flex-col items-center"
-          onClick={() => trackEvent(product.id, "click")}
+          onClick={() => trackEvent(product.id, "click", user ? { email: user.email || undefined, name: user.displayName || undefined } : undefined)}
         >
           <div className="w-full aspect-[3/4.2] relative rounded-2xl overflow-hidden ">
             <Image

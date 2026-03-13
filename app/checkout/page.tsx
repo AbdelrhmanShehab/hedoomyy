@@ -18,29 +18,16 @@ export default function CheckoutPage() {
   const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!loading && !user) {
+      router.push("/login?redirect=/checkout&message=Please login to your account to complete your purchase.");
+    }
+  }, [loading, user, router]);
+
+  useEffect(() => {
     if (user) {
       setUserId(user.uid);
-
-      // If we have userData from global AuthContext, prefer it
-      if (userData) {
-        setOrder(prev => ({
-          ...prev,
-          contact: {
-            email: prev.contact.email || userData.email || user.email || ""
-          },
-          delivery: {
-            address: prev.delivery.address || userData.address || "",
-            phone: prev.delivery.phone || userData.phone || "",
-            firstName: prev.delivery.firstName || userData.firstName || "",
-            lastName: prev.delivery.lastName || userData.lastName || "",
-            city: prev.delivery.city || userData.city || "",
-            apartment: prev.delivery.apartment || userData.apartment || "",
-            secondPhone: prev.delivery.secondPhone || userData.secondPhone || "",
-          }
-        }));
-      }
     }
-  }, [user, userData, setOrder]);
+  }, [user]);
 
   useEffect(() => {
     setOrder((prev) => ({

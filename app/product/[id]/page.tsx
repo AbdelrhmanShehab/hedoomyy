@@ -66,6 +66,17 @@ export default function ProductPage() {
   /* ---------------- FETCH PRODUCT & RELATED ---------------- */
 
   useEffect(() => {
+    if (product && user) {
+      trackEvent(product.id, "view", {
+        email: user.email || undefined,
+        name: user.displayName || undefined
+      });
+    } else if (product) {
+      trackEvent(product.id, "view");
+    }
+  }, [product, user]);
+
+  useEffect(() => {
     const fetchProductData = async () => {
       try {
         if (!id) return;
@@ -83,7 +94,6 @@ export default function ProductPage() {
         } as Product;
 
         setProduct(productData);
-        trackEvent(id, "view");
 
         // Fetch related products (just first 8 for now)
         const q = query(collection(db, "products"), limit(8));
@@ -173,6 +183,11 @@ export default function ProductPage() {
       qty,
       stock: variantStock,
     });
+
+    trackEvent(product.id, "cart", user ? {
+      email: user.email || undefined,
+      name: user.displayName || undefined
+    } : undefined);
 
     openCart();
   };

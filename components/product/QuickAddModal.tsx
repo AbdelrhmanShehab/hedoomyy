@@ -3,6 +3,8 @@
 import { Product } from "@/data/product";
 import { useState, useMemo } from "react";
 import { useCart } from "@/context/CartContext";
+import { useAuth } from "@/context/AuthContext";
+import { trackEvent } from "@/lib/trackEvent";
 
 type Props = {
   product: Product;
@@ -14,6 +16,7 @@ export default function QuickAddModal({
   onClose,
 }: Props) {
   const { addItem } = useCart();
+  const { user } = useAuth();
 
   const variants = product.variants ?? [];
 
@@ -64,6 +67,11 @@ export default function QuickAddModal({
       qty: qty,
       stock: selectedVariant.stock,
     });
+
+    trackEvent(product.id, "cart", user ? {
+      email: user.email || undefined,
+      name: user.displayName || undefined
+    } : undefined);
 
     onClose();
   };

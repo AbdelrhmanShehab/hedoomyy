@@ -11,8 +11,14 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 export default function PaymentUploadPage() {
     const { order, shippingFee } = useCheckout();
     const { clearCart } = useCart();
-    const { user } = useAuth();
+    const { user, loading } = useAuth();
     const router = useRouter();
+
+    useEffect(() => {
+        if (!loading && !user) {
+            router.push("/login?redirect=/checkout/payment-upload&message=Please login to your account to complete your purchase.");
+        }
+    }, [loading, user, router]);
 
     const [file, setFile] = useState<File | null>(null);
     const [preview, setPreview] = useState<string | null>(null);

@@ -34,9 +34,9 @@ export function trackEvent(
             email: userInfo.email,
             name: userInfo.name || "",
             productId,
-            lastActivity: serverTimestamp(),
+            updatedAt: serverTimestamp(),
             status: "pending", // Status will be updated to "converted" on purchase
-            eventType: event // "view" or "cart"
+            lastActivity: event // "view" or "cart"
         }, { merge: true }).catch(() => { });
     }
 }

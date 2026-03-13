@@ -5,6 +5,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useEffect, useState } from "react";
 import { db } from "../../lib/firebase";
 import { collection, getDocs } from "firebase/firestore";
+import Link from "next/link";
 
 export default function DeliveryForm() {
   const { order, setOrder, errors, setErrors, setShippingFee } = useCheckout();
@@ -71,24 +72,70 @@ export default function DeliveryForm() {
     }
   };
 
+  const autoFillFromProfile = () => {
+    if (!userData) return;
+
+    setOrder(prev => ({
+      ...prev,
+      contact: {
+        email: userData.email || prev.contact.email || ""
+      },
+      delivery: {
+        address: userData.address || "",
+        phone: userData.phone || "",
+        firstName: userData.firstName || "",
+        lastName: userData.lastName || "",
+        city: userData.city || "",
+        apartment: userData.apartment || "",
+        secondPhone: userData.secondPhone || "",
+      }
+    }));
+
+    // Clear form errors after filling
+    setErrors({});
+  };
+
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <h2 className="text-base font-medium">Delivery Information</h2>
-        {userData && (
-          <span className="flex items-center gap-1.5 px-3 py-1 bg-purple-50 text-purple-600 text-[10px] font-bold uppercase tracking-wider rounded-full border border-purple-100 animate-in fade-in zoom-in duration-500">
-            <span className="w-1.5 h-1.5 bg-purple-400 rounded-full animate-pulse" />
-            Profile Synced
-          </span>
+        {userData ? (
+          <div className="flex items-center gap-3">
+             <Link
+              href="/account"
+              className="text-[10px] font-bold text-gray-400 uppercase tracking-widest hover:text-purple-500 transition-colors"
+            >
+              Go to Account →
+            </Link>
+            <button
+              onClick={autoFillFromProfile}
+              className="flex items-center gap-2 px-4 py-2 bg-black hover:bg-zinc-800 text-white text-xs font-bold uppercase tracking-wider rounded-full shadow-md transition-all active:scale-95 group"
+            >
+              <span className="w-1.5 h-1.5 bg-white rounded-full group-hover:animate-ping" />
+              Fill from Profile
+            </button>
+          </div>
+        ) : (
+          <Link
+            href="/account"
+            className="text-[10px] font-bold text-gray-400 uppercase tracking-widest hover:text-purple-500 transition-colors"
+          >
+            Go to Account →
+          </Link>
         )}
       </div>
 
-      {!userData && (
-        <div className="bg-amber-50 border border-amber-100 rounded-2xl p-4 flex gap-3 items-start">
-          <span className="text-lg">💡</span>
-          <p className="text-xs text-amber-800 leading-relaxed">
-            <a href="/account" className="font-bold underline">Login</a> to make your data filled every order!
-          </p>
+      {userData && (
+        <div className="bg-purple-50 border border-purple-100 rounded-2xl p-4 flex gap-4 items-center animate-in fade-in slide-in-from-top-2 duration-500">
+          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm text-lg">
+            ✨
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-bold text-purple-900">Fill your data once!</p>
+            <p className="text-xs text-purple-800/80 leading-relaxed">
+              Save your info in the <Link href="/account" className="font-extrabold underline decoration-purple-300 underline-offset-2">Account Page</Link> so it&apos;s ready for every order. Use the button above to auto-fill.
+            </p>
+          </div>
         </div>
       )}
 
