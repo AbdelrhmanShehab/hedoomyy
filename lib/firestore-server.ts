@@ -128,3 +128,14 @@ export async function fetchBestSellers(limitCount = 8) {
         },
     });
 }
+
+export async function fetchProductById(id: string) {
+    const res = await fetch(`${BASE_URL}/products/${id}`, {
+        next: { revalidate: 60 },
+    });
+    if (!res.ok) return null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const doc: any = await res.json();
+    if (!doc.fields) return null;
+    return docToObject(doc) as Record<string, any>;
+}

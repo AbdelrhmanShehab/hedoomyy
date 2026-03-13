@@ -14,6 +14,23 @@ import {
   fetchBestSellers,
 } from "@/lib/firestore-server";
 import { Product } from "@/data/product";
+import type { Metadata } from "next";
+import Script from "next/script";
+
+export const metadata: Metadata = {
+  title: "Hedoomyy | Online Fashion Store in Egypt",
+  description:
+    "Shop affordable women's clothing online in Egypt. Discover new arrivals, best sellers, dresses, tops and more. Fast delivery across Cairo and all of Egypt.",
+  alternates: {
+    canonical: "https://hedoomyy.com",
+  },
+  openGraph: {
+    url: "https://hedoomyy.com",
+    title: "Hedoomyy | Online Fashion Store in Egypt",
+    description:
+      "Shop affordable women's clothing online in Egypt. Discover new arrivals, best sellers, dresses, tops and more. Fast delivery across Cairo and all of Egypt.",
+  },
+};
 
 export default async function Home() {
   // All three fetches run in PARALLEL — no waterfall
@@ -23,13 +40,62 @@ export default async function Home() {
     fetchBestSellers(8),
   ]);
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://hedoomyy.com/#website",
+        url: "https://hedoomyy.com",
+        name: "Hedoomyy",
+        description:
+          "Online clothing store based in Cairo, Egypt. Quality fashion at affordable prices.",
+        potentialAction: {
+          "@type": "SearchAction",
+          target: {
+            "@type": "EntryPoint",
+            urlTemplate: "https://hedoomyy.com/products?category={search_term_string}",
+          },
+          "query-input": "required name=search_term_string",
+        },
+        inLanguage: "en-US",
+      },
+      {
+        "@type": "Organization",
+        "@id": "https://hedoomyy.com/#organization",
+        name: "Hedoomyy",
+        url: "https://hedoomyy.com",
+        logo: {
+          "@type": "ImageObject",
+          url: "https://hedoomyy.com/footerhedoomyy.png",
+        },
+        contactPoint: {
+          "@type": "ContactPoint",
+          telephone: "+201141088386",
+          contactType: "customer service",
+          areaServed: "EG",
+          availableLanguage: ["Arabic", "English"],
+        },
+        sameAs: [
+          "https://www.instagram.com/hedoomyy/",
+          "https://www.tiktok.com/@hedoomyy",
+        ],
+      },
+    ],
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
+      <Script
+        id="home-jsonld"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Header />
       <Image
         src={hedoomyybanner}
         className="   h-[35vh] md:h-[60vh] lg:h-[70vh]  w-full object-fit "
-        alt="Hedoomyy banner"
+        alt="Hedoomyy — Online Fashion Store in Egypt"
         priority
         sizes="100vw"
       />

@@ -1,9 +1,23 @@
-"use client";
-
 import Link from "next/link";
 import { Heart } from "lucide-react";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "About Us",
+  description:
+    "Learn about Hedoomyy — an online clothing store based in Cairo, Egypt. Our mission is to provide quality fashion at affordable prices with a smooth shopping experience.",
+  alternates: {
+    canonical: "https://hedoomyy.com/about",
+  },
+  openGraph: {
+    url: "https://hedoomyy.com/about",
+    title: "About Us | Hedoomyy",
+    description:
+      "Learn about Hedoomyy — an online clothing store based in Cairo, Egypt. Our mission is to provide quality fashion at affordable prices.",
+  },
+};
 
 export default function AboutPage() {
   return (
