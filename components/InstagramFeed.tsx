@@ -1,40 +1,11 @@
-'use client';
-
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import Image from 'next/image';
-import { Instagram } from 'lucide-react';
-
-interface InstagramPost {
-  id: string;
-  media_url: string;
-  permalink: string;
-  caption: string;
-}
 
 export default function InstagramFeed() {
-  const [posts, setPosts] = useState<InstagramPost[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchPosts() {
-      try {
-        const res = await fetch('/api/instagram');
-        const data = await res.json();
-        if (data?.data) {
-          setPosts(data.data.slice(0, 10));
-        }
-      } catch (error) {
-        console.error('Instagram fetch error:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchPosts();
-  }, []);
+  const images = Array.from({ length: 10 }, (_, i) => `/img${i + 1}.png`);
 
   return (
-    <section className="w-[90%] mx-auto  bg-white py-16">
+    <section className="w-[90%] mx-auto bg-white py-16">
 
       {/* Title */}
       <div className="text-center mb-10">
@@ -48,25 +19,21 @@ export default function InstagramFeed() {
 
         {/* Posts Grid */}
         <div className="grid grid-cols-2 md:grid-cols-5 w-full">
-          {(loading ? Array.from({ length: 10 }) : posts).map((post: any, i) => (
+          {images.map((imgSrc, i) => (
             <a
-              key={post?.id || i}
-              href={post?.permalink || '#'}
+              key={i}
+              href="#"
               target="_blank"
               rel="noopener noreferrer"
               className={`relative aspect-square overflow-hidden ${i >= 6 ? 'hidden md:block' : 'block'}`}
             >
-              {loading ? (
-                <div className="w-full h-full bg-gray-100 animate-pulse" />
-              ) : (
-                <Image
-                  src={post.media_url}
-                  alt={post.caption || 'Instagram'}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width:768px) 50vw, 20vw"
-                />
-              )}
+              <Image
+                src={imgSrc}
+                alt={`Instagram post ${i + 1}`}
+                fill
+                className="object-cover"
+                sizes="(max-width:768px) 50vw, 20vw"
+              />
             </a>
           ))}
         </div>
