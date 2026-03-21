@@ -26,6 +26,7 @@ export interface Product {
   offerId?: string;
 
   images: string[];
+  shareCount?: number;
 
   variants: ProductVariant[];
 

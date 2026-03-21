@@ -75,30 +75,30 @@ export default async function ProductPage({
 
   const jsonLd = product
     ? {
-        "@context": "https://schema.org",
-        "@type": "Product",
-        name: product.title,
-        description: product.description || "",
-        image: (product.images as string[]) ?? [],
-        url: `https://hedoomyy.com/product/${id}`,
-        brand: {
-          "@type": "Brand",
+      "@context": "https://schema.org",
+      "@type": "Product",
+      name: product.title,
+      description: product.description || "",
+      image: (product.images as string[]) ?? [],
+      url: `https://hedoomyy.com/product/${id}`,
+      brand: {
+        "@type": "Brand",
+        name: "Hedoomyy",
+      },
+      offers: {
+        "@type": "Offer",
+        priceCurrency: "EGP",
+        price: product.price,
+        availability:
+          product.status === "active"
+            ? "https://schema.org/InStock"
+            : "https://schema.org/OutOfStock",
+        seller: {
+          "@type": "Organization",
           name: "Hedoomyy",
         },
-        offers: {
-          "@type": "Offer",
-          priceCurrency: "EGP",
-          price: product.price,
-          availability:
-            product.status === "active"
-              ? "https://schema.org/InStock"
-              : "https://schema.org/OutOfStock",
-          seller: {
-            "@type": "Organization",
-            name: "Hedoomyy",
-          },
-        },
-      }
+      },
+    }
     : null;
 
   return (
