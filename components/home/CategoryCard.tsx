@@ -27,7 +27,7 @@ export default function CategoryCard({ title, image, href }: Props) {
         />
       </div>
 
-      <p className="text-[12px] md:text-sm font-medium text-zinc-600 text-center truncate w-full px-1">
+      <p className="text-[12px] md:text-sm font-bold text-zinc-600 text-center truncate w-full px-1">
         {displayName}
       </p>
     </Link>
