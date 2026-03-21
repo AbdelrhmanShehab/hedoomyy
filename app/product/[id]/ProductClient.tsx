@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { doc, getDoc, collection, query, limit, getDocs } from "firebase/firestore";
+import { doc, getDoc, collection, query, limit, getDocs, updateDoc, increment } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { trackEvent } from "@/lib/trackEvent";
 
@@ -219,6 +219,16 @@ export default function ProductClient({ id }: { id: string }) {
         await navigator.clipboard.writeText(window.location.href);
         alert("Link copied to clipboard!");
       }
+
+      // Update Firestore count
+      const productRef = doc(db, "products", id);
+      await updateDoc(productRef, {
+        shareCount: increment(1)
+      });
+
+      // Update local state for immediate feedback
+      setProduct(prev => prev ? { ...prev, shareCount: (prev.shareCount || 0) + 1 } : null);
+
     } catch (err) {
       console.error("Error sharing:", err);
     }
@@ -422,15 +432,25 @@ export default function ProductClient({ id }: { id: string }) {
 
               {/* SHARE */}
               <div className="pt-2">
-                <p className="text-sm text-gray-500">
-                  Loved it? {" "}
-                  <button
-                    onClick={handleShare}
-                    className="cursor-pointer text-[#DE9DE5] underline decoration-[#DE9DE5]/40 underline-offset-4 hover:decoration-[#DE9DE5] transition-all"
-                  >
-                    Share with your friends
-                  </button>
-                </p>
+                <div className="flex flex-col gap-3">
+                  <p className="text-sm text-gray-500">
+                    Loved it? {" "}
+                    <button
+                      onClick={handleShare}
+                      className="cursor-pointer text-[#DE9DE5] underline decoration-[#DE9DE5]/40 underline-offset-4 hover:decoration-[#DE9DE5] transition-all"
+                    >
+                      Share with your friends
+                    </button>
+                  </p>
+                  
+                  {product.shareCount && product.shareCount > 0 && (
+                    <div className="flex items-center gap-2 bg-[#DE9DE5]/10 w-fit px-4 py-2 rounded-full border border-[#DE9DE5]/20 transition-all duration-300 hover:scale-105">
+                      <span className="text-sm font-semibold text-[#DE9DE5]">
+                        🔥 {product.shareCount.toLocaleString()} {product.shareCount === 1 ? 'person shared' : 'people shared'} this
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
