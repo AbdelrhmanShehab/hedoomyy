@@ -8,7 +8,7 @@ export default function PaymentMethod() {
     <div className="space-y-2">
       <h2 className="text-lg font-medium">Payment</h2>
 
-      <label className="flex items-center gap-2">
+      <label className="flex items-center gap-2 cursor-pointer">
         <input
           type="radio"
           checked={order.payment === "cod"}
@@ -19,7 +19,7 @@ export default function PaymentMethod() {
         Cash on Delivery
       </label>
 
-      <label className="flex items-center gap-2">
+      <label className="flex items-center gap-2 cursor-pointer">
         <input
           type="radio"
           checked={order.payment === "online"}

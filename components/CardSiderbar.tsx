@@ -25,14 +25,14 @@ export function CartSidebar() {
     <>
       {/* OVERLAY */}
       <div
-        className="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-50 transition-opacity"
+        className="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-50 transition-opacity cursor-pointer"
         onClick={closeCart}
       />
 
       <aside className="fixed right-0 top-0 h-full w-[380px] bg-white shadow-2xl p-6 z-50 overflow-y-auto">
         <button
           onClick={closeCart}
-          className="mb-4 text-sm text-gray-500"
+          className="mb-4 text-sm text-gray-500 cursor-pointer"
         >
           ✕ Close
         </button>
@@ -71,7 +71,7 @@ export function CartSidebar() {
                     <div className="flex items-center gap-2 mt-2">
                       <button
                         onClick={() => updateQty(item.productId, item.variantId, -1)}
-                        className="w-7 h-7 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"
+                        className="w-7 h-7 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors cursor-pointer"
                         disabled={item.qty <= 1}
                       >
                         <Minus size={14} />
@@ -81,7 +81,7 @@ export function CartSidebar() {
                       </span>
                       <button
                         onClick={() => updateQty(item.productId, item.variantId, 1)}
-                        className="w-7 h-7 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"
+                        className="w-7 h-7 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors cursor-pointer"
                         disabled={item.stock !== undefined && item.qty >= item.stock}
                       >
                         <Plus size={14} />
@@ -95,7 +95,7 @@ export function CartSidebar() {
                           item.variantId
                         )
                       }
-                      className="text-red-500 text-xs mt-1"
+                      className="text-red-500 text-xs mt-1 cursor-pointer"
                     >
                       Remove
                     </button>
@@ -128,7 +128,7 @@ export function CartSidebar() {
                   closeCart();
                   router.push("/checkout");
                 }}
-                className="mt-4 w-full bg-black text-white py-3 rounded-full"
+                className="mt-4 w-full bg-black text-white py-3 rounded-full cursor-pointer"
               >
                 Checkout
               </button>

@@ -13,7 +13,7 @@ export default function Pagination({ page, totalPages, setPage }: Props) {
         <button
           key={i}
           onClick={() => setPage(i + 1)}
-          className={`w-9 h-9 rounded-full border text-sm ${
+          className={`w-9 h-9 rounded-full border text-sm cursor-pointer ${
             page === i + 1
               ? "bg-pink-400 text-white"
               : "text-gray-600"

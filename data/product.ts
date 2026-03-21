@@ -29,6 +29,8 @@ export interface Product {
   shareCount?: number;
 
   variants: ProductVariant[];
+  averageRating?: number;
+  reviewCount?: number;
 
   createdAt?: any;
   updatedAt?: any;

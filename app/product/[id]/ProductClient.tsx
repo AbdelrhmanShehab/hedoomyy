@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { doc, getDoc, collection, query, limit, getDocs, updateDoc, increment } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { useRouter } from "next/navigation";
 import { trackEvent } from "@/lib/trackEvent";
 
 import Header from "@/components/Header";
@@ -13,6 +14,8 @@ import Image from "next/image";
 import type { Product, ProductVariant } from "@/data/product";
 import { ChevronLeft, ChevronRight, Heart, Truck, ShoppingBag } from "lucide-react";
 import ProductSlider from "@/components/ProductSlider";
+import HeartRating from "@/components/product/HeartRating";
+import ReviewSection from "@/components/product/ReviewSection";
 import { Benne } from "next/font/google";
 import { useFavorites } from "@/context/FavoritesContext";
 import { useAuth } from "@/context/AuthContext";
@@ -25,6 +28,7 @@ const benne = Benne({
 });
 
 export default function ProductClient({ id }: { id: string }) {
+  const router = useRouter();
   const { addItem, openCart } = useCart();
 
   const [product, setProduct] = useState<Product | null>(null);
@@ -265,14 +269,14 @@ export default function ProductClient({ id }: { id: string }) {
                     <button
                       onClick={prevImage}
                       aria-label="Previous image"
-                      className="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 backdrop-blur-sm shadow-md rounded-full items-center justify-center text-gray-600 hover:bg-white transition-all scale-0 group-hover:scale-100 opacity-0 group-hover:opacity-100 z-10"
+                      className="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 backdrop-blur-sm shadow-md rounded-full items-center justify-center text-gray-600 hover:bg-white transition-all scale-0 group-hover:scale-100 opacity-0 group-hover:opacity-100 z-10 cursor-pointer"
                     >
                       <ChevronLeft size={24} />
                     </button>
                     <button
                       onClick={nextImage}
                       aria-label="Next image"
-                      className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 backdrop-blur-sm shadow-md rounded-full items-center justify-center text-gray-600 hover:bg-white transition-all scale-0 group-hover:scale-100 opacity-0 group-hover:opacity-100 z-10"
+                      className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 backdrop-blur-sm shadow-md rounded-full items-center justify-center text-gray-600 hover:bg-white transition-all scale-0 group-hover:scale-100 opacity-0 group-hover:opacity-100 z-10 cursor-pointer"
                     >
                       <ChevronRight size={24} />
                     </button>
@@ -289,7 +293,7 @@ export default function ProductClient({ id }: { id: string }) {
                     key={index}
                     onClick={() => scrollTo(index)}
                     aria-label={`View image ${index + 1}`}
-                    className={`relative w-20 aspect-[3/4] rounded-xl overflow-hidden border-2 transition-all flex-shrink-0 ${selectedImage === index ? "border-[#DE9DE5]" : "border-transparent"
+                    className={`relative w-20 aspect-[3/4] rounded-xl overflow-hidden border-2 transition-all flex-shrink-0 cursor-pointer ${selectedImage === index ? "border-[#DE9DE5]" : "border-transparent"
                       }`}
                   >
                     <Image src={img} alt={`${product.title} thumbnail ${index + 1}`} fill className="object-cover" />
@@ -305,25 +309,33 @@ export default function ProductClient({ id }: { id: string }) {
 
           {/* INFO SECTION */}
           <div className="flex flex-col">
-            <div className="flex justify-between items-start mb-4">
+            <div className="flex justify-between items-start mb-1">
               <h1 className="text-[32px] font-medium text-[#262626] leading-tight max-w-[80%]">
                 {product.title}
               </h1>
               <button
                 onClick={() => {
                   if (!user) {
-                    alert("Please login to add to favorites ❤️");
+                    const currentPath = window.location.pathname;
+                    router.push(`/login?redirect=${encodeURIComponent(currentPath)}&message=Please login to your account to add to favorites ❤️`);
                     return;
                   }
                   toggleFavorite(id);
                 }}
                 aria-label={isWishlisted ? "Remove from favorites" : "Add to favorites"}
-                className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${isWishlisted ? "bg-[#DE9DE5]/10 text-[#DE9DE5]" : "bg-gray-100 text-gray-400 hover:bg-gray-200"
+                className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer ${isWishlisted ? "bg-[#DE9DE5]/10 text-[#DE9DE5]" : "bg-gray-100 text-gray-400 hover:bg-gray-200"
                   }`}
               >
                 <Heart size={24} className={isWishlisted ? "fill-[#DE9DE5]" : ""} />
               </button>
             </div>
+
+            {product.reviewCount && product.reviewCount > 0 ? (
+              <div className="flex items-center gap-2 mb-4">
+                <HeartRating rating={product.averageRating || 0} size={14} />
+                <span className="text-xs text-gray-400 font-medium">({product.reviewCount} customer reviews)</span>
+              </div>
+            ) : null}
 
             <div className="flex flex-col gap-2 mb-10">
               {product.originalPrice ? (
@@ -360,7 +372,7 @@ export default function ProductClient({ id }: { id: string }) {
                       <button
                         key={c}
                         onClick={() => { setColor(c); setSize(""); setQty(1); }}
-                        className={`min-w-[80px] h-12 rounded-xl border flex items-center justify-center px-4 transition-all
+                        className={`min-w-[80px] h-12 rounded-xl border flex items-center justify-center px-4 transition-all cursor-pointer
                           ${isActive ? "bg-[#DE9DE5] border-[#DE9DE5] text-white shadow-md" : "border-gray-300 text-gray-700 hover:border-[#DE9DE5]"}
                           ${!hasStockForColor ? "opacity-40 cursor-not-allowed" : ""}
                         `}
@@ -385,7 +397,7 @@ export default function ProductClient({ id }: { id: string }) {
                       <button
                         key={s}
                         onClick={() => { setSize(s); setQty(1); }}
-                        className={`min-w-[80px] h-12 rounded-xl border flex items-center justify-center px-4 transition-all
+                        className={`min-w-[80px] h-12 rounded-xl border flex items-center justify-center px-4 transition-all cursor-pointer
                           ${isActive ? "bg-[#DE9DE5] border-[#DE9DE5] text-white shadow-md" : "border-gray-300 text-gray-700 hover:border-[#DE9DE5]"}
                           ${!hasStock ? "opacity-40 cursor-not-allowed" : ""}
                         `}
@@ -419,7 +431,7 @@ export default function ProductClient({ id }: { id: string }) {
                   disabled={!canAdd}
                   onClick={handleAdd}
                   aria-label="Add to bag"
-                  className={`flex-1 flex items-center justify-center gap-3 h-[58px] rounded-full text-lg font-medium transition-all
+                  className={`flex-1 flex items-center justify-center gap-3 h-[58px] rounded-full text-lg font-medium transition-all cursor-pointer
                     ${canAdd ? "bg-[#DE9DE5] hover:bg-[#cf8ed5] text-white shadow-lg active:scale-[0.98]" : "bg-gray-200 text-gray-400"}
                   `}
                 >
@@ -444,7 +456,7 @@ export default function ProductClient({ id }: { id: string }) {
                   </p>
                   
                   {product.shareCount && product.shareCount > 0 && (
-                    <div className="flex items-center gap-2 bg-[#DE9DE5]/10 w-fit px-4 py-2 rounded-full border border-[#DE9DE5]/20 transition-all duration-300 hover:scale-105">
+                    <div className="flex items-center gap-2 bg-[#DE9DE5]/10 w-fit px-4 py-2 rounded-full border border-[#DE9DE5]/20 transition-all duration-300 hover:scale-105 cursor-pointer" onClick={handleShare}>
                       <span className="text-sm font-semibold text-[#DE9DE5]">
                         🔥 {product.shareCount.toLocaleString()} {product.shareCount === 1 ? 'person shared' : 'people shared'} this
                       </span>
@@ -472,6 +484,13 @@ export default function ProductClient({ id }: { id: string }) {
             </p>
           </section>
         </div>
+
+        {/* REVIEWS SECTION */}
+        <ReviewSection 
+          productId={id} 
+          averageRating={product.averageRating} 
+          reviewCount={product.reviewCount} 
+        />
 
         {/* RELATED PRODUCTS */}
         {relatedProducts.length > 0 && (

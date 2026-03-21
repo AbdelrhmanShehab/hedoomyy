@@ -4,8 +4,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { Product } from "../data/product";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import QuickAddModal from "./product/QuickAddModal";
 import { Heart } from "lucide-react";
+import HeartRating from "./product/HeartRating";
 import { useFavorites } from "@/context/FavoritesContext";
 import { useAuth } from "@/context/AuthContext";
 import { trackEvent } from "@/lib/trackEvent";
@@ -15,6 +17,7 @@ type Props = {
 };
 
 export default function ProductCard({ product }: Props) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const { toggleFavorite, isFavorite } = useFavorites();
   const { user } = useAuth();
@@ -59,12 +62,13 @@ export default function ProductCard({ product }: Props) {
           onClick={(e) => {
             e.preventDefault();
             if (!user) {
-              alert("Please login to add to favorites ❤️");
+              const currentPath = window.location.pathname;
+              router.push(`/login?redirect=${encodeURIComponent(currentPath)}&message=Please login to your account to add to favorites ❤️`);
               return;
             }
             toggleFavorite(product.id);
           }}
-          className="absolute top-2 right-2 md:top-3 md:right-3 bg-white/80 backdrop-blur-sm p-1.5 md:p-2 rounded-full z-10 transition hover:bg-white shadow-sm"
+          className="absolute top-2 right-2 md:top-3 md:right-3 bg-white/80 backdrop-blur-sm p-1.5 md:p-2 rounded-full z-10 transition hover:bg-white shadow-sm cursor-pointer"
           aria-label={isFavorited ? "Remove from favorites" : "Add to favorites"}
         >
           <Heart
@@ -74,7 +78,7 @@ export default function ProductCard({ product }: Props) {
 
         <Link
           href={`/product/${product.id}`}
-          className="w-full flex flex-col items-center"
+          className="w-full flex flex-col items-center cursor-pointer"
           onClick={() => trackEvent(product.id, "click", user ? { email: user.email || undefined, name: user.displayName || undefined } : undefined)}
         >
           <div className="w-full aspect-[3/4.2] relative rounded-2xl overflow-hidden ">
@@ -119,13 +123,20 @@ export default function ProductCard({ product }: Props) {
                 </p>
               )}
             </div>
+
+            {product.reviewCount && product.reviewCount > 0 ? (
+              <div className="flex items-center justify-center gap-1.5 mt-2">
+                <HeartRating rating={product.averageRating || 0} size={10} />
+                <span className="text-[10px] text-gray-400 font-medium">({product.reviewCount})</span>
+              </div>
+            ) : null}
           </div>
         </Link>
 
         <button
           disabled={!hasStock}
           onClick={() => setOpen(true)}
-          className={`mt-3 px-4 md:px-6 py-2.5 md:py-4 rounded-full text-[12px] md:text-sm
+          className={`mt-3 cursor-pointer px-4 md:px-6 py-2.5 md:py-4 rounded-full text-[12px] md:text-sm
             ${hasStock
               ? "border text-[#DE9DE5] font-medium border-[#DE9DE5] border-2 hover:bg-[#DE9DE5] hover:text-white"
               : "bg-gray-200 text-gray-400 cursor-not-allowed"

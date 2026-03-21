@@ -53,7 +53,7 @@ export default function FilterBar({
         <div className="relative" ref={sortRef}>
           <button
             onClick={() => setIsSortOpen(!isSortOpen)}
-            className="flex items-center gap-2 text-lg font-normal text-gray-800 focus:outline-none"
+            className="flex items-center gap-2 text-lg font-normal text-gray-800 focus:outline-none cursor-pointer"
           >
             <span>{currentSortLabel}</span>
             <ChevronDown className={`w-5 h-5 transition-transform duration-200 ${isSortOpen ? "rotate-180" : ""}`} />
@@ -69,7 +69,7 @@ export default function FilterBar({
                       setSort(option.value);
                       setIsSortOpen(false);
                     }}
-                    className={`px-6 py-4 text-center text-lg font-normal transition-colors hover:bg-gray-50
+                    className={`px-6 py-4 text-center text-lg font-normal transition-colors hover:bg-gray-50 cursor-pointer
                       ${index !== sortOptions.length - 1 ? "border-b border-gray-100" : ""}
                       ${sort === option.value ? "text-black font-medium" : "text-gray-700"}
                     `}
@@ -84,7 +84,7 @@ export default function FilterBar({
 
         {/* Custom Filter Button */}
         <button
-          className="flex items-center gap-3 bg-[#E5E5E5] px-6 py-3 rounded-full text-lg font-normal text-gray-800 transition-opacity hover:opacity-90 active:scale-95"
+          className="flex items-center gap-3 bg-[#E5E5E5] px-6 py-3 rounded-full text-lg font-normal text-gray-800 transition-opacity hover:opacity-90 active:scale-95 cursor-pointer"
           onClick={() => {/* Category filter logic - could open a drawer or modal if needed */ }}
         >
           <span>Filter By Category</span>

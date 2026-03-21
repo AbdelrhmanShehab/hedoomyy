@@ -86,7 +86,7 @@ export default function CheckoutClient() {
         <button
           onClick={proceedToPayment}
           disabled={!isFormValid}
-          className={`w-full rounded-full py-4 font-medium transition
+          className={`w-full rounded-full py-4 font-medium transition cursor-pointer
             ${isFormValid
               ? "bg-purple-400 hover:bg-purple-300 text-white"
               : "bg-gray-200 text-gray-400 cursor-not-allowed"

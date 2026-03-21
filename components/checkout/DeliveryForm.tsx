@@ -109,7 +109,7 @@ export default function DeliveryForm() {
             </Link>
             <button
               onClick={autoFillFromProfile}
-              className="flex items-center gap-2 px-4 py-2 bg-black hover:bg-zinc-800 text-white text-xs font-bold uppercase tracking-wider rounded-full shadow-md transition-all active:scale-95 group"
+              className="flex items-center gap-2 px-4 py-2 bg-black hover:bg-zinc-800 text-white text-xs font-bold uppercase tracking-wider rounded-full shadow-md transition-all active:scale-95 group cursor-pointer"
             >
               <span className="w-1.5 h-1.5 bg-white rounded-full group-hover:animate-ping" />
               Fill from Profile
@@ -133,7 +133,7 @@ export default function DeliveryForm() {
           <div className="flex-1">
             <p className="text-sm font-bold text-purple-900">Fill your data once!</p>
             <p className="text-xs text-purple-800/80 leading-relaxed">
-              Save your info in the <Link href="/account" className="font-extrabold underline decoration-purple-300 underline-offset-2">Account Page</Link> so it&apos;s ready for every order. Use the button above to auto-fill.
+              Save your info in the <Link href="/account" className="font-extrabold underline decoration-purple-300 underline-offset-2 cursor-pointer">Account Page</Link> so it&apos;s ready for every order. Use the button above to auto-fill.
             </p>
           </div>
         </div>
@@ -221,7 +221,7 @@ export default function DeliveryForm() {
           <select
             value={order.delivery.city}
             onChange={(e) => updateDelivery("city", e.target.value)}
-            className={`w-full border rounded-xl px-4 py-3 text-sm ${errors.city ? "border-red-500" : "border-gray-300"
+            className={`w-full border rounded-xl px-4 py-3 text-sm cursor-pointer ${errors.city ? "border-red-500" : "border-gray-300"
               }`}
           >
             <option value="">Select City</option>
