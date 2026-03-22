@@ -3,7 +3,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { User, ShoppingBag, Menu, X, Heart } from "lucide-react";
-import { db } from "@/lib/firebase";
 import { useEffect, useState, memo } from "react";
 import useCategories from "../usecategories";
 import callIcon from "../public/calIIcon.svg";
@@ -11,6 +10,7 @@ import instagramIcon from "../public/instagramIcon.svg";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { useFavorites } from "@/context/FavoritesContext";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface Order {
   id: string;
@@ -21,8 +21,7 @@ export default function Header() {
   const { items, openCart } = useCart();
   const { user, userData } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  /* --- NOTIFICATION LOGIC REMOVED --- */
+  const { t, lang, setLang } = useLanguage();
 
   const cartCount = items.reduce(
     (sum, item) => sum + item.qty,
@@ -53,25 +52,35 @@ export default function Header() {
 
           {/* Center Text */}
           <span className="hidden md:block text-s ">
-            Enjoy your shopping :)
+            {t("header_enjoy")}
           </span>
 
           {/* Right Side */}
           <div className="flex items-center gap-3 text-s">
             {/* Desktop Links */}
             <div className="hidden md:flex items-center gap-3">
-              <a href="/policy" className="hover:underline cursor-pointer">FAQs</a>
+              <a href="/policy" className="hover:underline cursor-pointer">{t("header_faqs")}</a>
               <span className="text-white/60">|</span>
-              <a href="/policy" className="hover:underline cursor-pointer">Return & Exchange</a>
+              <a href="/policy" className="hover:underline cursor-pointer">{t("header_return")}</a>
               <span className="text-white/60">|</span>
-              <a href="/policy" className="hover:underline cursor-pointer">Delivery</a>
+              <a href="/policy" className="hover:underline cursor-pointer">{t("header_delivery")}</a>
               <span className="text-white/60">|</span>
-              <a href="/about" className="hover:underline cursor-pointer">About Us</a>
+              <a href="/about" className="hover:underline cursor-pointer">{t("header_about")}</a>
             </div>
             {/* Mobile Link */}
             <div className="md:hidden">
-              <Link href="/policy" className="hover:underline font-bold cursor-pointer">Our Policy</Link>
+              <Link href="/policy" className="hover:underline font-bold cursor-pointer">{t("header_our_policy")}</Link>
             </div>
+
+            {/* Language Toggle */}
+            <span className="text-white/60 hidden md:inline">|</span>
+            <button
+              onClick={() => setLang(lang === "en" ? "ar" : "en")}
+              className="font-bold hover:opacity-80 transition-opacity cursor-pointer bg-transparent border-none text-white text-sm"
+              aria-label="Switch language"
+            >
+              {t("header_lang_toggle")}
+            </button>
           </div>
 
         </div>
@@ -91,8 +100,8 @@ export default function Header() {
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-            <Link href="/" className="hover:text-black transition-colors cursor-pointer">Home</Link>
-            <Link href="/products" className="hover:text-black transition-colors cursor-pointer">All Items</Link>
+            <Link href="/" className="hover:text-black transition-colors cursor-pointer">{t("header_home")}</Link>
+            <Link href="/products" className="hover:text-black transition-colors cursor-pointer">{t("header_all_items")}</Link>
 
             {categories.map(cat => (
               <Link
@@ -151,6 +160,15 @@ export default function Header() {
                 </span>
               )}
             </div>
+
+            {/* Mobile Language Toggle */}
+            <button
+              onClick={() => setLang(lang === "en" ? "ar" : "en")}
+              className="md:hidden text-sm font-bold text-gray-700 cursor-pointer bg-transparent border-none"
+              aria-label="Switch language"
+            >
+              {t("header_lang_toggle")}
+            </button>
           </div>
         </div>
       </div>
@@ -169,7 +187,7 @@ export default function Header() {
                 className="text-lg font-medium text-gray-900 border-b border-gray-50 pb-2 cursor-pointer"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Home
+                {t("header_home")}
               </Link>
 
               <Link
@@ -177,7 +195,7 @@ export default function Header() {
                 className="text-lg font-medium text-gray-900 border-b border-gray-50 pb-2 cursor-pointer"
                 onClick={() => setIsMenuOpen(false)}
               >
-                All Items
+                {t("header_all_items")}
               </Link>
               {categories.map(cat => (
                 <Link

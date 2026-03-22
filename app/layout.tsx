@@ -4,13 +4,21 @@ import { CartProvider } from "../context/CartContext";
 import { CartSidebar } from "../components/CardSiderbar";
 import { AuthProvider } from "../context/AuthContext";
 import { FavoritesProvider } from "../context/FavoritesContext";
-import { Quicksand } from "next/font/google";
+import { Quicksand, Cairo } from "next/font/google";
 import NotificationManager from "../components/NotificationManager";
+import { LanguageProvider } from "../context/LanguageContext";
 import type { Metadata } from "next";
 
 const quicksand = Quicksand({
   subsets: ["latin"],
   display: "swap",
+  variable: "--font-quicksand",
+});
+
+const cairo = Cairo({
+  subsets: ["arabic", "latin"],
+  display: "swap",
+  variable: "--font-cairo",
 });
 
 export const metadata: Metadata = {
@@ -85,19 +93,22 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={quicksand.className}>
-        <AuthProvider>
-          <FavoritesProvider>
-            <CartProvider>
-              <CheckoutProvider>
-                <NotificationManager />
-                <main>{children}</main>
-                <CartSidebar />
-              </CheckoutProvider>
-            </CartProvider>
-          </FavoritesProvider>
-        </AuthProvider>
+      <body className={`${quicksand.variable} ${cairo.variable} font-sans`}>
+        <LanguageProvider>
+          <AuthProvider>
+            <FavoritesProvider>
+              <CartProvider>
+                <CheckoutProvider>
+                  <NotificationManager />
+                  <main>{children}</main>
+                  <CartSidebar />
+                </CheckoutProvider>
+              </CartProvider>
+            </FavoritesProvider>
+          </AuthProvider>
+        </LanguageProvider>
       </body>
     </html>
   );
 }
+
