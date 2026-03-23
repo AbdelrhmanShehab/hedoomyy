@@ -6,10 +6,12 @@ import { useEffect, useState } from "react";
 import { db } from "../../lib/firebase";
 import { collection, getDocs } from "firebase/firestore";
 import Link from "next/link";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function DeliveryForm() {
   const { order, setOrder, errors, setErrors, setShippingFee } = useCheckout();
   const { userData } = useAuth();
+  const { t } = useLanguage();
   const [citiesData, setCitiesData] = useState<{ id: string; fee: number }[]>([]);
 
   useEffect(() => {
@@ -67,7 +69,7 @@ export default function DeliveryForm() {
     if (!regex.test(phone)) {
       setErrors(prev => ({
         ...prev,
-        phone: "Invalid Egyptian phone number",
+        phone: t("checkout_invalid_phone"),
       }));
     }
   };
@@ -98,21 +100,21 @@ export default function DeliveryForm() {
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
-        <h2 className="text-base font-medium">Delivery Information</h2>
+        <h2 className="text-base font-medium">{t("checkout_delivery_info")}</h2>
         {userData ? (
           <div className="flex items-center gap-3">
              <Link
               href="/account"
               className="text-[10px] font-bold text-gray-400 uppercase tracking-widest hover:text-purple-500 transition-colors"
             >
-              Go to Account →
+              {t("checkout_go_to_account")}
             </Link>
             <button
               onClick={autoFillFromProfile}
               className="flex items-center gap-2 px-4 py-2 bg-black hover:bg-zinc-800 text-white text-xs font-bold uppercase tracking-wider rounded-full shadow-md transition-all active:scale-95 group cursor-pointer"
             >
               <span className="w-1.5 h-1.5 bg-white rounded-full group-hover:animate-ping" />
-              Fill from Profile
+              {t("checkout_fill_profile")}
             </button>
           </div>
         ) : (
@@ -120,7 +122,7 @@ export default function DeliveryForm() {
             href="/account"
             className="text-[10px] font-bold text-gray-400 uppercase tracking-widest hover:text-purple-500 transition-colors"
           >
-            Go to Account →
+            {t("checkout_go_to_account")}
           </Link>
         )}
       </div>
@@ -131,9 +133,9 @@ export default function DeliveryForm() {
             ✨
           </div>
           <div className="flex-1">
-            <p className="text-sm font-bold text-purple-900">Fill your data once!</p>
+            <p className="text-sm font-bold text-purple-900">{t("checkout_fill_once")}</p>
             <p className="text-xs text-purple-800/80 leading-relaxed">
-              Save your info in the <Link href="/account" className="font-extrabold underline decoration-purple-300 underline-offset-2 cursor-pointer">Account Page</Link> so it&apos;s ready for every order. Use the button above to auto-fill.
+              {t("checkout_fill_once_desc")}
             </p>
           </div>
         </div>
@@ -141,13 +143,13 @@ export default function DeliveryForm() {
 
       {/* Address */}
       <div>
-        <label className="block text-xs mb-1">Address *</label>
+        <label className="block text-xs mb-1">{t("checkout_address")}</label>
         <input
           value={order.delivery.address}
           onChange={(e) => updateDelivery("address", e.target.value)}
           className={`w-full border rounded-xl px-4 py-3 text-sm ${errors.address ? "border-red-500" : "border-gray-300"
             }`}
-          placeholder="Street, building, area"
+          placeholder={t("checkout_address_placeholder")}
         />
         {errors.address && (
           <p className="text-red-500 text-xs mt-1">{errors.address}</p>
@@ -157,7 +159,7 @@ export default function DeliveryForm() {
       {/* Names */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-xs mb-1">First Name *</label>
+          <label className="block text-xs mb-1">{t("checkout_first_name")}</label>
           <input
             value={order.delivery.firstName}
             onChange={(e) => updateDelivery("firstName", e.target.value)}
@@ -170,7 +172,7 @@ export default function DeliveryForm() {
         </div>
 
         <div>
-          <label className="block text-xs mb-1">Last Name *</label>
+          <label className="block text-xs mb-1">{t("checkout_last_name")}</label>
           <input
             value={order.delivery.lastName}
             onChange={(e) => updateDelivery("lastName", e.target.value)}
@@ -186,7 +188,7 @@ export default function DeliveryForm() {
       {/* Phones */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-xs mb-1">Phone Number *</label>
+          <label className="block text-xs mb-1">{t("checkout_phone")}</label>
           <input
             value={order.delivery.phone}
             onChange={(e) => updateDelivery("phone", e.target.value)}
@@ -202,7 +204,7 @@ export default function DeliveryForm() {
 
         <div>
           <label className="block text-xs mb-1">
-            Second Phone (optional)
+            {t("checkout_second_phone")}
           </label>
           <input
             value={order.delivery.secondPhone || ""}
@@ -217,14 +219,14 @@ export default function DeliveryForm() {
       {/* City Dropdown */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-xs mb-1">City *</label>
+          <label className="block text-xs mb-1">{t("checkout_city")}</label>
           <select
             value={order.delivery.city}
             onChange={(e) => updateDelivery("city", e.target.value)}
             className={`w-full border rounded-xl px-4 py-3 text-sm cursor-pointer ${errors.city ? "border-red-500" : "border-gray-300"
               }`}
           >
-            <option value="">Select City</option>
+            <option value="">{t("checkout_city_placeholder")}</option>
             {citiesData.map(city => (
               <option key={city.id} value={city.id}>
                 {city.id}
@@ -235,19 +237,17 @@ export default function DeliveryForm() {
             <p className="text-red-500 text-xs mt-1">{errors.city}</p>
           )}
         </div>
-
-
       </div>
 
       {/* Apartment */}
       <div>
-        <label className="block text-xs mb-1">Apartment *</label>
+        <label className="block text-xs mb-1">{t("checkout_apartment")}</label>
         <input
           value={order.delivery.apartment}
           onChange={(e) => updateDelivery("apartment", e.target.value)}
           className={`w-full border rounded-xl px-4 py-3 text-sm ${errors.apartment ? "border-red-500" : "border-gray-300"
             }`}
-          placeholder="Apt, floor, etc."
+          placeholder={t("checkout_apartment_placeholder")}
         />
         {errors.apartment && (
           <p className="text-red-500 text-xs mt-1">{errors.apartment}</p>

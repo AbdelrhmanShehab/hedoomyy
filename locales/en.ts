@@ -135,8 +135,9 @@ const en = {
 
   // ── Account Sidebar ───────────────────────────────────────
   account_my_account: "My Account",
-  account_profile: "Profile",
-  account_orders: "Orders",
+  account_subtitle: "Manage your info and track orders",
+  account_profile: "Personal Information",
+  account_orders: "Order History",
   account_addresses: "Addresses",
   account_sign_out: "Sign Out",
 
@@ -179,29 +180,30 @@ const en = {
   addresses_set_default: "Set Default",
 
   // ── About ─────────────────────────────────────────────────
-  about_back: "Back to home >",
-  about_title: "About Us",
-  about_subtitle: "A small brand with a simple mission — creating quality pieces that look good, feel good, and stay affordable.",
+  about_hero_title: "Because looking good shouldn't cost a fortune",
+  about_hero_subtitle: "A small brand with a simple mission — creating quality pieces that look good, feel good, and stay affordable.",
   about_our_story: "Our Story",
-  about_our_story_text: "Hedoomyy is an online clothing store based in Cairo. We started with a simple idea: provide high-quality pieces without the unnecessary high prices that usually come with fashion brands.",
-  about_our_mission: "Our Mission",
-  about_our_mission_text: "Our mission is to give customers a smooth and enjoyable online shopping experience while delivering clothing that balances comfort, style, and durability.",
-  about_different: "What Makes Us Different",
-  about_different_text: "Every piece is made with attention to detail and passion. We focus on good materials, clean designs, and fair pricing so everyone can enjoy quality clothing without overpaying.",
-  about_made_with_love: "Made With Love",
-  about_made_with_love_text: "All of our pieces are created with love and care. We hope every item you receive becomes something you truly enjoy wearing.",
+  about_story_title: "Hedoomyy is an online clothing store based in Cairo.",
+  about_story_p1: "We started with a simple idea: provide high-quality pieces without the unnecessary high prices that usually come with fashion brands.",
+  about_story_p2: "Every piece is made with attention to detail and passion. We focus on good materials, clean designs, and fair pricing so everyone can enjoy quality clothing without overpaying.",
+  about_mission_title: "Our Mission",
+  about_mission_desc: "Our mission is to give customers a smooth and enjoyable online shopping experience while delivering clothing that balances comfort, style, and durability.",
+  about_value_1_title: "Quality Materials",
+  about_value_1_desc: "We prioritize materials that feel great and last long.",
+  about_value_2_title: "Fair Pricing",
+  about_value_2_desc: "High quality doesn't have to mean high price.",
+  about_value_3_title: "Made with Love",
+  about_value_3_desc: "Every item is handled with care and attention.",
+  about_made_with_love: "All of our pieces are created with love and care.",
   about_start_shopping: "Start Shopping →",
 
   // ── Login ─────────────────────────────────────────────────
-  login_title: "Welcome Back",
-  login_subtitle: "Sign in to your Hedoomyy account",
-  login_email: "Email",
-  login_password: "Password",
-  login_sign_in: "Sign In",
-  login_no_account: "Don't have an account?",
-  login_sign_up: "Sign Up",
-  login_forgot_password: "Forgot password?",
-  login_google: "Continue with Google",
+  login_welcome: "Welcome Back!",
+  login_subtitle: "Add your google account to login",
+  login_google_btn: "Login with Google",
+  login_tagline_1: "Enter.",
+  login_tagline_2: "Explore.",
+  login_tagline_3: "Express yourself.",
 
   // ── Review Section ────────────────────────────────────────
   reviews_title: "Customer Reviews",
@@ -214,8 +216,89 @@ const en = {
 
   // ── Favorites ─────────────────────────────────────────────
   favorites_title: "Your Favorites",
-  favorites_empty: "You haven't saved any favorites yet.",
+  favorites_loading: "Loading your favorites...",
+  favorites_empty_title: "Your bag is empty",
+  favorites_empty_desc: "Save the items you love to find them easily later. Start browsing our collection and click the heart icon!",
   favorites_browse: "Browse Products",
+
+  // ── Confirmation ──────────────────────────────────────────
+  confirmation_loading: "Loading order…",
+  confirmation_not_found: "Order not found.",
+  confirmation_title: "Order Confirmation",
+  confirmation_thank_you: "Thank you",
+  confirmation_for_order: "for your order",
+  confirmation_check_email: "Please check your email for confirmation.",
+  confirmation_pickup_time: "Pick-up Time",
+  confirmation_pickup_desc: "From 1 to 5 working days",
+  confirmation_excluding_days: "excluding Friday & Saturday",
+  confirmation_deposit_paid: "Deposit Paid",
+  confirmation_full_paid: "Full Amount Paid Online",
+  confirmation_amount_paid: "Amount paid",
+  confirmation_remaining: "Remaining on delivery",
+  confirmation_confirmed: "Confirmed",
+  confirmation_awaiting: "Awaiting confirmation",
+  confirmation_screenshot: "Transaction Screenshot",
+  confirmation_view_full: "Click to view full image",
+
+  // ── Policy ────────────────────────────────────────────────
+  policy_contact_us: "Contact Us",
+  policy_back_home: "Back to home",
+  policy_submit_email: "Submit Email:",
+  policy_call_us: "Call us:",
+  policy_social_media: "Our Social Media:",
+  policy_title_our: "Our Policy",
+  policy_title_return: "Return Policy",
+  policy_title_delivery: "Delivery Policy",
+  policy_title_deposit: "Deposit Policy",
+  
+  // FAQ - Our
+  faq_our_q1: "How long does shipping take?",
+  faq_our_a1: "Orders usually arrive within 1 to 7 business days after the order is confirmed.",
+  faq_our_q2: "How long do pre-order items take to arrive?",
+  faq_our_a2: "Pre-order items typically arrive within 5 to 20 days.",
+  faq_our_q3: "Will I receive a tracking number?",
+  faq_our_a3: "Yes, you will receive a mail that your order has been shipped once it's ready.",
+  faq_our_q4: "Are you responsible for shipping delays?",
+  faq_our_a4: "No, we are not responsible for delays caused by couriers, customs, or unforeseen circumstances.",
+
+  // FAQ - Return
+  faq_return_q1: "Do you offer returns or exchanges?",
+  faq_return_a1: "Unfortunately we don't do return nor exchange unless the item you received was defected or different from pictures shown.",
+  faq_return_q2: "What if I discover a defect after the courier leaves?",
+  faq_return_a2_p1: "If a defect is found after delivery:",
+  faq_return_a2_li1: "Another courier will collect the item",
+  faq_return_a2_li2: "The piece will be examined by our quality control team",
+  faq_return_a2_li3: "If the defect is confirmed, you will receive a full refund, excluding shipping fees",
+  faq_return_no_trying: "Trying the item on is not allowed.",
+
+  // FAQ - Delivery
+  faq_delivery_q1: "What am I allowed to check during delivery?",
+  faq_delivery_a1_p1: "You may only check that:",
+  faq_delivery_a1_li1: "The item is not defective",
+  faq_delivery_a1_li2: "The item matches the pictures shown",
+  faq_delivery_q2: "Can I try the item before paying?",
+  faq_delivery_a2: "No. Trying the item before payment is not allowed.",
+
+  // FAQ - Deposit
+  faq_deposit_q1: "Is a deposit required to place an order?",
+  faq_deposit_a1: "Yes. A deposit is required for every order to confirm and start production.",
+  faq_deposit_q2: "Why do you require a deposit?",
+  faq_deposit_a2: "All pieces are made to order. The deposit helps us secure materials and begin the production process for your item.",
+  faq_deposit_q3: "Is the deposit refundable?",
+  faq_deposit_a3: "Deposits are non-refundable once the order is confirmed, as production starts immediately. (unless there is a defect in the product).",
+  faq_deposit_q4: "When do I pay the remaining balance?",
+  faq_deposit_a4: "The remaining balance must be paid upon delivery.",
+
+  // ── Categories ──────────────────────────────────────────
+  category_all: "All Items",
+  category_shirts: "Shirts",
+  category_full_sets: "Full Sets",
+  category_dresses: "Dresses",
+  category_pants: "Pants",
+  category_skirt: "Skirts",
+  category_kimono: "Kimonos",
+  category_outerwear: "Outerwear",
+  category_accessories: "Accessories",
 } as const;
 
 export type TranslationKeys = keyof typeof en;

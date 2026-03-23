@@ -1,9 +1,11 @@
 "use client";
 
 import { useCheckout } from "../../context/CheckoutContext";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function ContactForm() {
   const { order, setOrder, errors, setErrors } = useCheckout();
+  const { t } = useLanguage();
 
   const handleEmailChange = (value: string) => {
     setOrder(prev => ({
@@ -20,21 +22,21 @@ export default function ContactForm() {
     if (!regex.test(email)) {
       setErrors(prev => ({
         ...prev,
-        email: "Invalid email format",
+        email: t("checkout_contact_invalid_email"),
       }));
     }
   };
 
   return (
     <div className="space-y-2">
-      <h2 className="text-lg font-medium">Contact</h2>
+      <h2 className="text-lg font-medium">{t("checkout_contact")}</h2>
 
       <input
         type="email"
         value={order.contact.email}
         onChange={(e) => handleEmailChange(e.target.value)}
         onBlur={() => validateEmail(order.contact.email)}
-        placeholder="Email address"
+        placeholder={t("checkout_contact_placeholder")}
         className={`w-full border rounded-xl px-4 py-3 text-sm ${
           errors.email ? "border-red-500" : "border-gray-300"
         }`}

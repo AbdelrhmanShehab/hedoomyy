@@ -7,6 +7,7 @@ export interface ProductVariant {
   size: string;
 
   stock: number; // stock per size + color
+  fit?: string; // e.g. "small", "true to size", "large"
 }
 
 export interface Product {

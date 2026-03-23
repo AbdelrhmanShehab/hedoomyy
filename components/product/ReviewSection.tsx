@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { collection, query, where, orderBy, onSnapshot, addDoc, doc, updateDoc, increment, serverTimestamp } from "firebase/firestore";
+import { collection, query, where, onSnapshot, addDoc, doc, updateDoc, increment, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/context/AuthContext";
 import { Review } from "@/data/review";
 import HeartRating from "./HeartRating";
+import { useLanguage } from "@/context/LanguageContext";
 
 type Props = {
   productId: string;
@@ -15,6 +16,7 @@ type Props = {
 
 export default function ReviewSection({ productId, averageRating = 0, reviewCount = 0 }: Props) {
   const { user, userData } = useAuth();
+  const { t } = useLanguage();
   const [reviews, setReviews] = useState<Review[]>([]);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
@@ -32,7 +34,6 @@ export default function ReviewSection({ productId, averageRating = 0, reviewCoun
         ...doc.data()
       })) as Review[];
       
-      // Sort manually on client to avoid requiring a composite index
       const sortedData = data.sort((a, b) => {
         const timeA = a.createdAt?.toMillis?.() || 0;
         const timeB = b.createdAt?.toMillis?.() || 0;
@@ -62,10 +63,8 @@ export default function ReviewSection({ productId, averageRating = 0, reviewCoun
 
       await addDoc(collection(db, "reviews"), newReview);
 
-      // Update product aggregation
       const productRef = doc(db, "products", productId);
       
-      // Calculate new average
       const currentCount = reviewCount || 0;
       const currentAvg = averageRating || 0;
       const newCount = currentCount + 1;
@@ -93,7 +92,7 @@ export default function ReviewSection({ productId, averageRating = 0, reviewCoun
         {/* Left Side: Summary & Form */}
         <div className="md:w-1/3 space-y-8">
           <div>
-            <h2 className="text-2xl font-medium text-gray-900 mb-2">Customer Reviews</h2>
+            <h2 className="text-2xl font-medium text-gray-900 mb-2">{t("reviews_title")}</h2>
             <div className="flex items-center gap-3">
               <HeartRating rating={averageRating} />
               <span className="text-sm text-gray-500 font-medium">
@@ -104,7 +103,7 @@ export default function ReviewSection({ productId, averageRating = 0, reviewCoun
 
           {user ? (
             <form onSubmit={handleSubmit} className="space-y-4 bg-gray-50 p-6 rounded-2xl border border-gray-100">
-              <p className="font-medium text-gray-900">Add a Review</p>
+              <p className="font-medium text-gray-900">{t("reviews_write")}</p>
               
               <div>
                 <p className="text-sm text-gray-500 mb-2">Tap a heart to rate:</p>
@@ -118,7 +117,7 @@ export default function ReviewSection({ productId, averageRating = 0, reviewCoun
 
               <div>
                 <textarea
-                  placeholder="What did you think about this product?"
+                  placeholder={t("reviews_your_review")}
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
                   className="w-full bg-white border border-gray-200 rounded-xl p-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#DE9DE5]/20 min-h-[120px] transition-all"
@@ -131,12 +130,12 @@ export default function ReviewSection({ productId, averageRating = 0, reviewCoun
                 disabled={submitting || rating === 0 || !comment.trim()}
                 className="w-full bg-[#DE9DE5] text-white py-3 rounded-full font-medium hover:bg-[#cf8ed5] transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
-                {submitting ? "Submitting..." : "Submit Review"}
+                {submitting ? "Submitting..." : t("reviews_submit")}
               </button>
             </form>
           ) : (
             <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
-              <p className="text-sm text-gray-600 mb-4">Please log in to share your thoughts with us!</p>
+              <p className="text-sm text-gray-600 mb-4">{t("reviews_login_to_review")}</p>
               <button
                 onClick={() => {
                   const currentPath = window.location.pathname;
@@ -172,7 +171,7 @@ export default function ReviewSection({ productId, averageRating = 0, reviewCoun
               ))
             ) : (
               <div className="h-64 flex flex-col items-center justify-center text-gray-400 border-2 border-dashed border-gray-100 rounded-3xl">
-                <p>No reviews yet. Be the first to share your thoughts!</p>
+                <p>{t("reviews_no_reviews")}</p>
               </div>
             )}
           </div>

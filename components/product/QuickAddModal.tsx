@@ -8,6 +8,7 @@ import HeartRating from "./HeartRating";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { trackEvent } from "@/lib/trackEvent";
+import { useLanguage } from "@/context/LanguageContext";
 
 type Props = {
   product: Product;
@@ -20,6 +21,7 @@ export default function QuickAddModal({
 }: Props) {
   const { addItem } = useCart();
   const { user } = useAuth();
+  const { t } = useLanguage();
 
   const variants = product.variants ?? [];
 
@@ -98,8 +100,8 @@ export default function QuickAddModal({
           <div className="text-right">
             {product.originalPrice && product.originalPrice > product.price ? (
               <div className="flex flex-col items-end">
-                <span className="text-[10px] text-gray-400 line-through">Old: {product.originalPrice} EGP</span>
-                <span className="text-sm font-bold text-red-500">New: {product.price} EGP</span>
+                <span className="text-[10px] text-gray-400 line-through">{t("card_old")} {product.originalPrice} EGP</span>
+                <span className="text-sm font-bold text-red-500">{t("card_new")} {product.price} EGP</span>
               </div>
             ) : (
               <span className="text-sm font-bold text-pink-400">{product.price} EGP</span>
@@ -109,7 +111,7 @@ export default function QuickAddModal({
 
         {/* COLORS */}
         <div className="mb-4">
-          <p className="text-sm mb-2">Color</p>
+          <p className="text-sm mb-2">{t("modal_color")}</p>
           <div className="flex gap-2 flex-wrap">
             {colors.map(color => {
               const hasStock = variants.some(
@@ -147,7 +149,7 @@ export default function QuickAddModal({
         {/* SIZES */}
         {selectedColor && (
           <div className="mb-4">
-            <p className="text-sm mb-2">Size</p>
+            <p className="text-sm mb-2">{t("modal_size")}</p>
             <div className="flex gap-2 flex-wrap">
               {sizes.map(size => {
                 const variant = variants.find(
@@ -187,7 +189,7 @@ export default function QuickAddModal({
         {/* QUANTITY */}
         {selectedSize && (
           <div className="mb-6">
-            <p className="text-sm mb-2">Quantity</p>
+            <p className="text-sm mb-2">{t("modal_quantity")}</p>
             <div className="flex items-center gap-4">
               <div className="flex items-center border rounded-full px-2 py-1">
                 <button
@@ -207,7 +209,7 @@ export default function QuickAddModal({
               </div>
               {selectedVariant?.stock !== undefined && selectedVariant.stock <= 10 && (
                 <p className="text-xs text-amber-500 font-medium">
-                  Only {selectedVariant.stock} left in stock
+                  {t("modal_only_left", { n: selectedVariant.stock })}
                 </p>
               )}
             </div>
@@ -227,17 +229,17 @@ export default function QuickAddModal({
           `}
         >
           {!selectedVariant
-            ? "Select Options"
+            ? t("modal_select_options")
             : isOutOfStock
-              ? "Out of Stock"
-              : "Add to Cart"}
+              ? t("product_out_of_stock")
+              : t("modal_add_to_cart")}
         </button>
 
         <button
           onClick={onClose}
           className="mt-3 w-full text-sm text-gray-500 cursor-pointer"
         >
-          Cancel
+          {t("modal_cancel")}
         </button>
       </div>
     </div>

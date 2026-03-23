@@ -1,22 +1,25 @@
+"use client";
 import Image from "next/image";
 import feedbacks from "../../data/feedback";
+import { useLanguage } from "@/context/LanguageContext";
+
 export default function Feedback() {
+    const { t } = useLanguage();
     return (
         <section className="relative w-full min-h-[900px] flex flex-col justify-center items-center py-40">
 
             {/* Section Label */}
             <div className="absolute top-8 left-8 z-20">
-                <h3 className="text-2xl font-bold text-zinc-900">Our Family</h3>
+                <h3 className="text-2xl font-bold text-zinc-900">{t("feedback_our_family")}</h3>
             </div>
 
             {/* Center Text */}
             <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
                 <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-4">
-                    Explore what our customers <br className="hidden md:block" />
-                    have to say about us
+                    {t("feedback_headline")}
                 </h2>
                 <p className="text-lg md:text-xl text-gray-500 font-medium">
-                    your feedback shapes everything we do &lt;3
+                    {t("feedback_subline")}
                 </p>
             </div>
 

@@ -11,6 +11,7 @@ import HeartRating from "./product/HeartRating";
 import { useFavorites } from "@/context/FavoritesContext";
 import { useAuth } from "@/context/AuthContext";
 import { trackEvent } from "@/lib/trackEvent";
+import { useLanguage } from "@/context/LanguageContext";
 
 type Props = {
   product: Product;
@@ -21,6 +22,7 @@ export default function ProductCard({ product }: Props) {
   const [open, setOpen] = useState(false);
   const { toggleFavorite, isFavorite } = useFavorites();
   const { user } = useAuth();
+  const { t } = useLanguage();
 
   const isFavorited = isFavorite(product.id);
 
@@ -47,12 +49,12 @@ export default function ProductCard({ product }: Props) {
         <div className="absolute top-2 left-2 md:top-3 md:left-3 flex flex-col gap-1.5 md:gap-2 z-10">
           {product.isBestSeller && (
             <div className="bg-black text-white text-[10px] md:text-xs px-2 md:px-3 py-0.5 md:py-1 rounded-full w-max font-medium">
-              BEST SELLER
+              {t("card_best_seller")}
             </div>
           )}
           {product.originalPrice && product.originalPrice > product.price && (
             <div className="bg-red-500 text-white text-[10px] md:text-xs px-2 md:px-3 py-0.5 md:py-1 rounded-full w-max font-medium">
-              SALE
+              {t("card_sale")}
             </div>
           )}
         </div>
@@ -69,7 +71,7 @@ export default function ProductCard({ product }: Props) {
             toggleFavorite(product.id);
           }}
           className="absolute top-2 right-2 md:top-3 md:right-3 bg-white/80 backdrop-blur-sm p-1.5 md:p-2 rounded-full z-10 transition hover:bg-white shadow-sm cursor-pointer"
-          aria-label={isFavorited ? "Remove from favorites" : "Add to favorites"}
+          aria-label={isFavorited ? t("card_remove_from_favorites") : t("card_add_to_favorites")}
         >
           <Heart
             className={`w-4 h-4 md:w-5 h-5 transition-colors ${isFavorited ? "text-pink-400 fill-pink-400" : "text-gray-400"}`}
@@ -92,7 +94,7 @@ export default function ProductCard({ product }: Props) {
 
             {!hasStock && (
               <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white text-xs md:text-base">
-                Out of Stock
+                {t("product_out_of_stock")}
               </div>
             )}
           </div>
@@ -105,13 +107,13 @@ export default function ProductCard({ product }: Props) {
               {product.originalPrice && product.originalPrice > product.price ? (
                 <>
                   <div className="flex items-center gap-1.5 md:gap-2">
-                    <span className="text-[9px] md:text-[10px] text-gray-400 font-medium uppercase">Old:</span>
+                    <span className="text-[9px] md:text-[10px] text-gray-400 font-medium uppercase">{t("card_old")}</span>
                     <p className="text-[10px] md:text-xs text-gray-400 line-through font-medium">
                       {product.originalPrice} EGP
                     </p>
                   </div>
                   <div className="flex items-center gap-1.5 md:gap-2">
-                    <span className="text-[9px] md:text-[10px] text-red-500 font-bold uppercase">New:</span>
+                    <span className="text-[9px] md:text-[10px] text-red-500 font-bold uppercase">{t("card_new")}</span>
                     <p className="text-[12px] md:text-sm font-bold text-red-500">
                       {product.price} EGP
                     </p>
@@ -143,7 +145,7 @@ export default function ProductCard({ product }: Props) {
             }
           `}
         >
-          Quick Add
+          {t("product_quick_add")}
         </button>
       </div>
 

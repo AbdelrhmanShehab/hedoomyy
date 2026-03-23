@@ -2,9 +2,11 @@
 
 import { useCheckout } from "../../context/CheckoutContext";
 import Image from "next/image";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function OrderSummary() {
   const { order, shippingFee } = useCheckout();
+  const { t } = useLanguage();
 
   const subtotal = order.items.reduce(
     (sum, item) => sum + item.price * item.qty,
@@ -17,7 +19,7 @@ export default function OrderSummary() {
   if (order.items.length === 0) {
     return (
       <div className="text-sm text-gray-500">
-        Your cart is empty.
+        {t("checkout_order_summary")}
       </div>
     );
   }
@@ -54,17 +56,17 @@ export default function OrderSummary() {
 
       <div className="border-t pt-4 space-y-2 text-sm">
         <div className="flex justify-between">
-          <span>Subtotal</span>
+          <span>{t("checkout_subtotal")}</span>
           <span>EGP {subtotal.toLocaleString()}</span>
         </div>
 
         <div className="flex justify-between">
-          <span>Shipping</span>
+          <span>{t("checkout_shipping")}</span>
           <span>EGP {shipping}</span>
         </div>
 
         <div className="flex justify-between font-medium pt-2 text-base">
-          <span>Total</span>
+          <span>{t("checkout_total")}</span>
           <span>EGP {total.toLocaleString()}</span>
         </div>
       </div>

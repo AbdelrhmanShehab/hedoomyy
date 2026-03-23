@@ -137,8 +137,9 @@ const ar: Record<TranslationKeys, string> = {
 
   // ── Account Sidebar ───────────────────────────────────────
   account_my_account: "حسابي",
-  account_profile: "الملف الشخصي",
-  account_orders: "الطلبات",
+  account_subtitle: "إدارة بياناتك وتتبع طلباتك",
+  account_profile: "البيانات الشخصية",
+  account_orders: "سجل الطلبات",
   account_addresses: "العناوين",
   account_sign_out: "تسجيل الخروج",
 
@@ -181,29 +182,30 @@ const ar: Record<TranslationKeys, string> = {
   addresses_set_default: "اجعليه افتراضي",
 
   // ── About ─────────────────────────────────────────────────
-  about_back: "< الرجوع للرئيسية",
-  about_title: "من نحن",
-  about_subtitle: "علامة تجارية صغيرة بمهمة بسيطة — إنشاء قطع عالية الجودة تبان حلوة وتحسسك بالراحة وبسعر مناسب.",
+  about_hero_title: "لأن المظهر الجميل ما لازمه يكلف كتير",
+  about_hero_subtitle: "علامة تجارية صغيرة بمهمة بسيطة — إنشاء قطع عالية الجودة تبان حلوة وتحسسك بالراحة وبسعر مناسب.",
   about_our_story: "قصتنا",
-  about_our_story_text: "هدومي متجر ملابس أونلاين من القاهرة. بدأنا بفكرة بسيطة: نقدم قطع عالية الجودة من غير الأسعار الغالية اللي بتيجي مع ماركات الموضة.",
-  about_our_mission: "مهمتنا",
-  about_our_mission_text: "مهمتنا هي إننا نديك تجربة تسوق أونلاين سلسة وممتعة مع توصيل ملابس بتوازن بين الراحة والستايل والمتانة.",
-  about_different: "إيه اللي بيميزنا",
-  about_different_text: "كل قطعة بتتعمل باهتمام وشغف. بنركز على الخامات الكويسة والتصميمات الأنيقة والأسعار العادلة عشان الكل يقدر يستمتع بالموضة من غير زيادة.",
-  about_made_with_love: "صُنعت بحب",
-  about_made_with_love_text: "كل قطعة بنعملها بحب واهتمام. بنتمنى كل حاجة بتوصلك تبقى حاجة بتحبيها وبتلبسيها.",
+  about_story_title: "هدومي متجر ملابس أونلاين من القاهرة.",
+  about_story_p1: "بدأنا بفكرة بسيطة: نقدم قطع عالية الجودة من غير الأسعار الغالية اللي بتيجي مع ماركات الموضة.",
+  about_story_p2: "كل قطعة بتتعمل باهتمام وشغف. بنركز على الخامات الكويسة والتصميمات الأنيقة والأسعار العادلة عشان الكل يقدر يستمتع بالموضة من غير زيادة.",
+  about_mission_title: "مهمتنا",
+  about_mission_desc: "مهمتنا هي إننا نديك تجربة تسوق أونلاين سلسة وممتعة مع توصيل ملابس بتوازن بين الراحة والستايل والمتانة.",
+  about_value_1_title: "خامات عالية الجودة",
+  about_value_1_desc: "بنركز على الخامات اللي ملمسها حلو وبتعيش معاكي.",
+  about_value_2_title: "أسعار عادلة",
+  about_value_2_desc: "الجودة العالية مش لازم معناها سعر غالي.",
+  about_value_3_title: "صُنعت بحب",
+  about_value_3_desc: "كل قطعة بنتعامل معاها باهتمام ورعاية.",
+  about_made_with_love: "كل قطعنا بتتعمل بحب واهتمام.",
   about_start_shopping: "ابدئي التسوق ←",
 
   // ── Login ─────────────────────────────────────────────────
-  login_title: "أهلًا بيكي",
-  login_subtitle: "سجلي دخولك لحساب هدومي",
-  login_email: "البريد الإلكتروني",
-  login_password: "كلمة المرور",
-  login_sign_in: "تسجيل الدخول",
-  login_no_account: "مالكيش حساب؟",
-  login_sign_up: "سجلي",
-  login_forgot_password: "نسيتي كلمة المرور؟",
-  login_google: "كملي بـ Google",
+  login_welcome: "أهلًا بيكي تاني!",
+  login_subtitle: "سجلي دخولك بحساب Google",
+  login_google_btn: "تسجيل الدخول بـ Google",
+  login_tagline_1: "ادخلي.",
+  login_tagline_2: "استكشفي.",
+  login_tagline_3: "عبري عن نفسك.",
 
   // ── Review Section ────────────────────────────────────────
   reviews_title: "تقييمات العملاء",
@@ -216,8 +218,89 @@ const ar: Record<TranslationKeys, string> = {
 
   // ── Favorites ─────────────────────────────────────────────
   favorites_title: "المفضلة",
-  favorites_empty: "لسه معندكيش منتجات في المفضلة.",
+  favorites_loading: "جاري تحميل المفضلة...",
+  favorites_empty_title: "شنطتك فاضية",
+  favorites_empty_desc: "احفظي الحاجات اللي بتحبيها عشان تلاقيها بسهولة بعدين. ابدئي تصفحي مجموعتنا ودوسي على شكل القلب!",
   favorites_browse: "تصفحي المنتجات",
+
+  // ── Confirmation ──────────────────────────────────────────
+  confirmation_loading: "جاري تحميل الأوردر…",
+  confirmation_not_found: "الأوردر مش موجود.",
+  confirmation_title: "تأكيد الأوردر",
+  confirmation_thank_you: "شكرًا",
+  confirmation_for_order: "على طلبك",
+  confirmation_check_email: "من فضلك راجعي بريدك الإلكتروني للتأكيد.",
+  confirmation_pickup_time: "وقت الاستلام",
+  confirmation_pickup_desc: "من يوم لـ 5 أيام عمل",
+  confirmation_excluding_days: "باستثناء الجمعة والسبت",
+  confirmation_deposit_paid: "تم دفع العربون",
+  confirmation_full_paid: "تم دفع المبلغ بالكامل أونلاين",
+  confirmation_amount_paid: "المبلغ المدفوع",
+  confirmation_remaining: "الباقي عند الاستلام",
+  confirmation_confirmed: "تم التأكيد",
+  confirmation_awaiting: "في انتظار التأكيد",
+  confirmation_screenshot: "صورة التحويل",
+  confirmation_view_full: "دوسي هنا عشان تشوفي الصورة كاملة",
+
+  // ── Policy ────────────────────────────────────────────────
+  policy_contact_us: "تواصل معنا",
+  policy_back_home: "العودة للرئيسية",
+  policy_submit_email: "أرسل بريد إلكتروني:",
+  policy_call_us: "اتصل بنا:",
+  policy_social_media: "وسائل التواصل الاجتماعي:",
+  policy_title_our: "سياستنا",
+  policy_title_return: "سياسة الاسترجاع",
+  policy_title_delivery: "سياسة التوصيل",
+  policy_title_deposit: "سياسة العربون",
+  
+  // FAQ - Our
+  faq_our_q1: "كام المدة اللي بياخدها الشحن؟",
+  faq_our_a1: "الأوردرات عادة بتوصل في خلال 1 لـ 7 أيام عمل بعد تأكيد الأوردر.",
+  faq_our_q2: "كام المدة اللي بياخدها الحجز المسبق (Pre-order)؟",
+  faq_our_a2: "قطع الحجز المسبق عادة بتوصل في خلال 5 لـ 20 يوم.",
+  faq_our_q3: "هل هستلم رقم تتبع؟",
+  faq_our_a3: "أيوة، هتوصلك رسالة لما الأوردر يتشحن ويكون جاهز.",
+  faq_our_q4: "هل أنتم مسؤولين عن تأخير الشحن؟",
+  faq_our_a4: "لأ، إحنا مش مسؤولين عن أي تأخير بسبب شركات الشحن أو الجمارك أو أي ظروف طارئة.",
+
+  // FAQ - Return
+  faq_return_q1: "هل فيه استرجاع أو استبدال؟",
+  faq_return_a1: "للأسف مفيش استرجاع ولا استبدال إلا لو القطعة فيها عيب صناعة أو مختلفة عن الصور المعروضة.",
+  faq_return_q2: "إيه اللي يحصل لو اكتشفت عيب بعد ما المندوب مشي؟",
+  faq_return_a2_p1: "لو اكتشفت عيب بعد الاستلام:",
+  faq_return_a2_li1: "مندوب تاني هييجي يستلم القطعة",
+  faq_return_a2_li2: "القطعة هتتفحص من فريق الجودة عندنا",
+  faq_return_a2_li3: "لو العيب اتأكد، هتاخد فلوسك كاملة ماعدا مصاريف الشحن",
+  faq_return_no_trying: "قياس القطعة غير مسموح به.",
+
+  // FAQ - Delivery
+  faq_delivery_q1: "إيه اللي مسموح لي أراجعه وقت الاستلام؟",
+  faq_delivery_a1_p1: "مسموح لك تراجع بس إن:",
+  faq_delivery_a1_li1: "القطعة مفيهاش عيوب",
+  faq_delivery_a1_li2: "القطعة مطابقة للصور المعروضة",
+  faq_delivery_q2: "ممكن أقيس قبل ما أدفع؟",
+  faq_delivery_a2: "لأ، ممنوع القياس قبل الدفع.",
+
+  // FAQ - Deposit
+  faq_deposit_q1: "هل فيه عربون مطلوب للأوردر؟",
+  faq_deposit_a1: "أيوة، فيه عربون مطلوب لكل أوردر عشان يتأكد ونبدأ في تنفيذه.",
+  faq_deposit_q2: "ليه بتطلبوا عربون؟",
+  faq_deposit_a2: "كل القطع بتتصنع بالطلب، فالعربون بيساعدنا نشتري الخامات ونبدأ عملية التصنيع مخصوص عشانك.",
+  faq_deposit_q3: "هل العربون مسترد؟",
+  faq_deposit_a3: "العربون غير مسترد بمجرد تأكيد الأوردر وبدء التنفيذ، إلا لو فيه عيب في المنتج.",
+  faq_deposit_q4: "إمتى أدفع باقي المبلغ؟",
+  faq_deposit_a4: "باقي المبلغ بيتدفع وقت الاستلام لمندوب الشحن.",
+
+  // ── Categories ──────────────────────────────────────────
+  category_all: "كل المنتجات",
+  category_shirts: "قمصان / شميزات",
+  category_full_sets: "طقم كامل",
+  category_dresses: "فساتين",
+  category_pants: "بناطيل",
+  category_skirt: "جيبات",
+  category_kimono: "كيمونو",
+  category_outerwear: "ملابس خارجية",
+  category_accessories: "إكسسوارات",
 };
 
 export default ar;
