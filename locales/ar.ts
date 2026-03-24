@@ -23,10 +23,10 @@ const ar: Record<TranslationKeys, string> = {
   footer_policy: "السياسة",
   footer_track_order: "تتبعي طلبك",
   footer_faqs: "الأسئلة الشائعة",
-  footer_copyright: "© هدومي 2021",
+  footer_copyright: "© Hedoomyy 2021",
 
   // ── Hero ─────────────────────────────────────────────────
-  hero_headline: "لأن المظهر الجميل ما لازمه يكلف كتير",
+  hero_headline: "لأن المظهر الجميل ",
   hero_shop_all: "تسوقي كل المنتجات",
 
   // ── Feedback ─────────────────────────────────────────────
