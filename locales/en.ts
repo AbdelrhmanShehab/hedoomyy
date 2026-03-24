@@ -250,7 +250,7 @@ const en = {
   policy_title_return: "Return Policy",
   policy_title_delivery: "Delivery Policy",
   policy_title_deposit: "Deposit Policy",
-  
+
   // FAQ - Our
   faq_our_q1: "How long does shipping take?",
   faq_our_a1: "Orders usually arrive within 1 to 7 business days after the order is confirmed.",
@@ -289,16 +289,6 @@ const en = {
   faq_deposit_q4: "When do I pay the remaining balance?",
   faq_deposit_a4: "The remaining balance must be paid upon delivery.",
 
-  // ── Categories ──────────────────────────────────────────
-  category_all: "All Items",
-  category_shirts: "Shirts",
-  category_full_sets: "Full Sets",
-  category_dresses: "Dresses",
-  category_pants: "Pants",
-  category_skirt: "Skirts",
-  category_kimono: "Kimonos",
-  category_outerwear: "Outerwear",
-  category_accessories: "Accessories",
 } as const;
 
 export type TranslationKeys = keyof typeof en;

@@ -2,7 +2,7 @@ import type { TranslationKeys } from "./en";
 
 const ar: Record<TranslationKeys, string> = {
   // ── Header ──────────────────────────────────────────────
-  header_enjoy: "استمتعي بتسوقك 🛍️",
+  header_enjoy: "استمتعي بتسوقك!",
   header_faqs: "الأسئلة الشائعة",
   header_return: "الإرجاع والاستبدال",
   header_delivery: "التوصيل",
@@ -26,7 +26,7 @@ const ar: Record<TranslationKeys, string> = {
   footer_copyright: "© Hedoomyy 2021",
 
   // ── Hero ─────────────────────────────────────────────────
-  hero_headline: "لأن المظهر الجميل ",
+  hero_headline: "لأن المظهر الجميل لا يجب أن يكلف ثروة",
   hero_shop_all: "تسوقي كل المنتجات",
 
   // ── Feedback ─────────────────────────────────────────────
@@ -182,7 +182,7 @@ const ar: Record<TranslationKeys, string> = {
   addresses_set_default: "اجعليه افتراضي",
 
   // ── About ─────────────────────────────────────────────────
-  about_hero_title: "لأن المظهر الجميل ما لازمه يكلف كتير",
+  about_hero_title: "لأن المظهر الجميل لا يجب أن يكلف ثروة",
   about_hero_subtitle: "علامة تجارية صغيرة بمهمة بسيطة — إنشاء قطع عالية الجودة تبان حلوة وتحسسك بالراحة وبسعر مناسب.",
   about_our_story: "قصتنا",
   about_story_title: "هدومي متجر ملابس أونلاين من القاهرة.",
@@ -252,7 +252,7 @@ const ar: Record<TranslationKeys, string> = {
   policy_title_return: "سياسة الاسترجاع",
   policy_title_delivery: "سياسة التوصيل",
   policy_title_deposit: "سياسة العربون",
-  
+
   // FAQ - Our
   faq_our_q1: "كام المدة اللي بياخدها الشحن؟",
   faq_our_a1: "الأوردرات عادة بتوصل في خلال 1 لـ 7 أيام عمل بعد تأكيد الأوردر.",
@@ -284,23 +284,14 @@ const ar: Record<TranslationKeys, string> = {
   // FAQ - Deposit
   faq_deposit_q1: "هل فيه عربون مطلوب للأوردر؟",
   faq_deposit_a1: "أيوة، فيه عربون مطلوب لكل أوردر عشان يتأكد ونبدأ في تنفيذه.",
-  faq_deposit_q2: "ليه بتطلبوا عربون؟",
+  faq_deposit_q2: " ليه بتطلبوا عربون؟",
   faq_deposit_a2: "كل القطع بتتصنع بالطلب، فالعربون بيساعدنا نشتري الخامات ونبدأ عملية التصنيع مخصوص عشانك.",
   faq_deposit_q3: "هل العربون مسترد؟",
   faq_deposit_a3: "العربون غير مسترد بمجرد تأكيد الأوردر وبدء التنفيذ، إلا لو فيه عيب في المنتج.",
   faq_deposit_q4: "إمتى أدفع باقي المبلغ؟",
   faq_deposit_a4: "باقي المبلغ بيتدفع وقت الاستلام لمندوب الشحن.",
 
-  // ── Categories ──────────────────────────────────────────
-  category_all: "كل المنتجات",
-  category_shirts: "قمصان / شميزات",
-  category_full_sets: "طقم كامل",
-  category_dresses: "فساتين",
-  category_pants: "بناطيل",
-  category_skirt: "جيبات",
-  category_kimono: "كيمونو",
-  category_outerwear: "ملابس خارجية",
-  category_accessories: "إكسسوارات",
+
 };
 
 export default ar;
