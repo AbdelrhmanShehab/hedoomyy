@@ -3,15 +3,7 @@ import React, { useRef } from "react";
 import ProductCard from "./ProductCard";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
-
-interface Product {
-  id: string;
-  name: string;
-  price: number;
-  image: string;
-  category: string;
-  [key: string]: any;
-}
+import { Product } from "@/data/product";
 
 interface ProductSliderProps {
   products: Product[];
