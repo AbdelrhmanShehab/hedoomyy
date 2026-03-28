@@ -43,7 +43,7 @@ export default function ProductCard({ product }: Props) {
 
   return (
     <>
-      <div className="group flex flex-col items-center transition hover:-translate-y-1 relative">
+      <div className="group/card flex flex-col items-center transition hover:-translate-y-1 relative">
 
         {/* BADGES */}
         <div className="absolute top-2 left-2 md:top-3 md:left-3 flex flex-col gap-1.5 md:gap-2 z-10">
@@ -89,7 +89,7 @@ export default function ProductCard({ product }: Props) {
               alt={product.title}
               fill
               sizes="(max-width:768px) 50vw, 300px"
-              className="object-cover transition group-hover:scale-105"
+              className="object-cover transition group-hover/card:scale-105"
             />
 
             {!hasStock && (

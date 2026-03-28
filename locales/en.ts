@@ -31,6 +31,7 @@ const en = {
   feedback_our_family: "Our Family",
   feedback_headline: "Explore what our customers have to say about us",
   feedback_subline: "your feedback shapes everything we do <3",
+  instagram_follow: "Follow us and be part of our family",
 
   // ── Home — New Arrivals ──────────────────────────────────
   new_arrivals_title: "Explore New Arrivals",

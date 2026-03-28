@@ -18,7 +18,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 
 export const metadata: Metadata = {
-  title: "Hedoomyy | Online Fashion Store in Egypt",
+  title: "Hedoomyy",
   description:
     "Shop affordable women's clothing online in Egypt. Discover new arrivals, best sellers, dresses, tops and more. Fast delivery across Cairo and all of Egypt.",
   alternates: {
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     url: "https://hedoomyy.com",
-    title: "Hedoomyy | Online Fashion Store in Egypt",
+    title: "Hedoomyy",
     description:
       "Shop affordable women's clothing online in Egypt. Discover new arrivals, best sellers, dresses, tops and more. Fast delivery across Cairo and all of Egypt.",
   },

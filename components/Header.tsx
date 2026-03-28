@@ -162,13 +162,13 @@ export default function Header() {
             </div>
 
             {/* Mobile Language Toggle */}
-            <button
+            {/* <button
               onClick={() => setLang(lang === "en" ? "ar" : "en")}
               className="md:hidden text-sm font-bold text-gray-700 cursor-pointer bg-transparent border-none"
               aria-label="Switch language"
             >
               {t("header_lang_toggle")}
-            </button>
+            </button> */}
           </div>
         </div>
       </div>

@@ -33,6 +33,8 @@ const ar: Record<TranslationKeys, string> = {
   feedback_our_family: "عائلتنا",
   feedback_headline: "ما يقولوه عملاؤنا عنا",
   feedback_subline: "رأيك يحدد كل حاجة بنعملها <3",
+  instagram_follow: "تابعينا وكوني جزء من عيلتنا",
+
 
   // ── Home — New Arrivals ──────────────────────────────────
   new_arrivals_title: "استكشفي أحدث المنتجات",
@@ -290,7 +292,6 @@ const ar: Record<TranslationKeys, string> = {
   faq_deposit_a3: "العربون غير مسترد بمجرد تأكيد الأوردر وبدء التنفيذ، إلا لو فيه عيب في المنتج.",
   faq_deposit_q4: "إمتى أدفع باقي المبلغ؟",
   faq_deposit_a4: "باقي المبلغ بيتدفع وقت الاستلام لمندوب الشحن.",
-
 
 };
 
