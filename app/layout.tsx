@@ -59,7 +59,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: "https://hedoomyy.com",
-    siteName: "Hedoomyy",
+    siteName: "Hedoomyy | For Her",
     title: "Hedoomyy | Online Fashion Store in Egypt",
     description:
       "Discover quality fashion pieces at affordable prices. Fast delivery across Egypt.",
@@ -74,7 +74,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Hedoomyy | Online Fashion Store in Egypt",
+    title: "Hedoomyy | For Her",
     description:
       "Discover quality fashion pieces at affordable prices. Fast delivery across Egypt.",
     images: ["/hedoomyybanner.png"],
@@ -84,6 +84,10 @@ export const metadata: Metadata = {
     canonical: "https://hedoomyy.com",
   },
   category: "fashion",
+  icons: {
+    icon: "/black-icon.png",
+    apple: "/black-icon.png",
+  },
 };
 
 export default function RootLayout({
