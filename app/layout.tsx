@@ -84,6 +84,9 @@ export const metadata: Metadata = {
     canonical: "https://hedoomyy.com",
   },
   category: "fashion",
+  verification: {
+    google: "8KXZMUvKbqm1jeqvC5UhImOalB5hR7xbdxk_mJaZX78",
+  },
   icons: {
     icon: "/black-icon.png",
     apple: "/black-icon.png",
