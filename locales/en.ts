@@ -294,6 +294,10 @@ const en = {
   faq_deposit_q4: "When do I pay the remaining balance?",
   faq_deposit_a4: "The remaining balance must be paid upon delivery.",
 
+  // ── Maintenance Mode ──────────────────────────────────────
+  maintenance_title: "We'll be back shortly",
+  maintenance_desc: "We're currently updating our store to provide you with the best fashion experience. Thank you for your patience!",
+  maintenance_follow: "Follow us for the latest updates:",
 } as const;
 
 export type TranslationKeys = keyof typeof en;

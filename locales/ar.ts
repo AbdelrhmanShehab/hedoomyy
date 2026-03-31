@@ -297,6 +297,10 @@ const ar: Record<TranslationKeys, string> = {
   faq_deposit_q4: "إمتى أدفع باقي المبلغ؟",
   faq_deposit_a4: "باقي المبلغ بيتدفع وقت الاستلام لمندوب الشحن.",
 
+  // ── Maintenance Mode ──────────────────────────────────────
+  maintenance_title: "سنعود قريبًا",
+  maintenance_desc: "نحن نقوم حاليًا بتحديث متجرنا لنقدم لكِ أفضل تجربة تسوق. شكرًا لصبرك!",
+  maintenance_follow: "تابعينا لمعرفة آخر التحديثات:",
 };
 
 export default ar;

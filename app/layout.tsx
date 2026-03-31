@@ -10,6 +10,7 @@ import { LanguageProvider } from "../context/LanguageContext";
 import type { Metadata } from "next";
 import ScrollToTop from "../components/ScrollToTop";
 import { Suspense } from "react";
+import MaintenanceGuard from "../components/MaintenanceGuard";
 
 const quicksand = Quicksand({
   subsets: ["latin"],
@@ -104,20 +105,22 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${quicksand.variable} ${cairo.variable} font-sans`}>
         <LanguageProvider>
-          <AuthProvider>
-            <FavoritesProvider>
-              <CartProvider>
-                <CheckoutProvider>
-                  <NotificationManager />
-                  <Suspense fallback={null}>
-                    <ScrollToTop />
-                  </Suspense>
-                  <main>{children}</main>
-                  <CartSidebar />
-                </CheckoutProvider>
-              </CartProvider>
-            </FavoritesProvider>
-          </AuthProvider>
+          <MaintenanceGuard>
+            <AuthProvider>
+              <FavoritesProvider>
+                <CartProvider>
+                  <CheckoutProvider>
+                    <NotificationManager />
+                    <Suspense fallback={null}>
+                      <ScrollToTop />
+                    </Suspense>
+                    <main>{children}</main>
+                    <CartSidebar />
+                  </CheckoutProvider>
+                </CartProvider>
+              </FavoritesProvider>
+            </AuthProvider>
+          </MaintenanceGuard>
         </LanguageProvider>
       </body>
     </html>
