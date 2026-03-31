@@ -205,6 +205,10 @@ const en = {
   login_tagline_1: "Enter.",
   login_tagline_2: "Explore.",
   login_tagline_3: "Express yourself.",
+  login_required_title: "Authentication Required",
+  login_required_desc: "To save your favorites and access them from any device, you need to be logged into your account.",
+  login_required_btn: "Login to Continue",
+  login_required_back: "Back to Shopping",
 
   // ── Review Section ────────────────────────────────────────
   reviews_title: "Customer Reviews",

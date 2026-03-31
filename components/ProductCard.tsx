@@ -65,7 +65,7 @@ export default function ProductCard({ product }: Props) {
             e.preventDefault();
             if (!user) {
               const currentPath = window.location.pathname;
-              router.push(`/login?redirect=${encodeURIComponent(currentPath)}&message=Please login to your account to add to favorites ❤️`);
+              router.push(`/login-required?redirect=${encodeURIComponent(currentPath)}`);
               return;
             }
             toggleFavorite(product.id);

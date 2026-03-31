@@ -8,6 +8,8 @@ import { Quicksand, Cairo } from "next/font/google";
 import NotificationManager from "../components/NotificationManager";
 import { LanguageProvider } from "../context/LanguageContext";
 import type { Metadata } from "next";
+import ScrollToTop from "../components/ScrollToTop";
+import { Suspense } from "react";
 
 const quicksand = Quicksand({
   subsets: ["latin"],
@@ -107,6 +109,9 @@ export default function RootLayout({
               <CartProvider>
                 <CheckoutProvider>
                   <NotificationManager />
+                  <Suspense fallback={null}>
+                    <ScrollToTop />
+                  </Suspense>
                   <main>{children}</main>
                   <CartSidebar />
                 </CheckoutProvider>

@@ -138,9 +138,9 @@ export default function Header() {
 
 
             <button
-              onClick={() => {
-                window.location.href = user ? "/favorites" : "/login?redirect=/favorites";
-              }}
+               onClick={() => {
+                 window.location.href = user ? "/favorites" : "/login-required?redirect=/favorites";
+               }}
               className="relative p-1 hover:bg-gray-100 rounded-full transition-all cursor-pointer bg-transparent border-none"
             >
               <Heart className="w-5 h-5 text-gray-700 hover:text-pink-400 transition-colors" />

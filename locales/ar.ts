@@ -208,6 +208,10 @@ const ar: Record<TranslationKeys, string> = {
   login_tagline_1: "ادخلي.",
   login_tagline_2: "استكشفي.",
   login_tagline_3: "عبري عن نفسك.",
+  login_required_title: "تسجيل الدخول مطلوب",
+  login_required_desc: "عشان تحفظي الحاجات اللي بتحبيها وتقدري توصلي لها من أي جهاز، محتاجة تكوني مسجلة دخول بحسابك.",
+  login_required_btn: "تسجيل الدخول للمتابعة",
+  login_required_back: "العودة للتسوق",
 
   // ── Review Section ────────────────────────────────────────
   reviews_title: "تقييمات العملاء",

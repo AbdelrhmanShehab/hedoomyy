@@ -21,6 +21,8 @@ import HeartRating from "@/components/product/HeartRating";
 import ReviewSection from "@/components/product/ReviewSection";
 import { trackEvent } from "@/lib/trackEvent";
 import { useLanguage } from "@/context/LanguageContext";
+import { db } from "@/lib/firebase";
+import { doc, onSnapshot } from "firebase/firestore";
 
 type Props = {
   product: Product;
@@ -43,6 +45,18 @@ export default function ProductClient({ product, relatedProducts }: Props) {
   const [selectedSize, setSelectedSize] = useState("");
   const [qty, setQty] = useState(1);
   const [activeImg, setActiveImg] = useState(0);
+  const [currentShareCount, setCurrentShareCount] = useState(product.shareCount || 0);
+
+  useEffect(() => {
+    const unsub = onSnapshot(doc(db, "products", product.id), (doc) => {
+      if (doc.exists()) {
+        const data = doc.data();
+        setCurrentShareCount(data.shareCount || 0);
+      }
+    });
+
+    return () => unsub();
+  }, [product.id]);
 
   const selectedVariant = variants.find(
     (v) => v.color === selectedColor && v.size === selectedSize
@@ -76,6 +90,7 @@ export default function ProductClient({ product, relatedProducts }: Props) {
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
     setCopied(true);
+    trackEvent(product.id, "share");
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -296,13 +311,19 @@ export default function ProductClient({ product, relatedProducts }: Props) {
                     </button>
                     
                     <button
-                      onClick={() => toggleFavorite(product.id)}
-                      disabled={!user}
+                      onClick={() => {
+                        if (!user) {
+                          const currentPath = window.location.pathname;
+                          window.location.href = `/login-required?redirect=${encodeURIComponent(currentPath)}`;
+                          return;
+                        }
+                        toggleFavorite(product.id);
+                      }}
                       className={`w-16 flex items-center justify-center rounded-2xl border-2 transition-all active:scale-95 cursor-pointer ${
                         isFavorited
                           ? "bg-pink-50 border-pink-100 text-pink-500"
                           : "border-zinc-100 text-zinc-400 hover:border-zinc-300"
-                      } ${!user ? "opacity-30 cursor-not-allowed" : ""}`}
+                      } `}
                     >
                       <Heart className={`w-6 h-6 ${isFavorited ? "fill-current" : ""}`} />
                     </button>
@@ -325,6 +346,14 @@ export default function ProductClient({ product, relatedProducts }: Props) {
                       </>
                     )}
                   </button>
+
+                  {currentShareCount > 0 && (
+                    <div className="text-center animate-in fade-in slide-in-from-bottom-2 duration-700">
+                      <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
+                        {currentShareCount} {currentShareCount === 1 ? t("product_person_shared") : t("product_people_shared")}
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
 
