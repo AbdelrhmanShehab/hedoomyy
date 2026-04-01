@@ -10,8 +10,9 @@ export default function MaintenanceGuard({
 }: {
   children: React.ReactNode;
 }) {
-  const [isActive, setIsActive] = useState<boolean | null>(null);
+  const [isActive, setIsActive] = useState<boolean>(true);
   const [isLocal, setIsLocal] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Check if we are on localhost
@@ -25,32 +26,37 @@ export default function MaintenanceGuard({
       doc(db, "settings", "website"),
       (snapshot) => {
         if (snapshot.exists()) {
-          setIsActive(snapshot.data().isActive);
-        } else {
-          // Default to active if document doesn't exist
-          setIsActive(true);
+          const data = snapshot.data();
+          setIsActive(data?.isActive ?? true);
         }
+        setLoading(false);
       },
       (error) => {
         console.error("Error fetching website status:", error);
-        // Fallback to active on error to avoid locking out the site
         setIsActive(true);
+        setLoading(false);
       }
     );
 
-    return () => unsubscribe();
+    // 🕒 Safety Fallback: Stop loading after 3s anyway
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 3000);
+
+    return () => {
+      unsubscribe();
+      clearTimeout(timer);
+    };
   }, []);
 
-  // Show nothing until we have the status
-  if (isActive === null) {
-    return null; // Or a minimal loading spinner
-  }
-
-  // If website is OFF and we are NOT on localhost, show maintenance page
-  if (!isActive && !isLocal) {
+  // While checking, we still show the app by default (isActive is true)
+  // unless we've explicitly received a 'false' from Firestore.
+  // We use the loading state to decide if we should even bother
+  // with the maintenance screen during the first 3 seconds.
+  
+  if (!isActive && !isLocal && !loading) {
     return <MaintenanceMode />;
   }
 
-  // Otherwise, show the application
   return <>{children}</>;
 }

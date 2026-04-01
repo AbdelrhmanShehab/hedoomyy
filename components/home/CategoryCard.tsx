@@ -10,6 +10,9 @@ type Props = {
 };
 
 export default function CategoryCard({ title, image, href }: Props) {
+  // 🛡️ Data Guard: Handle missing/invalid title
+  if (!title || typeof title !== "string") return null;
+
   // Extract just the category name from "Shop CategoryName" if needed
   const displayName = title.replace("Shop ", "");
 

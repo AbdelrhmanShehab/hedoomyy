@@ -11,6 +11,7 @@ import type { Metadata } from "next";
 import ScrollToTop from "../components/ScrollToTop";
 import { Suspense } from "react";
 import MaintenanceGuard from "../components/MaintenanceGuard";
+import ErrorBoundary from "../components/ErrorBoundary";
 
 const quicksand = Quicksand({
   subsets: ["latin"],
@@ -114,7 +115,9 @@ export default function RootLayout({
                     <Suspense fallback={null}>
                       <ScrollToTop />
                     </Suspense>
-                    <main>{children}</main>
+                    <ErrorBoundary>
+                      <main>{children}</main>
+                    </ErrorBoundary>
                     <CartSidebar />
                   </CheckoutProvider>
                 </CartProvider>

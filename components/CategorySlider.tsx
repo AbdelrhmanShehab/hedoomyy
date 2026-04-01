@@ -56,18 +56,27 @@ export default function CategorySlider({ categories }: Props) {
                 dir={isRTL ? "rtl" : "ltr"}
             >
                 {categories.map((cat) => {
-                    const translationKey = `category_${cat.slug.toLowerCase().replace(/-/g, "_")}` as any;
-                    const translatedTitle = t(translationKey) !== translationKey ? t(translationKey) : cat.name;
+                    // 🛡️ Data Guard: Handle missing/invalid objects
+                    if (!cat || typeof cat !== "object") return null;
+
+                    // 🛡️ Safety Guard: Strict string check for slug
+                    const safeSlug = typeof cat.slug === "string" ? cat.slug.toLowerCase() : "unknown";
+                    
+                    // 🛡️ Safety Guard: Strict name check + translation fallback
+                    const translationKey = `category_${safeSlug.replace(/-/g, "_")}` as any;
+                    const translatedTitle = (typeof t(translationKey) === "string" && t(translationKey) !== translationKey)
+                        ? t(translationKey) 
+                        : (typeof cat.name === "string" ? cat.name : "Untitled");
 
                     return (
                         <div
-                            key={cat.id}
+                            key={cat.id || Math.random().toString()}
                             className="min-w-[calc(50%-12px)] sm:min-w-[calc(33.33%-16px)] lg:min-w-[calc(25%-18px)] transition-all duration-300"
                         >
                             <CategoryCard
                                 title={translatedTitle}
-                                image={cat.image || "/placeholder.jpg"}
-                                href={`/products?category=${cat.slug}`}
+                                image={typeof cat.image === "string" ? cat.image : "/placeholder.jpg"}
+                                href={`/products?category=${safeSlug}`}
                             />
                         </div>
                     );
