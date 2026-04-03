@@ -40,10 +40,16 @@ function ProductsContent() {
   const [isSortOpen, setIsSortOpen] = useState(false);
   const sortRef = useRef<HTMLDivElement>(null);
 
+  const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+  const categoryRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (sortRef.current && !sortRef.current.contains(event.target as Node)) {
         setIsSortOpen(false);
+      }
+      if (categoryRef.current && !categoryRef.current.contains(event.target as Node)) {
+        setIsCategoryOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -175,70 +181,89 @@ function ProductsContent() {
         {title}
       </h1>
 
-     {/* FILTER BAR */}
-<div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-12">
+      {/* FILTER BAR */}
+      <div className="flex  md:flex-row md:items-center md:justify-center gap-6 mb-12">
 
-  {/* CATEGORY PILLS */}
-  <div className="flex gap-3 overflow-x-auto no-scrollbar">
-    
-    {/* ALL */}
-    <button
-      onClick={() => setFilterCategory(null)}
-      className={`px-5 py-2 rounded-full text-sm whitespace-nowrap transition-all 
-      ${!filterCategory 
-        ? "bg-black text-white" 
-        : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
-    >
-      All
-    </button>
-
-    {/* CATEGORIES */}
-    {categories.map(cat => (
-      <button
-        key={cat.id}
-        onClick={() => setFilterCategory(cat.slug)}
-        className={`px-5 py-2 rounded-full text-sm whitespace-nowrap transition-all
-        ${filterCategory === cat.slug
-          ? "bg-black text-white"
-          : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
-      >
-        {cat.name}
-      </button>
-    ))}
-
-  </div>
-
-  {/* SORT DROPDOWN */}
-  <div className="relative" ref={sortRef}>
-    <button
-      onClick={() => setIsSortOpen(!isSortOpen)}
-      className="flex items-center justify-between gap-3 border border-gray-200 bg-white px-5 py-2 rounded-full text-sm text-gray-700 hover:bg-gray-50 transition-colors focus:outline-none"
-    >
-      <span>{sortOptions.find(o => o.value === sort)?.label || "Sort By"}</span>
-      <span className={`text-gray-400 text-[10px] transition-transform duration-200 ${isSortOpen ? "rotate-180" : ""}`}>
-        ▼
-      </span>
-    </button>
-
-    {isSortOpen && (
-      <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-100 rounded-2xl shadow-xl overflow-hidden z-20 animate-in fade-in slide-in-from-top-2">
-        {sortOptions.map((option) => (
+        {/* CATEGORY DROPDOWN */}
+        <div className="relative" ref={categoryRef}>
           <button
-            key={option.value}
             onClick={() => {
-              setSort(option.value);
+              setIsCategoryOpen(!isCategoryOpen);
               setIsSortOpen(false);
             }}
-            className={`w-full text-left px-5 py-3 text-sm transition-colors hover:bg-gray-50 ${sort === option.value ? "bg-gray-50 font-medium text-black" : "text-gray-600"}`}
+            className="flex items-center justify-between gap-3 border border-gray-200 bg-white px-5 py-2 rounded-full text-sm text-gray-700 hover:bg-gray-50 transition-colors focus:outline-none"
           >
-            {option.label}
+            <span className="capitalize">
+              {filterCategory
+                ? categories.find(c => c.slug === filterCategory)?.name || filterCategory.replace(/-/g, " ")
+                : "All Categories"}
+            </span>
+            <span className={`text-gray-400 text-[10px] transition-transform duration-200 ${isCategoryOpen ? "rotate-180" : ""}`}>
+              ▼
+            </span>
           </button>
-        ))}
-      </div>
-    )}
-  </div>
 
-</div>
+          {isCategoryOpen && (
+            <div className="absolute left-0 mt-2 w-48 bg-white border border-gray-100 rounded-2xl shadow-xl overflow-hidden z-20 animate-in fade-in slide-in-from-top-2">
+              <button
+                onClick={() => {
+                  setFilterCategory(null);
+                  setIsCategoryOpen(false);
+                }}
+                className={`w-full text-left px-5 py-3 text-sm transition-colors hover:bg-gray-50 ${!filterCategory ? "bg-gray-50 font-medium text-black" : "text-gray-600"}`}
+              >
+                All Categories
+              </button>
+              {categories.map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => {
+                    setFilterCategory(cat.slug);
+                    setIsCategoryOpen(false);
+                  }}
+                  className={`w-full text-left px-5 py-3 text-sm transition-colors hover:bg-gray-50 capitalize ${filterCategory === cat.slug ? "bg-gray-50 font-medium text-black" : "text-gray-600"}`}
+                >
+                  {cat.name}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* SORT DROPDOWN */}
+        <div className="relative" ref={sortRef}>
+          <button
+            onClick={() => {
+              setIsSortOpen(!isSortOpen);
+              setIsCategoryOpen(false);
+            }}
+            className="flex items-center justify-between gap-3 border border-gray-200 bg-white px-5 py-2 rounded-full text-sm text-gray-700 hover:bg-gray-50 transition-colors focus:outline-none"
+          >
+            <span>{sortOptions.find(o => o.value === sort)?.label || "Sort By"}</span>
+            <span className={`text-gray-400 text-[10px] transition-transform duration-200 ${isSortOpen ? "rotate-180" : ""}`}>
+              ▼
+            </span>
+          </button>
+
+          {isSortOpen && (
+            <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-100 rounded-2xl shadow-xl overflow-hidden z-20 animate-in fade-in slide-in-from-top-2">
+              {sortOptions.map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => {
+                    setSort(option.value);
+                    setIsSortOpen(false);
+                  }}
+                  className={`w-full text-left px-5 py-3 text-sm transition-colors hover:bg-gray-50 ${sort === option.value ? "bg-gray-50 font-medium text-black" : "text-gray-600"}`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+      </div>
       {/* PRODUCTS */}
       {visibleProducts.length === 0 ? (
         <p className="text-center text-gray-500">
