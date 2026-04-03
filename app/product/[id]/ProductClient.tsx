@@ -423,7 +423,7 @@ export default function ProductClient({ product, relatedProducts }: Props) {
                 href="/products"
                 className="inline-flex items-center justify-center border border-white/70 text-white px-8 py-3.5 md:px-10 md:py-4 rounded-full font-medium hover:bg-white hover:text-black transition-all duration-300"
               >
-                {t("about_start_shopping")} 
+                {t("about_start_shopping")}
               </Link>
 
             </div>
