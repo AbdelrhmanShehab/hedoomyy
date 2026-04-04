@@ -5,7 +5,6 @@ import { CartSidebar } from "../components/CardSiderbar";
 import { AuthProvider } from "../context/AuthContext";
 import { FavoritesProvider } from "../context/FavoritesContext";
 import { Quicksand, Cairo } from "next/font/google";
-import NotificationManager from "../components/NotificationManager";
 import { LanguageProvider } from "../context/LanguageContext";
 import type { Metadata } from "next";
 import ScrollToTop from "../components/ScrollToTop";
@@ -111,7 +110,6 @@ export default function RootLayout({
               <FavoritesProvider>
                 <CartProvider>
                   <CheckoutProvider>
-                    <NotificationManager />
                     <Suspense fallback={null}>
                       <ScrollToTop />
                     </Suspense>

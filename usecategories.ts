@@ -9,21 +9,30 @@ export default function useCategories() {
 
   useEffect(() => {
     const fetch = async () => {
-      const snap = await getDocs(collection(db, "categories"));
+      try {
+        console.log("Fetching categories...");
 
-      if (!snap || snap.empty) {
-        setCategories([]);
+        const snap = await getDocs(collection(db, "categories"));
+
+        if (!snap || snap.empty) {
+          setCategories([]);
+          return;
+        }
+
+        setCategories(
+          snap.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+          })) as Category[]
+        );
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+
+        // 🔥 retry once after delay
+        setTimeout(fetch, 2000);
+      } finally {
         setLoading(false);
-        return;
       }
-
-      setCategories(
-        snap.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as Category[]
-      );
-      setLoading(false);
     };
 
     fetch();
