@@ -3,6 +3,7 @@ import { getMessaging } from "firebase/messaging";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
+import type { Messaging } from "firebase/messaging";
 // 🔑 Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyCQa6Nx0YPRM6v4A9-mXlIFP0-Gw_MSPCg",
@@ -24,7 +25,7 @@ export const db = getFirestore(app);
 // 📦 Storage
 export const storage = getStorage(app);
 
-let messaging = null;
+let messaging: Messaging | null = null;
 
 if (typeof window !== "undefined") {
   try {
