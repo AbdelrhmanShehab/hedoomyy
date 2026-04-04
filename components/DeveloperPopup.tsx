@@ -19,13 +19,7 @@ interface DeveloperPopupProps {
 }
 
 const socials = [
-  {
-    name: "Instagram",
-    icon: Instagram,
-    url: "https://www.instagram.com/abdelrhmaan17/",
-    color: "bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7]",
-    description: "Follow me for design updates"
-  },
+
   {
     name: "LinkedIn",
     icon: Linkedin,
