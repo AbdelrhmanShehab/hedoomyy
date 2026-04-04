@@ -15,7 +15,7 @@ export default function SizeSelector({ value, options, onChange }: Props) {
           <button
             key={opt}
             onClick={() => onChange(opt)}
-            className={`px-4 py-2 rounded-lg border text-sm ${
+            className={`px-4 py-2 rounded-lg border text-sm cursor-pointer ${
               value === opt
                 ? "bg-purple-300 text-white border-purple-300"
                 : "border-gray-300"

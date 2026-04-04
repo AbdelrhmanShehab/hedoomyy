@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState, useRef } from "react";
 import { collection, getDocs, where, query } from "firebase/firestore";
 import { db } from "../../lib/firebase";
 import { Product } from "../../data/product";
@@ -36,6 +36,33 @@ function ProductsContent() {
   const [filterCategory, setFilterCategory] = useState<string | null>(
     urlCategory
   );
+
+  const [isSortOpen, setIsSortOpen] = useState(false);
+  const sortRef = useRef<HTMLDivElement>(null);
+
+  const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+  const categoryRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (sortRef.current && !sortRef.current.contains(event.target as Node)) {
+        setIsSortOpen(false);
+      }
+      if (categoryRef.current && !categoryRef.current.contains(event.target as Node)) {
+        setIsCategoryOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const sortOptions: { value: SortType; label: string }[] = useMemo(() => [
+    { value: "", label: "Sort By" },
+    { value: "new", label: "New Arrivals" },
+    { value: "best", label: "Best Selling" },
+    { value: "price-high", label: "Price: High → Low" },
+    { value: "price-low", label: "Price: Low → High" },
+  ], []);
 
   /* ---------------- FETCH DATA ---------------- */
 
@@ -155,47 +182,88 @@ function ProductsContent() {
       </h1>
 
       {/* FILTER BAR */}
-      <div className="flex justify-center gap-4 mb-12 flex-wrap">
-        {/* CATEGORY FILTER */}
-        <select
-          value={filterCategory ?? ""}
-          onChange={e =>
-            setFilterCategory(
-              e.target.value || null
-            )
-          }
-          aria-label="Filter by category"
-          className="border px-4 py-2 rounded-full text-sm"
-        >
-          <option value="">All Categories</option>
-          {categories.map(cat => (
-            <option key={cat.id} value={cat.slug}>
-              {cat.name}
-            </option>
-          ))}
-        </select>
+      <div className="flex  md:flex-row md:items-center md:justify-center gap-6 mb-12">
 
-        {/* SORT */}
-        <select
-          value={sort}
-          onChange={e =>
-            setSort(e.target.value as SortType)
-          }
-          aria-label="Sort products"
-          className="border px-4 py-2 rounded-full text-sm"
-        >
-          <option value="">Sort By</option>
-          <option value="new">New Arrivals</option>
-          <option value="best">Best Selling</option>
-          <option value="price-high">
-            Price: High → Low
-          </option>
-          <option value="price-low">
-            Price: Low → High
-          </option>
-        </select>
+        {/* CATEGORY DROPDOWN */}
+        <div className="relative" ref={categoryRef}>
+          <button
+            onClick={() => {
+              setIsCategoryOpen(!isCategoryOpen);
+              setIsSortOpen(false);
+            }}
+            className="flex items-center justify-between gap-3 border border-gray-200 bg-white px-5 py-2 rounded-full text-sm text-gray-700 hover:bg-gray-50 transition-colors focus:outline-none"
+          >
+            <span className="capitalize">
+              {filterCategory
+                ? categories.find(c => c.slug === filterCategory)?.name || filterCategory.replace(/-/g, " ")
+                : "All Categories"}
+            </span>
+            <span className={`text-gray-400 text-[10px] transition-transform duration-200 ${isCategoryOpen ? "rotate-180" : ""}`}>
+              ▼
+            </span>
+          </button>
+
+          {isCategoryOpen && (
+            <div className="absolute left-0 mt-2 w-48 bg-white border border-gray-100 rounded-2xl shadow-xl overflow-hidden z-20 animate-in fade-in slide-in-from-top-2">
+              <button
+                onClick={() => {
+                  setFilterCategory(null);
+                  setIsCategoryOpen(false);
+                }}
+                className={`w-full text-left px-5 py-3 text-sm transition-colors hover:bg-gray-50 ${!filterCategory ? "bg-gray-50 font-medium text-black" : "text-gray-600"}`}
+              >
+                All Categories
+              </button>
+              {categories.map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => {
+                    setFilterCategory(cat.slug);
+                    setIsCategoryOpen(false);
+                  }}
+                  className={`w-full text-left px-5 py-3 text-sm transition-colors hover:bg-gray-50 capitalize ${filterCategory === cat.slug ? "bg-gray-50 font-medium text-black" : "text-gray-600"}`}
+                >
+                  {cat.name}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* SORT DROPDOWN */}
+        <div className="relative" ref={sortRef}>
+          <button
+            onClick={() => {
+              setIsSortOpen(!isSortOpen);
+              setIsCategoryOpen(false);
+            }}
+            className="flex items-center justify-between gap-3 border border-gray-200 bg-white px-5 py-2 rounded-full text-sm text-gray-700 hover:bg-gray-50 transition-colors focus:outline-none"
+          >
+            <span>{sortOptions.find(o => o.value === sort)?.label || "Sort By"}</span>
+            <span className={`text-gray-400 text-[10px] transition-transform duration-200 ${isSortOpen ? "rotate-180" : ""}`}>
+              ▼
+            </span>
+          </button>
+
+          {isSortOpen && (
+            <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-100 rounded-2xl shadow-xl overflow-hidden z-20 animate-in fade-in slide-in-from-top-2">
+              {sortOptions.map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => {
+                    setSort(option.value);
+                    setIsSortOpen(false);
+                  }}
+                  className={`w-full text-left px-5 py-3 text-sm transition-colors hover:bg-gray-50 ${sort === option.value ? "bg-gray-50 font-medium text-black" : "text-gray-600"}`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
       </div>
-
       {/* PRODUCTS */}
       {visibleProducts.length === 0 ? (
         <p className="text-center text-gray-500">

@@ -2,12 +2,19 @@
 
 @theme {
   --color-pink-400: #DE9DE5;
-  --font-quicksand: "Quicksand", sans-serif;
+  --font-quicksand: var(--font-quicksand), "Quicksand", sans-serif;
+  --font-cairo: var(--font-cairo), "Cairo", sans-serif;
 }
 
 :root {
-  font-family: var(--font-quicksand);
+  font-family: var(--font-quicksand), "Quicksand", sans-serif;
 }
+
+/* Switch to Cairo font when Arabic (RTL) is active */
+[dir="rtl"] {
+  font-family: var(--font-cairo), "Cairo", sans-serif;
+}
+
 
 .mainContainer {
   /* to make padding works even in mobile size screens */

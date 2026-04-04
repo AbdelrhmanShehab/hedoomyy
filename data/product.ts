@@ -7,6 +7,7 @@ export interface ProductVariant {
   size: string;
 
   stock: number; // stock per size + color
+  fit?: string; // e.g. "small", "true to size", "large"
 }
 
 export interface Product {
@@ -26,8 +27,11 @@ export interface Product {
   offerId?: string;
 
   images: string[];
+  shareCount?: number;
 
   variants: ProductVariant[];
+  averageRating?: number;
+  reviewCount?: number;
 
   createdAt?: any;
   updatedAt?: any;

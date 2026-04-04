@@ -10,6 +10,13 @@ export default function useCategories() {
   useEffect(() => {
     const fetch = async () => {
       const snap = await getDocs(collection(db, "categories"));
+      
+      if (!snap || snap.empty) {
+        setCategories([]);
+        setLoading(false);
+        return;
+      }
+
       setCategories(
         snap.docs.map(doc => ({
           id: doc.id,

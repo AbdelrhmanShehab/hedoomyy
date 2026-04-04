@@ -139,3 +139,36 @@ export async function fetchProductById(id: string) {
     if (!doc.fields) return null;
     return docToObject(doc) as Record<string, any>;
 }
+
+export async function fetchRelatedProducts(categoryId: string, currentProductId: string, limitCount = 4) {
+    if (!categoryId) return [];
+    
+    // Fetch active products in the same category
+    return runQuery({
+        structuredQuery: {
+            from: [{ collectionId: "products" }],
+            where: {
+                compositeFilter: {
+                    op: "AND",
+                    filters: [
+                        {
+                            fieldFilter: {
+                                field: { fieldPath: "status" },
+                                op: "EQUAL",
+                                value: { stringValue: "active" },
+                            },
+                        },
+                        {
+                            fieldFilter: {
+                                field: { fieldPath: "category" },
+                                op: "EQUAL",
+                                value: { stringValue: categoryId },
+                            },
+                        },
+                    ],
+                },
+            },
+            limit: limitCount + 1, // Get one extra to account for potentially filtering out the current product
+        },
+    }).then(products => products.filter(p => p.id !== currentProductId).slice(0, limitCount));
+}

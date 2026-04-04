@@ -1,6 +1,7 @@
 "use client";
 
 import { MapPin, Plus, Trash2, Edit2 } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 const mockAddresses = [
     {
@@ -24,12 +25,14 @@ const mockAddresses = [
 ];
 
 export default function AddressManager() {
+    const { t } = useLanguage();
+    
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-medium text-zinc-800">Your Addresses</h3>
-                <button className="flex items-center gap-2 bg-[#E6A6E9] text-white px-4 py-2 rounded-full text-sm font-medium hover:opacity-90 transition-opacity shadow-sm">
-                    <Plus className="w-4 h-4" /> Add New
+                <h3 className="text-xl font-medium text-zinc-800">{t("addresses_title")}</h3>
+                <button className="flex items-center gap-2 bg-[#E6A6E9] text-white px-4 py-2 rounded-full text-sm font-medium hover:opacity-90 transition-opacity shadow-sm cursor-pointer">
+                    <Plus className="w-4 h-4" /> {t("addresses_add_new")}
                 </button>
             </div>
 
@@ -41,7 +44,7 @@ export default function AddressManager() {
           `}>
                         {addr.isDefault && (
                             <span className="absolute top-4 right-4 bg-purple-100 text-purple-600 text-[10px] uppercase font-bold px-2 py-0.5 rounded">
-                                Default
+                                {t("addresses_default")}
                             </span>
                         )}
 
@@ -62,15 +65,15 @@ export default function AddressManager() {
                         </div>
 
                         <div className="flex items-center gap-3 pt-4 border-t border-gray-100/50">
-                            <button className="flex items-center gap-1.5 text-xs font-medium text-zinc-500 hover:text-zinc-800 transition-colors">
-                                <Edit2 className="w-3.5 h-3.5" /> Edit
+                            <button className="flex items-center gap-1.5 text-xs font-medium text-zinc-500 hover:text-zinc-800 transition-colors cursor-pointer">
+                                <Edit2 className="w-3.5 h-3.5" /> {t("addresses_edit")}
                             </button>
-                            <button className="flex items-center gap-1.5 text-xs font-medium text-red-400 hover:text-red-600 transition-colors">
-                                <Trash2 className="w-3.5 h-3.5" /> Remove
+                            <button className="flex items-center gap-1.5 text-xs font-medium text-red-400 hover:text-red-600 transition-colors cursor-pointer">
+                                <Trash2 className="w-3.5 h-3.5" /> {t("addresses_remove")}
                             </button>
                             {!addr.isDefault && (
-                                <button className="ml-auto text-xs font-medium text-purple-600 hover:text-purple-700">
-                                    Set Default
+                                <button className="ml-auto text-xs font-medium text-purple-600 hover:text-purple-700 cursor-pointer">
+                                    {t("addresses_set_default")}
                                 </button>
                             )}
                         </div>

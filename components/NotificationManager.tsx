@@ -12,7 +12,8 @@ export default function NotificationManager() {
           const registration = await navigator.serviceWorker.register("/firebase-messaging-sw.js");
           console.log("Service Worker registered with scope:", registration.scope);
 
-          if (messaging && Notification.permission === "granted") {
+          const hasNotificationAPI = typeof window !== "undefined" && "Notification" in window;
+          if (messaging && hasNotificationAPI && Notification.permission === "granted") {
             try {
               const token = await getToken(messaging, {
                 vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,

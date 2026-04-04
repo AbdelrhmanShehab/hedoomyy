@@ -1,11 +1,14 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import { onAuthStateChanged, User as FirebaseUser } from "firebase/auth";
 import { doc, getDoc, setDoc, collection, getDocs } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import { User, Save, Loader2 } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function ProfileOverview() {
+    const { t } = useLanguage();
     const [user, setUser] = useState<FirebaseUser | null>(null);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -62,10 +65,10 @@ export default function ProfileOverview() {
         setSaving(true);
         try {
             await setDoc(doc(db, "users", user.uid), formData, { merge: true });
-            alert("Profile updated successfully!");
+            alert(t("profile_saved"));
         } catch (error) {
             console.error("Error saving user data:", error);
-            alert("Failed to update profile.");
+            alert(t("profile_save_failed"));
         } finally {
             setSaving(false);
         }
@@ -91,7 +94,7 @@ export default function ProfileOverview() {
 
                 <div>
                     <h2 className="text-xl font-semibold text-zinc-800">
-                        {user?.displayName || "Your Profile"}
+                        {user?.displayName || t("profile_your_profile")}
                     </h2>
                     <p className="text-sm text-gray-500">{user?.email}</p>
                 </div>
@@ -100,7 +103,7 @@ export default function ProfileOverview() {
             {/* Profile Form */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">First Name</label>
+                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{t("profile_first_name")}</label>
                     <input
                         type="text"
                         name="firstName"
@@ -112,7 +115,7 @@ export default function ProfileOverview() {
                 </div>
 
                 <div className="space-y-2">
-                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Last Name</label>
+                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{t("profile_last_name")}</label>
                     <input
                         type="text"
                         name="lastName"
@@ -124,7 +127,7 @@ export default function ProfileOverview() {
                 </div>
 
                 <div className="space-y-2">
-                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Phone Number</label>
+                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{t("profile_phone")}</label>
                     <input
                         type="tel"
                         name="phone"
@@ -136,7 +139,7 @@ export default function ProfileOverview() {
                 </div>
 
                 <div className="space-y-2">
-                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Secondary Phone</label>
+                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{t("profile_second_phone")}</label>
                     <input
                         type="tel"
                         name="secondPhone"
@@ -148,7 +151,7 @@ export default function ProfileOverview() {
                 </div>
 
                 <div className="md:col-span-2 space-y-2">
-                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Shipping Address</label>
+                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{t("profile_address")}</label>
                     <input
                         type="text"
                         name="address"
@@ -160,7 +163,7 @@ export default function ProfileOverview() {
                 </div>
 
                 <div className="space-y-2">
-                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Apartment/Suite</label>
+                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{t("profile_apartment")}</label>
                     <input
                         type="text"
                         name="apartment"
@@ -172,14 +175,14 @@ export default function ProfileOverview() {
                 </div>
 
                 <div className="space-y-2">
-                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">City</label>
+                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{t("profile_city")}</label>
                     <select
                         name="city"
                         value={formData.city}
                         onChange={handleChange}
                         className="w-full border-b border-gray-200 focus:border-purple-500 outline-none py-2 transition-colors bg-white cursor-pointer"
                     >
-                        <option value="">Select City</option>
+                        <option value="">{t("profile_select_city")}</option>
                         {citiesData.map(city => (
                             <option key={city} value={city}>{city}</option>
                         ))}
@@ -190,14 +193,14 @@ export default function ProfileOverview() {
             <button
                 onClick={handleSave}
                 disabled={saving}
-                className="flex items-center justify-center gap-2 bg-purple-600 text-white px-8 py-3 rounded-full font-medium hover:bg-purple-700 transition-colors disabled:bg-purple-300 w-full md:w-auto"
+                className="flex items-center justify-center gap-2 bg-purple-600 text-white px-8 py-3 rounded-full font-medium hover:bg-purple-700 transition-colors disabled:bg-purple-300 w-full md:w-auto cursor-pointer"
             >
                 {saving ? (
                     <Loader2 className="w-5 h-5 animate-spin" />
                 ) : (
                     <Save className="w-5 h-5" />
                 )}
-                Save Changes
+                {t("profile_save")}
             </button>
         </div>
     );

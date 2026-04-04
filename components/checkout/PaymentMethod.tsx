@@ -1,14 +1,16 @@
 "use client";
 import { useCheckout } from "../../context/CheckoutContext";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function PaymentMethod() {
   const { order, setOrder } = useCheckout();
+  const { t } = useLanguage();
 
   return (
     <div className="space-y-2">
-      <h2 className="text-lg font-medium">Payment</h2>
+      <h2 className="text-lg font-medium">{t("checkout_payment")}</h2>
 
-      <label className="flex items-center gap-2">
+      <label className="flex items-center gap-2 cursor-pointer">
         <input
           type="radio"
           checked={order.payment === "cod"}
@@ -16,10 +18,10 @@ export default function PaymentMethod() {
             setOrder({ ...order, payment: "cod" })
           }
         />
-        Cash on Delivery
+        {t("checkout_cod")}
       </label>
 
-      <label className="flex items-center gap-2">
+      <label className="flex items-center gap-2 cursor-pointer">
         <input
           type="radio"
           checked={order.payment === "online"}
@@ -27,7 +29,7 @@ export default function PaymentMethod() {
             setOrder({ ...order, payment: "online" })
           }
         />
-        Pay Online
+        {t("checkout_online")}
       </label>
     </div>
   );

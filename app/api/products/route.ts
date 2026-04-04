@@ -28,6 +28,7 @@ export async function GET() {
           : [],
 
       variants: data.variants ?? [],
+      shareCount: data.shareCount ?? 0,
 
       createdAt: data.createdAt ?? null,
       updatedAt: data.updatedAt ?? null,

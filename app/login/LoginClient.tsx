@@ -8,6 +8,7 @@ import loginImg from "../../public/login.png";
 import heartIcon from "../../public/heartLoginIcon.svg";
 import { Suspense } from "react";
 import { Kaushan_Script } from "next/font/google";
+import { useLanguage } from "@/context/LanguageContext";
 
 const kaushanScript = Kaushan_Script({
   weight: "400",
@@ -20,6 +21,7 @@ function LoginContent() {
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirect") || "/";
   const message = searchParams.get("message");
+  const { t, isRTL } = useLanguage();
 
   const loginWithGoogle = async () => {
     try {
@@ -36,8 +38,8 @@ function LoginContent() {
   };
 
   return (
-    <div className="min-h-screen flex relative">
-      {/* ================= LEFT SIDE ================= */}
+    <div className={`min-h-screen flex relative ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+      {/* ================= LEFT SIDE (Visible on Desktop) ================= */}
       <div className="hidden md:flex w-1/3 relative">
         <Image
           src={loginImg}
@@ -50,16 +52,17 @@ function LoginContent() {
         <div className="absolute inset-0 bg-black/30"></div>
 
         {/* Text */}
-        <div className="absolute bottom-[25%] left-16 text-white z-10">
+        <div className={`absolute bottom-[25%] z-10 text-white ${isRTL ? "right-16 text-right" : "left-16 text-left"}`}>
           <h2 className="text-4xl font-medium leading-snug">
-            Enter.
+            {t("login_tagline_1")}
             <br />
-            Explore.
+            {t("login_tagline_2")}
             <br />
-            Express yourself.
+            {t("login_tagline_3")}
           </h2>
         </div>
       </div>
+      
       {/* ================= RIGHT SIDE ================= */}
       <div className="flex w-full md:w-1/2 items-center justify-center px-6">
         <div className="w-full max-w-md space-y-8 text-center bg-white p-10 rounded-3xl shadow-sm">
@@ -74,7 +77,7 @@ function LoginContent() {
           <div className="space-y-2">
             <div className="flex justify-center items-center gap-2">
               <h1 className={`${kaushanScript.className} text-4xl text-gray-700`}>
-                Welcome Back!
+                {t("login_welcome")}
               </h1>
               <Image
                 src={heartIcon}
@@ -84,16 +87,16 @@ function LoginContent() {
               />
             </div>
             <p className="text-sm text-gray-500">
-              Add your google account to login
+              {t("login_subtitle")}
             </p>
           </div>
 
           {/* Button */}
           <button
             onClick={loginWithGoogle}
-            className="w-full bg-purple-400 hover:bg-purple-500 text-white font-medium py-4 rounded-xl transition duration-300 shadow-md hover:shadow-lg"
+            className="w-full bg-purple-400 hover:bg-purple-500 text-white font-medium py-4 rounded-xl transition duration-300 shadow-md hover:shadow-lg cursor-pointer"
           >
-            Login with Google
+            {t("login_google_btn")}
           </button>
         </div>
       </div>

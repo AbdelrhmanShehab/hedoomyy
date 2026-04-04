@@ -1,66 +1,60 @@
 "use client";
-
-import { useRef } from "react";
-import { Product } from "../data/product";
+import React, { useRef } from "react";
 import ProductCard from "./ProductCard";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
+import { Product } from "@/data/product";
 
-type Props = {
-    products: Product[];
+interface ProductSliderProps {
+  products: Product[];
+}
+
+const ProductSlider: React.FC<ProductSliderProps> = ({ products }) => {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const { isRTL } = useLanguage();
+
+  const scroll = (direction: "left" | "right") => {
+    if (scrollRef.current) {
+      const { scrollLeft, clientWidth } = scrollRef.current;
+      const scrollTo = direction === "left" 
+        ? scrollLeft - clientWidth / 2 
+        : scrollLeft + clientWidth / 2;
+      
+      scrollRef.current.scrollTo({ left: scrollTo, behavior: "smooth" });
+    }
+  };
+
+  return (
+    <div className="relative group overflow-hidden">
+      <div
+        ref={scrollRef}
+        className="flex overflow-x-auto gap-4 no-scrollbar scroll-smooth px-4"
+        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+      >
+        {products.map((product) => (
+          <div key={product.id} className="min-w-[280px] md:min-w-[320px]">
+            <ProductCard product={product} />
+          </div>
+        ))}
+      </div>
+
+      {/* Navigation Arrows */}
+      <button
+        onClick={() => scroll(isRTL ? "right" : "left")}
+        aria-label={isRTL ? "التالي" : "Previous"}
+        className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
+      >
+        <ChevronLeft className="w-6 h-6" />
+      </button>
+      <button
+        onClick={() => scroll(isRTL ? "left" : "right")}
+        aria-label={isRTL ? "السابق" : "Next"}
+        className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
+      >
+        <ChevronRight className="w-6 h-6" />
+      </button>
+    </div>
+  );
 };
 
-export default function ProductSlider({ products }: Props) {
-    const scrollRef = useRef<HTMLDivElement>(null);
-
-    const scroll = (direction: "left" | "right") => {
-        if (!scrollRef.current) return;
-
-        const container = scrollRef.current;
-        const card = container.querySelector("div");
-
-        if (!card) return;
-
-        const cardWidth = card.clientWidth + 24; // 24 = gap-6
-        const scrollAmount = cardWidth * 4; // move 4 cards
-
-        container.scrollBy({
-            left: direction === "left" ? -scrollAmount : scrollAmount,
-            behavior: "smooth",
-        });
-    };
-
-    return (
-        <div className="relative">
-            {/* Left Arrow (Desktop Only) */}
-            <button
-                onClick={() => scroll("left")}
-                className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow-md rounded-full p-2"
-            >
-                <ChevronLeft size={20} />
-            </button>
-
-            {/* Slider */}
-            <div
-                ref={scrollRef}
-                className="flex gap-6 overflow-x-auto md:overflow-hidden scroll-smooth no-scrollbar px-4 md:px-10"
-            >
-                {products.map((product) => (
-                    <div
-                        key={product.id}
-                        className="min-w-[calc(50%-12px)] sm:min-w-[calc(33.33%-16px)] lg:min-w-[calc(25%-18px)] transition-all duration-300"
-                    >
-                        <ProductCard product={product} />
-                    </div>
-                ))}
-            </div>
-
-            {/* Right Arrow (Desktop Only) */}
-            <button
-                onClick={() => scroll("right")}
-                className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow-md rounded-full p-2"
-            >
-                <ChevronRight size={20} />
-            </button>
-        </div>
-    );
-}
+export default ProductSlider;

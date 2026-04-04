@@ -9,11 +9,13 @@ import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function CheckoutClient() {
   const { items } = useCart();
   const { order, setOrder, setErrors } = useCheckout();
   const { user, userData, loading } = useAuth();
+  const { t } = useLanguage();
   const router = useRouter();
   const [userId, setUserId] = useState<string | null>(null);
 
@@ -49,14 +51,14 @@ export default function CheckoutClient() {
   const proceedToPayment = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!order.contact.email) newErrors.email = "Email is required";
-    if (!order.delivery.address) newErrors.address = "Address is required";
-    if (!order.delivery.phone) newErrors.phone = "Phone number is required";
-    if (!order.delivery.firstName) newErrors.firstName = "First name required";
-    if (!order.delivery.lastName) newErrors.lastName = "Last name required";
-    if (!order.delivery.city) newErrors.city = "City is required";
-    if (!order.delivery.apartment) newErrors.apartment = "Apartment is required";
-    if (!order.payment) newErrors.payment = "Select payment method";
+    if (!order.contact.email) newErrors.email = t("error_email_required");
+    if (!order.delivery.address) newErrors.address = t("error_address_required");
+    if (!order.delivery.phone) newErrors.phone = t("error_phone_required");
+    if (!order.delivery.firstName) newErrors.firstName = t("error_first_name_required");
+    if (!order.delivery.lastName) newErrors.lastName = t("error_last_name_required");
+    if (!order.delivery.city) newErrors.city = t("error_city_required");
+    if (!order.delivery.apartment) newErrors.apartment = t("error_apartment_required");
+    if (!order.payment) newErrors.payment = t("error_payment_required");
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -86,18 +88,18 @@ export default function CheckoutClient() {
         <button
           onClick={proceedToPayment}
           disabled={!isFormValid}
-          className={`w-full rounded-full py-4 font-medium transition
+          className={`w-full rounded-full py-4 font-medium transition cursor-pointer
             ${isFormValid
               ? "bg-purple-400 hover:bg-purple-300 text-white"
               : "bg-gray-200 text-gray-400 cursor-not-allowed"
             }`}
         >
-          Save and Proceed →
+          {t("checkout_save_proceed")}
         </button>
 
         {!isFormValid && (
           <p className="text-xs text-gray-400 text-center">
-            Please complete all required fields
+            {t("checkout_complete_fields")}
           </p>
         )}
       </div>

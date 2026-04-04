@@ -6,6 +6,7 @@ import { Product } from "@/data/product";
 import { useState } from "react";
 import QuickAddModal from "../product/QuickAddModal";
 import { ShoppingCart } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface Props {
   products: Product[];
@@ -13,6 +14,7 @@ interface Props {
 
 export default function NewArrivals({ products }: Props) {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const { t } = useLanguage();
 
   if (!products || products.length === 0) return null;
 
@@ -69,7 +71,7 @@ export default function NewArrivals({ products }: Props) {
                   }}
                   className="bg-white text-black px-6 py-2.5 rounded-full font-medium text-sm transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 hover:bg-zinc-100"
                 >
-                  Quick Add
+                  {t("product_quick_add")}
                 </button>
               </div>
             )}
@@ -77,7 +79,7 @@ export default function NewArrivals({ products }: Props) {
             {/* OUT OF STOCK */}
             {isSold && (
               <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white text-sm font-medium">
-                Out of Stock
+                {t("product_out_of_stock")}
               </div>
             )}
 
@@ -138,14 +140,14 @@ export default function NewArrivals({ products }: Props) {
       {/* HEADER */}
       <div className="flex items-baseline justify-between mb-6">
         <h2 className="text-2xl font-medium">
-          Explore New Arrivals
+          {t("new_arrivals_title")}
         </h2>
 
         <Link
           href="/products?sort=new"
           className="text-sm font-medium text-zinc-600 hover:text-black transition-colors underline underline-offset-4"
         >
-          See More
+          {t("new_arrivals_see_more")}
         </Link>
       </div>
 

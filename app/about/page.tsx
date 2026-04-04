@@ -1,111 +1,129 @@
-import Link from "next/link";
-import { Heart } from "lucide-react";
-import Header from "../../components/Header";
-import Footer from "../../components/Footer";
-import type { Metadata } from "next";
+"use client";
 
-export const metadata: Metadata = {
-  title: "About Us",
-  description:
-    "Learn about Hedoomyy — an online clothing store based in Cairo, Egypt. Our mission is to provide quality fashion at affordable prices with a smooth shopping experience.",
-  alternates: {
-    canonical: "https://hedoomyy.com/about",
-  },
-  openGraph: {
-    url: "https://hedoomyy.com/about",
-    title: "About Us | Hedoomyy",
-    description:
-      "Learn about Hedoomyy — an online clothing store based in Cairo, Egypt. Our mission is to provide quality fashion at affordable prices.",
-  },
-};
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import Link from "next/link";
+import { Heart, ArrowRight, ArrowLeft } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function AboutPage() {
+  const { t, isRTL } = useLanguage();
+
   return (
-    <div>
+    <div className="min-h-screen bg-white">
       <Header />
 
-      <div className="max-w-7xl mx-auto px-6 py-12 grid md:grid-cols-2 gap-16">
+      <main className="max-w-5xl mx-auto px-6 py-24">
 
-        {/* LEFT SIDE */}
-        <div>
-          <Link href="/" className="text-sm text-gray-500">
-            Back to home &gt;
-          </Link>
+        {/* Breadcrumb */}
+        <Link
+          href="/"
+          className="flex items-center gap-2 text-sm text-gray-400 hover:text-black transition-colors w-fit"
+        >
+          {isRTL ? <ArrowRight className="w-4 h-4" /> : <ArrowLeft className="w-4 h-4" />}
+          {t("policy_back_home")}
+        </Link>
 
-          <h1 className="text-5xl font-light mt-6">
-            <span className="bg-gradient-to-r font-medium from-purple-300 to-pink-300 bg-clip-text text-transparent">
-              About Us
-            </span>
+        {/* HERO STATEMENT */}
+        <div className={`mt-16 mb-20 ${isRTL ? "text-right" : "text-left"}`}>
+          <h1 className="text-5xl md:text-7xl font-light leading-tight text-gray-900">
+            {t("about_new_hero_1")}
+            <br />
+            {t("about_new_hero_2")}
+            <span className="font-semibold">{t("about_new_hero_3")}</span>
           </h1>
-
-          <p className="text-gray-500 mt-6 text-sm max-w-md">
-            A small brand with a simple mission — creating quality pieces
-            that look good, feel good, and stay affordable.
-          </p>
         </div>
 
-        {/* RIGHT SIDE */}
-        <div className="space-y-10 text-sm">
+        {/* INTRO */}
+        <div className={`grid md:grid-cols-2 gap-12 mb-20 ${isRTL ? "text-right" : "text-left"}`}>
+          <div>
+            <h2 className="text-xl font-medium text-gray-900 mb-4">
+              {t("about_who_we_are")}
+            </h2>
 
-          <div className="border-b pb-6">
-            <h3 className="text-purple-300 font-bold mb-2">
-              Our Story
-            </h3>
-
-            <p className="text-gray-700">
-              Hedoomyy is an online clothing store based in Cairo.
-              We started with a simple idea: provide high-quality pieces
-              without the unnecessary high prices that usually come with fashion brands.
-            </p>
-          </div>
-
-          <div className="border-b pb-6">
-            <h3 className="text-purple-300 font-bold mb-2">
-              Our Mission
-            </h3>
-
-            <p className="text-gray-700">
-              Our mission is to give customers a smooth and enjoyable online
-              shopping experience while delivering clothing that balances
-              comfort, style, and durability.
-            </p>
-          </div>
-
-          <div className="border-b pb-6">
-            <h3 className="text-purple-300 font-bold mb-2">
-              What Makes Us Different
-            </h3>
-
-            <p className="text-gray-700">
-              Every piece is made with attention to detail and passion.
-              We focus on good materials, clean designs, and fair pricing
-              so everyone can enjoy quality clothing without overpaying.
+            <p className="text-gray-600 leading-relaxed">
+              {t("about_who_we_are_desc")}
             </p>
           </div>
 
           <div>
-            <h3 className="text-purple-300 font-bold mb-2 flex items-center gap-2">
-              Made With Love
-              <Heart className="w-4 h-4 text-pink-400 fill-pink-400" />
-            </h3>
+            <h2 className="text-xl font-medium text-gray-900 mb-4">
+              {t("about_what_we_believe")}
+            </h2>
 
-            <p className="text-gray-700">
-              All of our pieces are created with love and care.
-              We hope every item you receive becomes something
-              you truly enjoy wearing.
+            <p className="text-gray-600 leading-relaxed">
+              {t("about_what_we_believe_desc")}
             </p>
           </div>
+        </div>
 
-          {/* CTA */}
+        {/* PHILOSOPHY */}
+        <div className={`mb-20 max-w-3xl ${isRTL ? "text-right" : "text-left"}`}>
+          <h2 className="text-xl font-medium text-gray-900 mb-4">
+            {t("about_our_approach")}
+          </h2>
+          <p className="text-gray-600 leading-relaxed">
+            {t("about_our_approach_desc")}
+          </p>
+        </div>
+
+        {/* WHAT MAKES US SPECIAL */}
+        <section className={`mb-24 ${isRTL ? "text-right" : "text-left"}`}>
+          <h2 className="text-3xl md:text-4xl font-light text-gray-900 mb-12">
+            {t("about_what_makes_us")} <span className="font-semibold">{t("about_different")}</span>
+          </h2>
+
+          <div className="grid md:grid-cols-2 gap-12">
+            <div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                {t("about_affordable_title")}
+              </h3>
+              <p className="text-gray-600 leading-relaxed">
+                {t("about_affordable_desc")}
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                {t("about_cairo_title")}
+              </h3>
+              <p className="text-gray-600 leading-relaxed">
+                {t("about_cairo_desc")}
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2 flex items-center gap-2">
+                {t("about_love_title")}
+                <Heart className="w-4 h-4 text-red-500 fill-red-500" />
+              </h3>
+              <p className="text-gray-600 leading-relaxed">
+                {t("about_love_desc")}
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* EMOTIONAL LINE */}
+        <div className={`mb-24 ${isRTL ? "flex justify-end" : ""}`}>
+          <p className="text-2xl md:text-3xl font-light text-gray-900 flex items-center gap-3 w-fit">
+            {t("about_made_with_care")}
+            <Heart className="w-6 h-6 text-red-500 fill-red-500" />
+            {t("about_worn_with_confidence")}
+          </p>
+        </div>
+
+        {/* CTA */}
+        <div className={`${isRTL ? "text-right" : "text-left"}`}>
           <Link
             href="/products"
-            className="inline-block mt-6 text-purple-300 font-bold hover:underline"
+            className="inline-flex items-center gap-2 border border-black px-8 py-4 rounded-full hover:bg-black hover:text-white transition"
           >
-            Start Shopping →
+            {t("about_explore_collection")}
           </Link>
-
         </div>
-      </div>
+
+      </main>
 
       <Footer />
     </div>

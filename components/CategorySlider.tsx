@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import CategoryCard from "./home/CategoryCard";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 type Category = {
     id: string;
@@ -17,30 +18,33 @@ type Props = {
 
 export default function CategorySlider({ categories }: Props) {
     const scrollRef = useRef<HTMLDivElement>(null);
+    const { t, isRTL } = useLanguage();
 
     const scroll = (direction: "left" | "right") => {
         if (!scrollRef.current) return;
 
         const container = scrollRef.current;
-        const card = container.querySelector("a"); // All CategoryCards are <a> links
+        const card = container.querySelector("a");
 
         if (!card) return;
 
-        const cardWidth = card.clientWidth + 24; // 24 = gap-6
-        const scrollAmount = cardWidth * 4; // move 4 cards
+        const cardWidth = card.clientWidth + 24;
+        const scrollAmount = cardWidth * 4;
 
+        const scrollValue = direction === "left" ? -scrollAmount : scrollAmount;
+        
         container.scrollBy({
-            left: direction === "left" ? -scrollAmount : scrollAmount,
+            left: isRTL ? -scrollValue : scrollValue,
             behavior: "smooth",
         });
     };
 
     return (
         <div className="relative">
-            {/* Left Arrow (Desktop Only) */}
+            {/* Arrows (Desktop Only) */}
             <button
-                onClick={() => scroll("left")}
-                className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow-md rounded-full p-2 hover:bg-zinc-50 transition-colors"
+                onClick={() => scroll(isRTL ? "right" : "left")}
+                className={`hidden md:flex absolute ${isRTL ? "-right-5" : "-left-5"} top-1/2 -translate-y-1/2 z-10 bg-white shadow-md rounded-full p-2 hover:bg-zinc-50 transition-colors cursor-pointer`}
             >
                 <ChevronLeft size={20} className="text-zinc-600" />
             </button>
@@ -49,25 +53,39 @@ export default function CategorySlider({ categories }: Props) {
             <div
                 ref={scrollRef}
                 className="flex gap-6 overflow-x-auto md:overflow-hidden scroll-smooth no-scrollbar px-4 md:px-10"
+                dir={isRTL ? "rtl" : "ltr"}
             >
-                {categories.map((cat) => (
-                    <div
-                        key={cat.id}
-                        className="min-w-[calc(50%-12px)] sm:min-w-[calc(33.33%-16px)] lg:min-w-[calc(25%-18px)] transition-all duration-300"
-                    >
-                        <CategoryCard
-                            title={`Shop ${cat.name}`}
-                            image={cat.image || "/placeholder.jpg"}
-                            href={`/products?category=${cat.slug}`}
-                        />
-                    </div>
-                ))}
+                {categories.map((cat) => {
+                    // 🛡️ Data Guard: Handle missing/invalid objects
+                    if (!cat || typeof cat !== "object") return null;
+
+                    // 🛡️ Safety Guard: Strict string check for slug
+                    const safeSlug = typeof cat.slug === "string" ? cat.slug.toLowerCase() : "unknown";
+                    
+                    // 🛡️ Safety Guard: Strict name check + translation fallback
+                    const translationKey = `category_${safeSlug.replace(/-/g, "_")}` as any;
+                    const translatedTitle = (typeof t(translationKey) === "string" && t(translationKey) !== translationKey)
+                        ? t(translationKey) 
+                        : (typeof cat.name === "string" ? cat.name : "Untitled");
+
+                    return (
+                        <div
+                            key={cat.id || Math.random().toString()}
+                            className="min-w-[calc(50%-12px)] sm:min-w-[calc(33.33%-16px)] lg:min-w-[calc(25%-18px)] transition-all duration-300"
+                        >
+                            <CategoryCard
+                                title={translatedTitle}
+                                image={typeof cat.image === "string" ? cat.image : "/placeholder.jpg"}
+                                href={`/products?category=${safeSlug}`}
+                            />
+                        </div>
+                    );
+                })}
             </div>
 
-            {/* Right Arrow (Desktop Only) */}
             <button
-                onClick={() => scroll("right")}
-                className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow-md rounded-full p-2 hover:bg-zinc-50 transition-colors"
+                onClick={() => scroll(isRTL ? "left" : "right")}
+                className={`hidden md:flex absolute ${isRTL ? "-left-5" : "-right-5"} top-1/2 -translate-y-1/2 z-10 bg-white shadow-md rounded-full p-2 hover:bg-zinc-50 transition-colors cursor-pointer`}
             >
                 <ChevronRight size={20} className="text-zinc-600" />
             </button>

@@ -1,12 +1,13 @@
 import { db } from "@/lib/firebase";
 import { doc, setDoc, updateDoc, increment, serverTimestamp } from "firebase/firestore";
 
-export type TrackableEvent = "click" | "view" | "cart";
+export type TrackableEvent = "click" | "view" | "cart" | "share";
 
 const fieldMap: Record<TrackableEvent, string> = {
     click: "clicks",
     view: "views",
     cart: "cartAdds",
+    share: "shareCount",
 };
 
 /**
@@ -24,6 +25,12 @@ export function trackEvent(
 
     // 1. Update Aggregate Stats (Atomic increment)
     setDoc(statsRef, { [field]: increment(1) }, { merge: true }).catch(() => { });
+
+    // 1.1 Also update main product document for immediate display
+    if (event === "share") {
+        const productRef = doc(db, "products", productId);
+        updateDoc(productRef, { shareCount: increment(1) }).catch(() => { });
+    }
 
     // 2. Log to Leads collection for user journey / Retargeting
     if (userInfo?.email && (event === "cart" || event === "view")) {
