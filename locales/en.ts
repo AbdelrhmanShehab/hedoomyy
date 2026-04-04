@@ -22,6 +22,7 @@ const en = {
   footer_track_order: "Track Your Order",
   footer_faqs: "FAQs",
   footer_copyright: "© Hedoomyy 2021",
+  footer_powered_by: "Powered by",
 
   // ── Hero ─────────────────────────────────────────────────
   hero_headline: "Because looking good shouldn't cost a fortune",

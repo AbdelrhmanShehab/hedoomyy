@@ -7,10 +7,13 @@ import hedoomybanner from "../public/footerhedoomyy.png";
 import useCategories from "../usecategories";
 import tiktok from "../public/tiktok.svg";
 import { useLanguage } from "@/context/LanguageContext";
+import { useState } from "react";
+import DeveloperPopup from "./DeveloperPopup";
 
 export default function Footer() {
   const { categories = [] } = useCategories();
   const { t } = useLanguage();
+  const [isDevPopupOpen, setIsDevPopupOpen] = useState(false);
 
   return (
     <footer className="w-full bg-white text-zinc-800">
@@ -90,7 +93,18 @@ export default function Footer() {
 
         {/* Bottom section */}
         <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-          <p className="text-sm text-zinc-600">{t("footer_copyright")}</p>
+          <div className="flex flex-col items-center gap-1 md:items-start">
+            <p className="text-sm text-zinc-600">{t("footer_copyright")}</p>
+            <p className="text-[10px] text-zinc-400 uppercase tracking-widest">
+              {t("footer_powered_by")}{" "}
+              <button
+                onClick={() => setIsDevPopupOpen(true)}
+                className="font-bold text-zinc-600 transition-colors hover:text-zinc-900 cursor-pointer"
+              >
+                Abdelrhman Shehab
+              </button>
+            </p>
+          </div>
 
           <div className="flex items-center gap-4">
             <Link href="https://www.instagram.com/hedoomyy/" target="_blank">
@@ -104,6 +118,10 @@ export default function Footer() {
             </Link>
           </div>
         </div>
+        <DeveloperPopup
+          isOpen={isDevPopupOpen}
+          onClose={() => setIsDevPopupOpen(false)}
+        />
       </div>
     </footer>
   );

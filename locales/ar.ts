@@ -24,6 +24,7 @@ const ar: Record<TranslationKeys, string> = {
   footer_track_order: "تتبعي طلبك",
   footer_faqs: "الأسئلة الشائعة",
   footer_copyright: "©️ Hedoomyy 2021",
+  footer_powered_by: "تم التطوير بواسطة",
 
   // ── Hero ─────────────────────────────────────────────────
   hero_headline: "لأن المظهر الجميل لا يجب أن يكلف ثروة",

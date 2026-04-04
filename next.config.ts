@@ -15,6 +15,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "*.cdninstagram.com",
       },
+      {
+        protocol: "https",
+        hostname: "api.dicebear.com",
+      },
     ],
     // Optimise images for SEO: serve WebP/AVIF where supported
     formats: ["image/avif", "image/webp"],
