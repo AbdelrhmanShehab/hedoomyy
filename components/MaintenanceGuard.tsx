@@ -15,30 +15,35 @@ export default function MaintenanceGuard({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if we are on localhost
     if (typeof window !== "undefined") {
       const hostname = window.location.hostname;
       setIsLocal(hostname === "localhost" || hostname === "127.0.0.1");
     }
 
-    // Listen to website status in Firestore
-    const unsubscribe = onSnapshot(
-      doc(db, "settings", "website"),
-      (snapshot) => {
-        if (snapshot.exists()) {
-          const data = snapshot.data();
-          setIsActive(data?.isActive ?? true);
-        }
-        setLoading(false);
-      },
-      (error) => {
-        console.error("Error fetching website status:", error);
-        setIsActive(true);
-        setLoading(false);
-      }
-    );
+    let unsubscribe = () => { };
 
-    // 🕒 Safety Fallback: Stop loading after 3s anyway
+    try {
+      unsubscribe = onSnapshot(
+        doc(db, "settings", "website"),
+        (snapshot) => {
+          if (snapshot.exists()) {
+            const data = snapshot.data();
+            setIsActive(data?.isActive ?? true);
+          }
+          setLoading(false);
+        },
+        (error) => {
+          console.error("Error fetching website status:", error);
+          setIsActive(true);
+          setLoading(false);
+        }
+      );
+    } catch (error) {
+      console.error("Firestore failed completely:", error);
+      setIsActive(true);
+      setLoading(false);
+    }
+
     const timer = setTimeout(() => {
       setLoading(false);
     }, 3000);
@@ -48,12 +53,11 @@ export default function MaintenanceGuard({
       clearTimeout(timer);
     };
   }, []);
-
   // While checking, we still show the app by default (isActive is true)
   // unless we've explicitly received a 'false' from Firestore.
   // We use the loading state to decide if we should even bother
   // with the maintenance screen during the first 3 seconds.
-  
+
   if (!isActive && !isLocal && !loading) {
     return <MaintenanceMode />;
   }

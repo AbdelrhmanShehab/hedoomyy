@@ -24,5 +24,14 @@ export const db = getFirestore(app);
 // 📦 Storage
 export const storage = getStorage(app);
 
-// 💬 Messaging
-export const messaging = typeof window !== "undefined" ? getMessaging(app) : null;
+let messaging = null;
+
+if (typeof window !== "undefined") {
+  try {
+    messaging = getMessaging(app);
+  } catch (error) {
+    console.warn("Firebase messaging not supported:", error);
+  }
+}
+
+export { messaging };

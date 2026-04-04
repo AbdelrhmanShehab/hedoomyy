@@ -105,8 +105,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${quicksand.variable} ${cairo.variable} font-sans`}>
-        <LanguageProvider>
-          <MaintenanceGuard>
+        <ErrorBoundary>
+          <LanguageProvider>
             <AuthProvider>
               <FavoritesProvider>
                 <CartProvider>
@@ -115,18 +115,18 @@ export default function RootLayout({
                     <Suspense fallback={null}>
                       <ScrollToTop />
                     </Suspense>
-                    <ErrorBoundary>
+                    <MaintenanceGuard>
                       <main>{children}</main>
-                    </ErrorBoundary>
+                    </MaintenanceGuard>
                     <CartSidebar />
                   </CheckoutProvider>
                 </CartProvider>
               </FavoritesProvider>
             </AuthProvider>
-          </MaintenanceGuard>
-        </LanguageProvider>
+          </LanguageProvider>
+        </ErrorBoundary>
       </body>
-    </html>
+    </html >
   );
 }
 
