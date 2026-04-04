@@ -9,7 +9,7 @@ import tiktok from "../public/tiktok.svg";
 import { useLanguage } from "@/context/LanguageContext";
 
 export default function Footer() {
-  const { categories } = useCategories();
+  const { categories = [] } = useCategories();
   const { t } = useLanguage();
 
   return (
@@ -21,8 +21,10 @@ export default function Footer() {
           <div className="col-span-2 md:col-span-1 space-y-10">
             <Image
               src={hedoomybanner}
-              className=" h-28 w-34"
-              alt="Picture of the author"
+              alt="Hedoomyy"
+              width={140}
+              height={100}
+              className="h-28 w-34"
             />
             <p className="text-base font-semibold text-zinc-600">
               {t("footer_tagline")}
@@ -37,13 +39,15 @@ export default function Footer() {
               <li>
                 <Link href="/products">{t("footer_all_items")}</Link>
               </li>
-              {categories.map((cat) => (
-                <li key={cat.id}>
-                  <Link href={`/products?category=${cat.slug}`}>
-                    <span className="capitalize">{cat.name}</span>
-                  </Link>
-                </li>
-              ))}
+              {categories && categories.length > 0 ? (
+                categories.map((cat) => (
+                  <li key={cat.id}>
+                    <Link href={`/products?category=${cat.slug}`}>
+                      <span className="capitalize">{cat.name}</span>
+                    </Link>
+                  </li>
+                ))
+              ) : null}
             </ul>
           </div>
 

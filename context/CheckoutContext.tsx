@@ -36,7 +36,13 @@ export function CheckoutProvider({ children }: { children: React.ReactNode }) {
     if (typeof window === "undefined") return initialOrder;
 
     const saved = localStorage.getItem(STORAGE_KEY);
-    return saved ? JSON.parse(saved) : initialOrder;
+
+    try {
+      return saved ? JSON.parse(saved) : initialOrder;
+    } catch (e) {
+      console.error("Invalid checkout data, resetting...", e);
+      return initialOrder;
+    }
   });
 
   const [errors, setErrors] = useState<Errors>({});

@@ -21,6 +21,7 @@ export const FavoritesProvider = ({ children }: { children: React.ReactNode }) =
                 setFavorites(JSON.parse(saved));
             } catch (e) {
                 console.error("Failed to parse favorites", e);
+                setFavorites([]);   
             }
         }
     }, []);
