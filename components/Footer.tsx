@@ -9,11 +9,23 @@ import tiktok from "../public/tiktok.svg";
 import { useLanguage } from "@/context/LanguageContext";
 import { useState } from "react";
 import DeveloperPopup from "./DeveloperPopup";
+import { db } from "@/lib/firebase";
+import { doc, setDoc, increment } from "firebase/firestore";
 
 export default function Footer() {
   const { categories = [] } = useCategories();
   const { t } = useLanguage();
   const [isDevPopupOpen, setIsDevPopupOpen] = useState(false);
+
+  const handleDevClick = async () => {
+    setIsDevPopupOpen(true);
+    try {
+      const devStatsRef = doc(db, "stats", "developer_clicks");
+      await setDoc(devStatsRef, { count: increment(1) }, { merge: true });
+    } catch (error) {
+      console.error("Error tracking dev click:", error);
+    }
+  };
 
   return (
     <footer className="w-full bg-white text-zinc-800">
@@ -98,8 +110,8 @@ export default function Footer() {
             <p className="text-[10px] text-zinc-400 uppercase tracking-widest">
               {t("footer_powered_by")}{" "}
               <button
-                onClick={() => setIsDevPopupOpen(true)}
-                className="font-bold text-zinc-600 transition-colors hover:text-zinc-900 cursor-pointer"
+                onClick={handleDevClick}
+                className="font-bold text-zinc-600 transition-all hover:text-zinc-900 cursor-pointer underline underline-offset-4 decoration-zinc-200 hover:decoration-zinc-400 active:scale-95 duration-300"
               >
                 Abdelrhman Shehab
               </button>

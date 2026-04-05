@@ -60,6 +60,24 @@ export default function ProductClient({ product, relatedProducts }: Props) {
     return () => unsub();
   }, [product.id]);
 
+  // Auto-select if only one option exists
+  useEffect(() => {
+    if (colors.length === 1 && !selectedColor) {
+      setSelectedColor(colors[0]);
+    }
+  }, [colors, selectedColor]);
+
+  useEffect(() => {
+    if (selectedColor) {
+      const availableSizes = sizes.filter(size =>
+        variants.some(v => v.color === selectedColor && v.size === size && (v.stock ?? 0) > 0)
+      );
+      if (availableSizes.length === 1 && selectedSize !== availableSizes[0]) {
+        setSelectedSize(availableSizes[0]);
+      }
+    }
+  }, [selectedColor, sizes, variants, selectedSize]);
+
   const selectedVariant = variants.find(
     (v) => v.color === selectedColor && v.size === selectedSize
   );
@@ -256,7 +274,7 @@ export default function ProductClient({ product, relatedProducts }: Props) {
                               key={size}
                               disabled={!isAvailable}
                               onClick={() => setSelectedSize(size)}
-                              className={`min-w-[70px] h-12 rounded-xl border-2 text-sm font-bold transition-all relative cursor-pointer ${selectedSize === size
+                              className={`min-w-[70px] h-12 px-4 rounded-xl border-2 text-sm font-bold transition-all relative cursor-pointer ${selectedSize === size
                                 ? "bg-[#DE9DE5] border-[#DE9DE5] text-white shadow-lg shadow-pink-100 scale-105"
                                 : "border-zinc-100 text-zinc-600 hover:border-[#DE9DE5]/40 active:scale-95"
                                 } ${!isAvailable ? "opacity-30 cursor-not-allowed border-dashed" : ""}`}

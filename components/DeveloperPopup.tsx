@@ -8,7 +8,8 @@ import {
   Phone,
   X,
   ExternalLink,
-  Briefcase // Using Briefcase for Behance as Lucide doesn't have a direct Behance icon usually
+  Briefcase,
+  Mail
 } from "lucide-react";
 import { useEffect } from "react";
 import Image from "next/image";
@@ -40,6 +41,13 @@ const socials = [
     url: "https://github.com/AbdelrhmanShehab",
     color: "bg-[#24292e]",
     description: "Explore my code & repositories"
+  },
+  {
+    name: "Email",
+    icon: Mail,
+    url: "mailto:abdlrhman.shihab@gmail.com",
+    color: "bg-rose-500",
+    description: "Get in touch for collaborations"
   },
 ];
 
@@ -74,7 +82,7 @@ export default function DeveloperPopup({ isOpen, onClose }: DeveloperPopupProps)
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="fixed left-1/2 top-1/2 z-[110] w-[92%] max-w-md -translate-x-1/2 -translate-y-1/2 overflow-y-auto max-h-[90vh] rounded-[2rem] md:rounded-[2.5rem] bg-[#121212]/90 border border-white/10 text-white shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] backdrop-blur-2xl"
+            className="fixed left-1/2 top-1/2 z-[110] w-[92%] max-w-md -translate-x-1/2 -translate-y-1/2 overflow-y-auto custom-scrollbar max-h-[90vh] rounded-[2rem] md:rounded-[2.5rem] bg-[#121212]/90 border border-white/10 text-white shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] backdrop-blur-2xl"
           >
             {/* Header */}
             <div className="relative p-6 md:p-10 text-center">
