@@ -27,7 +27,6 @@ export default function CategoryCard({ title, image, href }: Props) {
           alt={title}
           fill
           className="object-cover transition-transform duration-500 group-hover:scale-110"
-          onError={(e) => { e.currentTarget.srcset = ""; e.currentTarget.src = "/1.png"; console.error("Image failed:", image); }}
         />
       </div>
 
