@@ -21,6 +21,11 @@ type Category = {
 
 /* ---------------- COMPONENT ---------------- */
 
+let cachedProducts: Product[] | null = null;
+let cachedCategories: Category[] | null = null;
+let cacheTimestamp: number | null = null;
+const CACHE_TTL = 5 * 60 * 1000; // 5 minute request delay limit
+
 function ProductsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -72,6 +77,19 @@ function ProductsContent() {
 
   useEffect(() => {
     const fetchData = async () => {
+      // Use memory cache to limit requests per session navigation
+      if (
+        cachedProducts && 
+        cachedCategories && 
+        cacheTimestamp && 
+        Date.now() - cacheTimestamp < CACHE_TTL
+      ) {
+        setProducts(cachedProducts);
+        setCategories(cachedCategories);
+        setLoading(false);
+        return;
+      }
+
       // Products
       const productsSnap = await getDocs(
         query(
@@ -105,6 +123,11 @@ function ProductsContent() {
         id: doc.id,
         ...(doc.data() as Omit<Category, "id">),
       }));
+
+      // Save to cache
+      cachedProducts = mappedProducts;
+      cachedCategories = mappedCategories;
+      cacheTimestamp = Date.now();
 
       setProducts(mappedProducts);
       setCategories(mappedCategories);

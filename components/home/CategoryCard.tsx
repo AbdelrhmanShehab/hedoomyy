@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -9,7 +10,7 @@ type Props = {
   href: string;
 };
 
-export default function CategoryCard({ title, image, href }: Props) {
+const CategoryCard = React.memo(({ title, image, href }: Props) => {
   // 🛡️ Data Guard: Handle missing/invalid title
   if (!title || typeof title !== "string") return null;
 
@@ -35,4 +36,8 @@ export default function CategoryCard({ title, image, href }: Props) {
       </p>
     </Link>
   );
-}
+});
+
+CategoryCard.displayName = "CategoryCard";
+
+export default CategoryCard;

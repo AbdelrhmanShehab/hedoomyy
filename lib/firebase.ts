@@ -1,7 +1,7 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getMessaging } from "firebase/messaging";
 import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 import type { Messaging } from "firebase/messaging";
 // 🔑 Firebase configuration
@@ -15,13 +15,31 @@ const firebaseConfig = {
 };
 
 // ✅ Prevent multiple initializations (Next.js)
-const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+const isAlreadyInitialized = getApps().length > 0;
+const app = isAlreadyInitialized ? getApp() : initializeApp(firebaseConfig);
 
 // 🔐 Auth
 export const auth = getAuth(app);
 
 // 🗄️ Firestore
-export const db = getFirestore(app);
+let dbInstance;
+if (isAlreadyInitialized) {
+  dbInstance = getFirestore(app);
+} else {
+  if (typeof window !== "undefined") {
+    try {
+      dbInstance = initializeFirestore(app, {
+        localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
+      });
+    } catch (e) {
+      console.warn("Firestore cache failed:", e);
+      dbInstance = getFirestore(app);
+    }
+  } else {
+    dbInstance = getFirestore(app);
+  }
+}
+export const db = dbInstance;
 // 📦 Storage
 export const storage = getStorage(app);
 

@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Product } from "../data/product";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import QuickAddModal from "./product/QuickAddModal";
 import { Heart } from "lucide-react";
@@ -17,7 +17,7 @@ type Props = {
   product: Product;
 };
 
-export default function ProductCard({ product }: Props) {
+const ProductCard = React.memo(({ product }: Props) => {
   // 🛡️ Data Guard: Prevent crash on invalid objects
   if (!product || typeof product !== "object" || !product.id) return null;
 
@@ -167,4 +167,8 @@ export default function ProductCard({ product }: Props) {
       )}
     </>
   );
-}
+});
+
+ProductCard.displayName = "ProductCard";
+
+export default ProductCard;
