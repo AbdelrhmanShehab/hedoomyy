@@ -43,6 +43,10 @@ function ProductsContent() {
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const categoryRef = useRef<HTMLDivElement>(null);
 
+  // Pagination state
+  const ITEMS_PER_PAGE = 8;
+  const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
+
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (sortRef.current && !sortRef.current.contains(event.target as Node)) {
@@ -126,6 +130,8 @@ function ProductsContent() {
   useEffect(() => {
     setFilterCategory(urlCategory);
     setSort(urlSort);
+    // Reset pagination when filters change
+    setVisibleCount(ITEMS_PER_PAGE);
   }, [urlCategory, urlSort]);
 
   /* ---------------- FILTER + SORT ---------------- */
@@ -270,7 +276,19 @@ function ProductsContent() {
           No products found.
         </p>
       ) : (
-        <ProductGrid products={visibleProducts} />
+        <>
+          <ProductGrid products={visibleProducts.slice(0, visibleCount)} />
+          {visibleCount < visibleProducts.length && (
+            <div className="flex justify-center mt-12 mb-8 animate-in fade-in slide-in-from-bottom-4">
+              <button
+                onClick={() => setVisibleCount((prev) => prev + ITEMS_PER_PAGE)}
+                className="px-8 py-3 rounded-full text-sm font-medium border-2 border-[#DE9DE5] text-[#DE9DE5] hover:bg-[#DE9DE5] hover:text-white transition-all duration-300 shadow-sm hover:shadow-md cursor-pointer disabled:opacity-50"
+              >
+                Load More Products
+              </button>
+            </div>
+          )}
+        </>
       )}
     </section>
   );

@@ -13,12 +13,15 @@ interface Props {
 }
 
 export default function NewArrivals({ products }: Props) {
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const { t } = useLanguage();
-
-  if (!products || products.length === 0) return null;
+  // 🛡️ Data Guard: Prevent crash if products is not an array
+  if (!Array.isArray(products) || products.length === 0) return null;
 
   const [bigProduct, ...smallProducts] = products;
+  const { t } = useLanguage();
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  // Additional check if bigProduct is valid
+  if (!bigProduct || typeof bigProduct !== "object") return null;
 
   const getStock = (product: Product) => {
     return (
@@ -27,12 +30,19 @@ export default function NewArrivals({ products }: Props) {
   };
 
   const renderProduct = (product: Product, isBig?: boolean) => {
+    // 🛡️ Data Guard: Prevent crash if product is invalid
+    if (!product || typeof product !== "object" || !product.id) return null;
+
     const totalStock = getStock(product);
     const isSold = totalStock === 0 || product.status !== "active";
 
     const hasDiscount =
-      product.originalPrice &&
-      product.originalPrice > product.price;
+      (product.originalPrice &&
+      product.originalPrice > product.price) || false;
+
+    const safeTitle = typeof product.title === "string" ? product.title : "Untitled";
+    const safePrice = typeof product.price === "number" ? product.price : 0;
+    const imageSrc = product.images?.[0] ?? "/1.png";
 
     return (
       <div className={`flex flex-col gap-2 ${isBig ? "h-full" : ""}`}>
@@ -49,8 +59,8 @@ export default function NewArrivals({ products }: Props) {
             className="block w-full h-full"
           >
             <Image
-              src={product.images?.[0] ?? "/1.png"}
-              alt={product.title}
+              src={imageSrc}
+              alt={safeTitle}
               fill
               sizes={
                 isBig
@@ -102,8 +112,8 @@ export default function NewArrivals({ products }: Props) {
               <div className="absolute top-3 left-3 bg-red-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm">
                 -
                 {Math.round(
-                  ((product.originalPrice! - product.price) /
-                    product.originalPrice!) *
+                  (((product.originalPrice || 0) - (product.price || 0)) /
+                    (product.originalPrice || 1)) *
                   100
                 )}
                 %
@@ -115,12 +125,12 @@ export default function NewArrivals({ products }: Props) {
         {/* PRODUCT INFO */}
         <div className="flex flex-col gap-0.5 px-0.5">
           <h3 className="text-sm text-zinc-600 truncate font-normal leading-tight">
-            {product.title}
+            {safeTitle}
           </h3>
 
           <div className="flex items-center gap-2">
             <span className="text-base font-bold text-zinc-900">
-              {product.price} EGP
+              {safePrice} EGP
             </span>
 
             {hasDiscount && (
@@ -161,7 +171,7 @@ export default function NewArrivals({ products }: Props) {
 
         {/* SMALL PRODUCTS */}
         {smallProducts.slice(0, 4).map((product) => (
-          <div key={product.id}>
+          <div key={product?.id || Math.random().toString()}>
             {renderProduct(product)}
           </div>
         ))}

@@ -7,7 +7,7 @@ export default function Hero() {
   return (
     <section className="flex flex-col items-center justify-center px-4  py-10 md:py-24 text-center">
       <h1 className=" lg:w-[1200px] text-3xl font-medium leading-snug text-zinc-900 md:text-5xl">
-        {t("hero_headline")}
+        {typeof t("hero_headline") === "string" ? t("hero_headline") : "Welcome to Hedoomyy"}
       </h1>
 
       <Link

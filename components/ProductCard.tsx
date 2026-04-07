@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Product } from "../data/product";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import QuickAddModal from "./product/QuickAddModal";
 import { Heart } from "lucide-react";
@@ -41,8 +41,12 @@ export default function ProductCard({ product }: Props) {
   const hasStock =
     product?.status === "active" && totalStock > 0;
 
-  const imageSrc =
-    product?.images?.[0] ?? "/1.png";
+  const defaultImage = product?.images?.[0] ?? "/1.png";
+  const [imgSrc, setImgSrc] = useState(defaultImage);
+
+  useEffect(() => {
+    setImgSrc(product?.images?.[0] ?? "/1.png");
+  }, [product?.images]);
 
   const safeTitle = typeof product?.title === "string" ? product.title : "Untitled Product";
   const safePrice = typeof product?.price === "number" ? product.price : 0;
@@ -91,11 +95,17 @@ export default function ProductCard({ product }: Props) {
         >
           <div className="w-full aspect-[3/4.2] relative rounded-2xl overflow-hidden ">
             <Image
-              src={imageSrc}
+              src={imgSrc}
               alt={safeTitle}
               fill
               sizes="(max-width:768px) 50vw, 300px"
               className="object-cover transition group-hover/card:scale-105"
+              onError={() => {
+                if (imgSrc !== "/1.png") {
+                  console.error("Failed to load image:", imgSrc);
+                  setImgSrc("/1.png");
+                }
+              }}
             />
 
             {!hasStock && (

@@ -104,7 +104,7 @@ export default function OrderHistory() {
                       <div key={idx} className="flex items-center gap-4 bg-white p-4 rounded-2xl border border-zinc-100 shadow-sm">
                         {item.image && (
                           <div className="w-14 h-14 relative rounded-xl overflow-hidden flex-shrink-0 border border-zinc-50">
-                            <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
+                            <img src={item.image} alt={item.title} className="w-full h-full object-cover" loading="lazy" onError={(e) => { e.currentTarget.src = "/1.png"; console.error("Image failed:", item.image); }} />
                           </div>
                         )}
                         <div className="flex-1 min-w-0">
