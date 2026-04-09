@@ -145,7 +145,6 @@ export default function ProductClient({ product, relatedProducts }: Props) {
                   fill
                   className="object-cover transition-all duration-700 group-hover:scale-105"
                   unoptimized
-
                 />
                 {activeImg > 0 && (
                   <button
@@ -188,7 +187,7 @@ export default function ProductClient({ product, relatedProducts }: Props) {
                     className={`relative w-24 md:w-28 aspect-square rounded-[20px] overflow-hidden flex-shrink-0 border-2 transition-all cursor-pointer ${activeImg === i ? "border-zinc-800 scale-95" : "border-transparent opacity-60 hover:opacity-100"
                       }`}
                   >
-                    <Image src={img} alt={`Thumb ${i}`} fill className="object-cover" />
+                    <Image src={img} alt={`Thumb ${i}`} fill className="object-cover" unoptimized />
                   </button>
                 ))}
               </div>
