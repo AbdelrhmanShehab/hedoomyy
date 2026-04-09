@@ -100,6 +100,7 @@ const ProductCard = React.memo(({ product }: Props) => {
               fill
               sizes="(max-width:768px) 50vw, 300px"
               className="object-cover transition group-hover/card:scale-105"
+              unoptimized
             />
 
             {!hasStock && (

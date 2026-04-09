@@ -144,7 +144,8 @@ export default function ProductClient({ product, relatedProducts }: Props) {
                   alt={product.title}
                   fill
                   className="object-cover transition-all duration-700 group-hover:scale-105"
-                  priority
+                  unoptimized
+
                 />
                 {activeImg > 0 && (
                   <button
