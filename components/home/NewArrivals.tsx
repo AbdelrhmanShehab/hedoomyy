@@ -38,7 +38,7 @@ export default function NewArrivals({ products }: Props) {
 
     const hasDiscount =
       (product.originalPrice &&
-      product.originalPrice > product.price) || false;
+        product.originalPrice > product.price) || false;
 
     const safeTitle = typeof product.title === "string" ? product.title : "Untitled";
     const safePrice = typeof product.price === "number" ? product.price : 0;
@@ -62,6 +62,7 @@ export default function NewArrivals({ products }: Props) {
               src={imageSrc}
               alt={safeTitle}
               fill
+              unoptimized
               sizes={
                 isBig
                   ? "(max-width: 768px) 100vw, 50vw"
