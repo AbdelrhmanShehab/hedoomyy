@@ -46,7 +46,6 @@ function LoginContent() {
           alt="Hedoomyy fashion store — login background"
           fill
           className="object-cover"
-          priority
         />
         {/* Overlay */}
         <div className="absolute inset-0 bg-black/30"></div>

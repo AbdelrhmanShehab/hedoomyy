@@ -24,7 +24,6 @@ export default function MaintenanceMode() {
             alt="Hedoomyy"
             fill
             className="object-contain"
-            priority
           />
         </div>
 

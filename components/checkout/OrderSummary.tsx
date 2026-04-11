@@ -35,6 +35,7 @@ export default function OrderSummary() {
               width={60}
               height={80}
               className="rounded-md object-cover"
+              unoptimized
             />
 
             <div className="text-sm">

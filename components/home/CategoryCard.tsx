@@ -28,6 +28,7 @@ const CategoryCard = React.memo(({ title, image, href }: Props) => {
           alt={title}
           fill
           className="object-cover transition-transform duration-500 group-hover:scale-110"
+          unoptimized
         />
       </div>
 

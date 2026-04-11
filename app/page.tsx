@@ -97,7 +97,6 @@ export default async function Home() {
         src={hedoomyybanner}
         className="   h-[35vh] md:h-[60vh] lg:h-[70vh]  w-full object-fit "
         alt="Hedoomyy — Online Fashion Store in Egypt"
-        priority
         sizes="100vw"
       />
       <main className="mainContainer">
