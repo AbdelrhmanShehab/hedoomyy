@@ -71,6 +71,7 @@ export function CartSidebar() {
                       alt={item.title}
                       fill
                       className="object-cover"
+                      unoptimized
                     />
                   </div>
 

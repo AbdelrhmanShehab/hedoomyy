@@ -9,6 +9,9 @@ interface Props {
 }
 
 export default function BestSeller({ products }: Props) {
+  // 🛡️ Data Guard: Prevent crash if products is not an array
+  if (!Array.isArray(products) || products.length === 0) return null;
+
   const { t } = useLanguage();
   const displayedProducts = products.slice(0, 7);
 

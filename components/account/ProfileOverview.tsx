@@ -99,7 +99,7 @@ export default function ProfileOverview() {
             <div className="flex items-center gap-5">
                 <div className="w-20 h-20 bg-purple-800 rounded-full flex items-center justify-center overflow-hidden border-2 border-purple-200">
                     {user?.photoURL ? (
-                        <img src={user.photoURL} alt="Profile" className="w-full h-full object-cover" />
+                        <img src={user.photoURL} alt="Profile" className="w-full h-full object-cover" loading="lazy" onError={(e) => { e.currentTarget.src = "/1.png"; console.error("Image failed:", user.photoURL); }} />
                     ) : (
                         <User className="w-8 h-8 text-purple-400" />
                     )}

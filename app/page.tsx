@@ -16,6 +16,7 @@ import {
 import { Product } from "@/data/product";
 import type { Metadata } from "next";
 import Script from "next/script";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 export const metadata: Metadata = {
   title: "Hedoomyy",
@@ -96,16 +97,27 @@ export default async function Home() {
         src={hedoomyybanner}
         className="   h-[35vh] md:h-[60vh] lg:h-[70vh]  w-full object-fit "
         alt="Hedoomyy — Online Fashion Store in Egypt"
-        priority
         sizes="100vw"
       />
       <main className="mainContainer">
-        <Hero />
-        <Categories categories={categories} />
-        <NewArrivals products={newArrivals as Product[]} />
-        <BestSeller products={bestSellers as Product[]} />
-        <Feedback />
-        <InstagramFeed />
+        <ErrorBoundary fallback={null}>
+          <Hero />
+        </ErrorBoundary>
+        <ErrorBoundary fallback={null}>
+          <Categories categories={categories} />
+        </ErrorBoundary>
+        <ErrorBoundary fallback={null}>
+          <NewArrivals products={newArrivals as Product[]} />
+        </ErrorBoundary>
+        <ErrorBoundary fallback={null}>
+          <BestSeller products={bestSellers as Product[]} />
+        </ErrorBoundary>
+        <ErrorBoundary fallback={null}>
+          <Feedback />
+        </ErrorBoundary>
+        <ErrorBoundary fallback={null}>
+          <InstagramFeed />
+        </ErrorBoundary>
       </main>
       <Footer />
     </div>

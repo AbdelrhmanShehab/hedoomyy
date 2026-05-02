@@ -10,6 +10,9 @@ interface ProductSliderProps {
 }
 
 const ProductSlider: React.FC<ProductSliderProps> = ({ products }) => {
+  // 🛡️ Data Guard: Prevent crash if products is not an array
+  if (!Array.isArray(products)) return null;
+
   const scrollRef = useRef<HTMLDivElement>(null);
   const { isRTL } = useLanguage();
 

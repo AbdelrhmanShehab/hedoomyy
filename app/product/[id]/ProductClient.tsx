@@ -112,7 +112,7 @@ export default function ProductClient({ product, relatedProducts }: Props) {
                   alt={product.title}
                   fill
                   className="object-cover transition-all duration-700 group-hover:scale-105"
-                  priority
+                  unoptimized
                 />
                 {activeImg > 0 && (
                   <button
@@ -155,7 +155,7 @@ export default function ProductClient({ product, relatedProducts }: Props) {
                     className={`relative w-24 md:w-28 aspect-square rounded-[20px] overflow-hidden flex-shrink-0 border-2 transition-all cursor-pointer ${activeImg === i ? "border-zinc-800 scale-95" : "border-transparent opacity-60 hover:opacity-100"
                       }`}
                   >
-                    <Image src={img} alt={`Thumb ${i}`} fill className="object-cover" />
+                    <Image src={img} alt={`Thumb ${i}`} fill className="object-cover" unoptimized />
                   </button>
                 ))}
               </div>
@@ -242,7 +242,7 @@ export default function ProductClient({ product, relatedProducts }: Props) {
                               key={size}
                               disabled={!isAvailable}
                               onClick={() => setSelectedSize(size)}
-                              className={`min-w-[70px] h-12 rounded-xl border-2 text-sm font-bold transition-all relative cursor-pointer ${selectedSize === size
+                              className={`min-w-[70px] h-12 px-4 rounded-xl border-2 text-sm font-bold transition-all relative cursor-pointer ${selectedSize === size
                                 ? "bg-[#DE9DE5] border-[#DE9DE5] text-white shadow-lg shadow-pink-100 scale-105"
                                 : "border-zinc-100 text-zinc-600 hover:border-[#DE9DE5]/40 active:scale-95"
                                 } ${!isAvailable ? "opacity-30 cursor-not-allowed border-dashed" : ""}`}

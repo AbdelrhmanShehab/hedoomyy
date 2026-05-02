@@ -9,11 +9,23 @@ import tiktok from "../public/tiktok.svg";
 import { useLanguage } from "@/context/LanguageContext";
 import { useState } from "react";
 import DeveloperPopup from "./DeveloperPopup";
+import { doc, setDoc, increment } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 export default function Footer() {
   const { categories = [] } = useCategories();
   const { t } = useLanguage();
   const [isDevPopupOpen, setIsDevPopupOpen] = useState(false);
+
+  const handleDevClick = async () => {
+    setIsDevPopupOpen(true);
+    try {
+      const devStatsRef = doc(db, "stats", "developer_clicks");
+      await setDoc(devStatsRef, { count: increment(1) }, { merge: true });
+    } catch (error) {
+      console.error("Error tracking dev click:", error);
+    }
+  };
 
   return (
     <footer className="w-full bg-white text-zinc-800">

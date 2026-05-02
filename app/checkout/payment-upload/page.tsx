@@ -240,6 +240,8 @@ export default function PaymentUploadPage() {
                                         src={preview}
                                         alt="Payment receipt preview"
                                         className="rounded-xl object-contain max-h-56 w-full mx-auto"
+                                        loading="lazy"
+                                        onError={(e) => { e.currentTarget.srcset = ""; e.currentTarget.src = "/1.png"; console.error("Image failed:", preview); }}
                                     />
                                     <p className="text-xs text-purple-500">
                                         ✓ Screenshot attached — click or drag to replace
