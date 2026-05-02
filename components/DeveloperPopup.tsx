@@ -2,13 +2,12 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Github,
   Instagram,
   Linkedin,
   Phone,
   X,
   ExternalLink,
-  Briefcase // Using Briefcase for Behance as Lucide doesn't have a direct Behance icon usually
+  Globe
 } from "lucide-react";
 import { useEffect } from "react";
 import Image from "next/image";
@@ -19,7 +18,6 @@ interface DeveloperPopupProps {
 }
 
 const socials = [
-
   {
     name: "LinkedIn",
     icon: Linkedin,
@@ -28,18 +26,11 @@ const socials = [
     description: "Connect for professional networking"
   },
   {
-    name: "Behance",
-    icon: Briefcase,
-    url: "https://www.behance.net/abdelrhmanhossam",
-    color: "bg-[#053eff]",
-    description: "View my design portfolio"
-  },
-  {
-    name: "GitHub",
-    icon: Github,
-    url: "https://github.com/AbdelrhmanShehab",
-    color: "bg-[#24292e]",
-    description: "Explore my code & repositories"
+    name: "Portfolio",
+    icon: Globe,
+    url: "https://abdelrhmanshihab.vercel.app/",
+    color: "bg-[#6366f1]",
+    description: "Explore my full portfolio and projects"
   },
 ];
 
@@ -80,6 +71,7 @@ export default function DeveloperPopup({ isOpen, onClose }: DeveloperPopupProps)
             <div className="relative p-6 md:p-10 text-center">
               <button
                 onClick={onClose}
+                suppressHydrationWarning
                 className="absolute right-4 top-4 md:right-8 md:top-8 rounded-full bg-white/5 p-2 transition-colors hover:bg-white/10"
               >
                 <X className="h-5 w-5" />

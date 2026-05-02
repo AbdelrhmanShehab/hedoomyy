@@ -6,8 +6,6 @@ import Footer from "@/components/Footer";
 import { Heart, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 import { useFavorites } from "@/context/FavoritesContext";
-import { collection, query, where, getDocs, documentId } from "firebase/firestore";
-import { db } from "@/lib/firebase";
 import { Product } from "@/data/product";
 import ProductCard from "@/components/ProductCard";
 import { useLanguage } from "@/context/LanguageContext";
@@ -27,10 +25,15 @@ export default function FavoritesClient() {
       }
 
       try {
-        const q = query(collection(db, "products"), where(documentId(), "in", favorites));
-        const snap = await getDocs(q);
-        const docs = snap.docs.map(d => ({ id: d.id, ...d.data() } as Product));
-        setProducts(docs);
+        const res = await fetch("/api/favorites", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ productIds: favorites }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setProducts(data);
+        }
       } catch (err) {
         console.error("Error fetching favorites:", err);
       } finally {

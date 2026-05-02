@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { User, ShoppingBag, Menu, X, Heart } from "lucide-react";
+import { User, ShoppingBag, Menu, X, Heart, Search } from "lucide-react";
 import { useEffect, useState, memo } from "react";
+import { useRouter } from "next/navigation";
 import useCategories from "../usecategories";
 import callIcon from "../public/calIIcon.svg";
 import instagramIcon from "../public/instagramIcon.svg";
@@ -22,6 +23,8 @@ export default function Header() {
   const { user, userData } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { t, lang, setLang } = useLanguage();
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState("");
 
   const cartCount = items.reduce(
     (sum, item) => sum + item.qty,
@@ -76,6 +79,7 @@ export default function Header() {
             <span className="text-white/60 hidden md:inline">|</span>
             <button
               onClick={() => setLang(lang === "en" ? "ar" : "en")}
+              suppressHydrationWarning
               className="font-bold hover:opacity-80 transition-opacity cursor-pointer bg-transparent border-none text-white text-sm"
               aria-label="Switch language"
             >
@@ -93,6 +97,7 @@ export default function Header() {
           <button
             className="md:hidden p-2 -ml-2 text-gray-700 cursor-pointer"
             onClick={toggleMenu}
+            suppressHydrationWarning
             aria-label="Toggle Menu"
           >
             {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -115,6 +120,25 @@ export default function Header() {
           </nav>
 
           <div className="flex items-center gap-5">
+            {/* Desktop Search */}
+            <div className="hidden lg:relative lg:block">
+              <input
+                type="text"
+                placeholder={t("search_placeholder") || "Search..."}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    router.push(`/products?search=${encodeURIComponent(searchQuery)}`);
+                    setSearchQuery("");
+                  }
+                }}
+                suppressHydrationWarning
+                className="pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-full text-sm focus:ring-2 focus:ring-gray-100 outline-none w-48 xl:w-64 transition-all"
+              />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            </div>
+
             <button
               onClick={() => {
                 if (user) {
@@ -123,6 +147,7 @@ export default function Header() {
                   window.location.href = "/login?redirect=/account";
                 }
               }}
+              suppressHydrationWarning
               className="flex items-center justify-center cursor-pointer bg-transparent border-none p-0"
             >
               {user ? (
@@ -141,6 +166,7 @@ export default function Header() {
                onClick={() => {
                  window.location.href = user ? "/favorites" : "/login-required?redirect=/favorites";
                }}
+               suppressHydrationWarning
               className="relative p-1 hover:bg-gray-100 rounded-full transition-all cursor-pointer bg-transparent border-none"
             >
               <Heart className="w-5 h-5 text-gray-700 hover:text-pink-400 transition-colors" />
@@ -149,6 +175,7 @@ export default function Header() {
             <div className="relative">
               <button
                 onClick={openCart}
+                suppressHydrationWarning
                 className="p-1 hover:bg-gray-100 rounded-full transition-all active:scale-95 cursor-pointer"
                 aria-label="Open Cart"
               >
@@ -182,6 +209,26 @@ export default function Header() {
           />
           <div className="absolute top-full left-0 w-full bg-white border-b border-gray-200 shadow-xl z-40 md:hidden">
             <nav className="flex flex-col p-6 gap-5">
+              {/* Mobile Search */}
+              <div className="relative mb-2">
+                <input
+                  type="text"
+                  placeholder={t("search_placeholder") || "Search..."}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      router.push(`/products?search=${encodeURIComponent(searchQuery)}`);
+                      setSearchQuery("");
+                      setIsMenuOpen(false);
+                    }
+                  }}
+                  suppressHydrationWarning
+                  className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none"
+                />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              </div>
+
               <Link
                 href="/"
                 className="text-lg font-medium text-gray-900 border-b border-gray-50 pb-2 cursor-pointer"

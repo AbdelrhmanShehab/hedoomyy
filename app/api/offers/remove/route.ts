@@ -1,4 +1,4 @@
-import { db } from "../../../../lib/firebase";
+import { db } from "../../../../lib/firestore-server-sdk";
 import { collection, getDocs, query, where, writeBatch, deleteField } from "firebase/firestore";
 
 export async function POST(request: Request) {

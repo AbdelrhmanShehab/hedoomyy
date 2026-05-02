@@ -44,6 +44,7 @@ export default function CategorySlider({ categories }: Props) {
             {/* Arrows (Desktop Only) */}
             <button
                 onClick={() => scroll(isRTL ? "right" : "left")}
+                suppressHydrationWarning
                 className={`hidden md:flex absolute ${isRTL ? "-right-5" : "-left-5"} top-1/2 -translate-y-1/2 z-10 bg-white shadow-md rounded-full p-2 hover:bg-zinc-50 transition-colors cursor-pointer`}
             >
                 <ChevronLeft size={20} className="text-zinc-600" />
@@ -55,7 +56,7 @@ export default function CategorySlider({ categories }: Props) {
                 className="flex gap-6 overflow-x-auto md:overflow-hidden scroll-smooth no-scrollbar px-4 md:px-10"
                 dir={isRTL ? "rtl" : "ltr"}
             >
-                {categories.map((cat) => {
+                {categories.map((cat, index) => {
                     // 🛡️ Data Guard: Handle missing/invalid objects
                     if (!cat || typeof cat !== "object") return null;
 
@@ -70,7 +71,7 @@ export default function CategorySlider({ categories }: Props) {
 
                     return (
                         <div
-                            key={cat.id || Math.random().toString()}
+                            key={cat.id || `cat-${index}`}
                             className="min-w-[calc(50%-12px)] sm:min-w-[calc(33.33%-16px)] lg:min-w-[calc(25%-18px)] transition-all duration-300"
                         >
                             <CategoryCard
@@ -85,6 +86,7 @@ export default function CategorySlider({ categories }: Props) {
 
             <button
                 onClick={() => scroll(isRTL ? "left" : "right")}
+                suppressHydrationWarning
                 className={`hidden md:flex absolute ${isRTL ? "-left-5" : "-right-5"} top-1/2 -translate-y-1/2 z-10 bg-white shadow-md rounded-full p-2 hover:bg-zinc-50 transition-colors cursor-pointer`}
             >
                 <ChevronRight size={20} className="text-zinc-600" />

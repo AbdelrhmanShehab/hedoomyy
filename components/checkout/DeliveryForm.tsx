@@ -3,8 +3,6 @@
 import { useCheckout } from "../../context/CheckoutContext";
 import { useAuth } from "../../context/AuthContext";
 import { useEffect, useState } from "react";
-import { db } from "../../lib/firebase";
-import { collection, getDocs } from "firebase/firestore";
 import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -17,12 +15,11 @@ export default function DeliveryForm() {
   useEffect(() => {
     const fetchCities = async () => {
       try {
-        const snapshot = await getDocs(collection(db, "cities"));
-        const cities = snapshot.docs.map(doc => ({
-          id: doc.id,
-          fee: doc.data().fee || 0
-        }));
-        setCitiesData(cities);
+        const res = await fetch("/api/cities");
+        if (res.ok) {
+          const cities = await res.json();
+          setCitiesData(cities);
+        }
       } catch (error) {
         console.error("Error fetching cities:", error);
       }
@@ -103,7 +100,7 @@ export default function DeliveryForm() {
         <h2 className="text-base font-medium">{t("checkout_delivery_info")}</h2>
         {userData ? (
           <div className="flex items-center gap-3">
-             <Link
+            <Link
               href="/account"
               className="text-[10px] font-bold text-gray-400 uppercase tracking-widest hover:text-purple-500 transition-colors"
             >

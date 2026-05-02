@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { Product } from "../data/product";
 import ProductCard from "./ProductCard";
 
@@ -7,7 +8,7 @@ type Props = {
   products: Product[];
 };
 
-export default function ProductGrid({ products }: Props) {
+const ProductGrid = memo(function ProductGrid({ products }: Props) {
   if (!products || products.length === 0) {
     return (
       <p className="text-center text-gray-500">
@@ -26,4 +27,6 @@ export default function ProductGrid({ products }: Props) {
       ))}
     </div>
   );
-}
+});
+
+export default ProductGrid;

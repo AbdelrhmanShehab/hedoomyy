@@ -1,7 +1,7 @@
 "use client";
 
 import { Product } from "@/data/product";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import Image from "next/image";
 import {
   Heart,
@@ -23,9 +23,6 @@ import HeartRating from "@/components/product/HeartRating";
 import ReviewSection from "@/components/product/ReviewSection";
 import { trackEvent } from "@/lib/trackEvent";
 import { useLanguage } from "@/context/LanguageContext";
-import { db } from "@/lib/firebase";
-import { doc, onSnapshot } from "firebase/firestore";
-
 type Props = {
   product: Product;
   relatedProducts: Product[];
@@ -48,17 +45,6 @@ export default function ProductClient({ product, relatedProducts }: Props) {
   const [qty, setQty] = useState(1);
   const [activeImg, setActiveImg] = useState(0);
   const [currentShareCount, setCurrentShareCount] = useState(product.shareCount || 0);
-
-  useEffect(() => {
-    const unsub = onSnapshot(doc(db, "products", product.id), (doc) => {
-      if (doc.exists()) {
-        const data = doc.data();
-        setCurrentShareCount(data.shareCount || 0);
-      }
-    });
-
-    return () => unsub();
-  }, [product.id]);
 
   const selectedVariant = variants.find(
     (v) => v.color === selectedColor && v.size === selectedSize

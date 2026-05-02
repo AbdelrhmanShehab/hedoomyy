@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { collection, query, where, onSnapshot, addDoc, doc, updateDoc, increment, serverTimestamp } from "firebase/firestore";
-import { db } from "@/lib/firebase";
 import { useAuth } from "@/context/AuthContext";
 import { Review } from "@/data/review";
 import HeartRating from "./HeartRating";
@@ -22,28 +20,12 @@ export default function ReviewSection({ productId, averageRating = 0, reviewCoun
   const [comment, setComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
+  // ✅ One-time fetch via API route — no Firebase SDK, no channel connections
   useEffect(() => {
-    const q = query(
-      collection(db, "reviews"),
-      where("productId", "==", productId)
-    );
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const data = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as Review[];
-      
-      const sortedData = data.sort((a, b) => {
-        const timeA = a.createdAt?.toMillis?.() || 0;
-        const timeB = b.createdAt?.toMillis?.() || 0;
-        return timeB - timeA;
-      });
-      
-      setReviews(sortedData);
-    });
-
-    return () => unsubscribe();
+    fetch(`/api/reviews?productId=${encodeURIComponent(productId)}`)
+      .then(res => res.json())
+      .then(data => setReviews(Array.isArray(data) ? data : []))
+      .catch(err => console.error("Error fetching reviews:", err));
   }, [productId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -52,28 +34,38 @@ export default function ReviewSection({ productId, averageRating = 0, reviewCoun
 
     setSubmitting(true);
     try {
-      const newReview = {
-        productId,
-        userId: user.uid,
-        userName: userData?.firstName ? `${userData.firstName} ${userData.lastName || ""}` : (user.displayName || "User"),
-        rating,
-        comment: comment.trim(),
-        createdAt: serverTimestamp(),
-      };
+      const userName = userData?.firstName
+        ? `${userData.firstName} ${userData.lastName || ""}`
+        : user.displayName || "User";
 
-      await addDoc(collection(db, "reviews"), newReview);
-
-      const productRef = doc(db, "products", productId);
-      
-      const currentCount = reviewCount || 0;
-      const currentAvg = averageRating || 0;
-      const newCount = currentCount + 1;
-      const newAvg = (currentAvg * currentCount + rating) / newCount;
-
-      await updateDoc(productRef, {
-        averageRating: newAvg,
-        reviewCount: increment(1)
+      // ✅ Call API route instead of addDoc
+      const res = await fetch("/api/reviews/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          productId,
+          userId: user.uid,
+          userName,
+          rating,
+          comment: comment.trim(),
+        }),
       });
+
+      if (!res.ok) throw new Error("Failed to submit review");
+
+      // Optimistic update — show the review instantly
+      setReviews(prev => [
+        {
+          id: `temp-${Date.now()}`,
+          productId,
+          userId: user.uid,
+          userName,
+          rating,
+          comment: comment.trim(),
+          createdAt: Date.now(), // REST API format
+        } as Review,
+        ...prev,
+      ]);
 
       setRating(0);
       setComment("");
@@ -104,17 +96,10 @@ export default function ReviewSection({ productId, averageRating = 0, reviewCoun
           {user ? (
             <form onSubmit={handleSubmit} className="space-y-4 bg-gray-50 p-6 rounded-2xl border border-gray-100">
               <p className="font-medium text-gray-900">{t("reviews_write")}</p>
-              
               <div>
                 <p className="text-sm text-gray-500 mb-2">Tap a heart to rate:</p>
-                <HeartRating 
-                  rating={rating} 
-                  interactive 
-                  onRatingChange={setRating} 
-                  size={24}
-                />
+                <HeartRating rating={rating} interactive onRatingChange={setRating} size={24} />
               </div>
-
               <div>
                 <textarea
                   placeholder={t("reviews_your_review")}
@@ -124,10 +109,10 @@ export default function ReviewSection({ productId, averageRating = 0, reviewCoun
                   required
                 />
               </div>
-
               <button
                 type="submit"
                 disabled={submitting || rating === 0 || !comment.trim()}
+                suppressHydrationWarning
                 className="w-full bg-[#DE9DE5] text-white py-3 rounded-full font-medium hover:bg-[#cf8ed5] transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
                 {submitting ? "Submitting..." : t("reviews_submit")}
@@ -141,6 +126,7 @@ export default function ReviewSection({ productId, averageRating = 0, reviewCoun
                   const currentPath = window.location.pathname;
                   window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}&message=Please login to your account to add a review.`;
                 }}
+                suppressHydrationWarning
                 className="inline-block text-[#DE9DE5] font-bold text-sm underline decoration-[#DE9DE5]/40 underline-offset-4 hover:decoration-[#DE9DE5] cursor-pointer"
               >
                 Log in to Review →
@@ -153,22 +139,23 @@ export default function ReviewSection({ productId, averageRating = 0, reviewCoun
         <div className="md:w-2/3">
           <div className="space-y-8">
             {reviews.length > 0 ? (
-              reviews.map((review) => (
-                <div key={review.id} className="border-b border-gray-100 pb-8 last:border-0">
-                  <div className="flex justify-between items-start mb-2">
-                    <p className="font-medium text-gray-900">{review.userName}</p>
-                    <span className="text-xs text-gray-400 font-medium uppercase tracking-wider">
-                      {review.createdAt?.toDate ? review.createdAt.toDate().toLocaleDateString() : 'Just now'}
-                    </span>
+              reviews.map((review) => {
+                const dateObj = review.createdAt ? (typeof review.createdAt === 'number' ? new Date(review.createdAt) : (review.createdAt as any).toDate ? (review.createdAt as any).toDate() : new Date()) : new Date();
+                return (
+                  <div key={review.id} className="border-b border-gray-100 pb-8 last:border-0">
+                    <div className="flex justify-between items-start mb-2">
+                      <p className="font-medium text-gray-900">{review.userName}</p>
+                      <span className="text-xs text-gray-400 font-medium uppercase tracking-wider">
+                        {dateObj.toLocaleDateString()}
+                      </span>
+                    </div>
+                    <div className="mb-4">
+                      <HeartRating rating={review.rating} size={14} />
+                    </div>
+                    <p className="text-gray-600 leading-relaxed text-sm">{review.comment}</p>
                   </div>
-                  <div className="mb-4">
-                    <HeartRating rating={review.rating} size={14} />
-                  </div>
-                  <p className="text-gray-600 leading-relaxed text-sm">
-                    {review.comment}
-                  </p>
-                </div>
-              ))
+                );
+              })
             ) : (
               <div className="h-64 flex flex-col items-center justify-center text-gray-400 border-2 border-dashed border-gray-100 rounded-3xl">
                 <p>{t("reviews_no_reviews")}</p>

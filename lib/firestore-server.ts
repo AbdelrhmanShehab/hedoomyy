@@ -75,6 +75,38 @@ export async function fetchCategories() {
     return listCollection("categories");
 }
 
+/** All active products — used by /api/products route */
+export async function fetchActiveProducts() {
+    return runQuery({
+        structuredQuery: {
+            from: [{ collectionId: "products" }],
+            where: {
+                fieldFilter: {
+                    field: { fieldPath: "status" },
+                    op: "EQUAL",
+                    value: { stringValue: "active" },
+                },
+            },
+        },
+    });
+}
+
+/** Reviews for a single product — used by /api/reviews route */
+export async function fetchReviewsByProduct(productId: string) {
+    return runQuery({
+        structuredQuery: {
+            from: [{ collectionId: "reviews" }],
+            where: {
+                fieldFilter: {
+                    field: { fieldPath: "productId" },
+                    op: "EQUAL",
+                    value: { stringValue: productId },
+                },
+            },
+        },
+    });
+}
+
 export async function fetchNewArrivals(limitCount = 5) {
     return runQuery({
         structuredQuery: {
@@ -171,4 +203,58 @@ export async function fetchRelatedProducts(categoryId: string, currentProductId:
             limit: limitCount + 1, // Get one extra to account for potentially filtering out the current product
         },
     }).then(products => products.filter(p => p.id !== currentProductId).slice(0, limitCount));
+}
+
+/** Fetch website settings — used for maintenance mode */
+export async function fetchWebsiteSettings() {
+    const res = await fetch(`${BASE_URL}/settings/website`, {
+        next: { revalidate: 60 },
+    });
+    if (!res.ok) return { isActive: true };
+    const doc: any = await res.json();
+    return parseFields(doc.fields ?? {});
+}
+
+/** Fetch user document by UID */
+export async function fetchUserById(uid: string) {
+    const res = await fetch(`${BASE_URL}/users/${uid}`, {
+        cache: "no-store",
+    });
+    if (!res.ok) return null;
+    const doc: any = await res.json();
+    return parseFields(doc.fields ?? {});
+}
+
+/** Fetch all cities for checkout */
+export async function fetchCities() {
+    return listCollection("cities");
+}
+
+/** Fetch products by a list of IDs — used for favorites */
+export async function fetchProductsByIds(ids: string[]) {
+    if (!ids || ids.length === 0) return [];
+
+    // The REST API doesn't have a direct 'in' operator for document IDs in a simple way like the SDK.
+    // We can fetch them in parallel or use a more complex runQuery.
+    // Let's use parallel fetch for simplicity since favorites lists are usually small.
+    const promises = ids.map(id => fetchProductById(id));
+    const results = await Promise.all(promises);
+    return results.filter(p => p !== null);
+}
+
+/** Fetch orders for a user */
+export async function fetchUserOrders(uid: string) {
+    return runQuery({
+        structuredQuery: {
+            from: [{ collectionId: "orders" }],
+            where: {
+                fieldFilter: {
+                    field: { fieldPath: "userId" },
+                    op: "EQUAL",
+                    value: { stringValue: uid },
+                },
+            },
+            orderBy: [{ field: { fieldPath: "createdAt" }, direction: "DESCENDING" }],
+        },
+    });
 }

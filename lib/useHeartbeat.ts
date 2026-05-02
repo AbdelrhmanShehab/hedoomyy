@@ -1,31 +1,34 @@
-import { useEffect } from "react";
-import { db } from "./firebase";
-import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { useEffect, useRef } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { usePathname } from "next/navigation";
 
 /**
- * Sends a heartbeat to Firestore `activePresence` collection every 45s.
+ * Sends a heartbeat to the server-side API every 45s.
  * Used for "Live Visitors" real-time monitoring.
+ * No Firestore SDK used on the client.
  */
 export function useHeartbeat() {
     const { user } = useAuth();
     const pathname = usePathname();
+    const sessionIdRef = useRef<string | null>(null);
 
     useEffect(() => {
-        // Unique session ID for the heartbeat (stored in memory/state)
-        // For simplicity, we'll use a combination of random ID and email/anonymous
-        const sessionId = Math.random().toString(36).substring(7);
+        if (!sessionIdRef.current) {
+            sessionIdRef.current = Math.random().toString(36).substring(7);
+        }
 
         const sendHeartbeat = async () => {
-            const ref = doc(db, "activePresence", sessionId);
             try {
-                await setDoc(ref, {
-                    lastActive: serverTimestamp(),
-                    path: pathname,
-                    email: user?.email || "Anonymous",
-                    uid: user?.uid || null,
-                }, { merge: true });
+                await fetch("/api/heartbeat", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        sessionId: sessionIdRef.current,
+                        path: pathname,
+                        email: user?.email || "Anonymous",
+                        uid: user?.uid || null,
+                    }),
+                });
             } catch (error) {
                 // Silently fails
             }
@@ -39,8 +42,6 @@ export function useHeartbeat() {
 
         return () => {
             clearInterval(interval);
-            // Optional: delete or mark as inactive on unmount?
-            // Firestore TTL or dashboard filter (last 2 mins) is better for "real-time".
         };
     }, [user, pathname]);
 }

@@ -1,7 +1,5 @@
 "use client";
 
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
@@ -19,11 +17,18 @@ export default function ConfirmationClient() {
     if (!orderId) return;
 
     const fetchOrder = async () => {
-      const snap = await getDoc(doc(db, "orders", orderId));
-      if (snap.exists()) {
-        setOrder(snap.data() as Order);
+      try {
+        // ✅ Calls API route (REST API) to avoid Firestore SDK channels
+        const res = await fetch(`/api/orders?id=${orderId}`);
+        if (res.ok) {
+          const data = await res.json();
+          setOrder(data);
+        }
+      } catch (err) {
+        console.error("Error fetching order:", err);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     fetchOrder();
@@ -33,6 +38,9 @@ export default function ConfirmationClient() {
   if (!order) return <p className="p-10">{t("confirmation_not_found")}</p>;
 
   const { items, delivery, payment, totals, createdAt } = order;
+
+  // Handle date from REST API/SDK
+  const dateObj = createdAt ? (typeof createdAt === 'number' ? new Date(createdAt) : (createdAt as any).seconds ? new Date((createdAt as any).seconds * 1000) : new Date()) : new Date();
 
   return (
     <section className="max-w-7xl mx-auto px-6 py-20 grid lg:grid-cols-[1fr_420px] gap-20">
@@ -167,13 +175,11 @@ export default function ConfirmationClient() {
             </div>
             <div>
               <span className="font-medium text-gray-500">{t("orders_date")}:</span>{" "}
-              {createdAt
-                ? new Date(createdAt.seconds * 1000).toLocaleDateString(isRTL ? "ar-EG" : "en-GB", {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                  })
-                : "N/A"}
+              {dateObj.toLocaleDateString(isRTL ? "ar-EG" : "en-GB", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })}
             </div>
           </div>
         </div>
@@ -190,7 +196,7 @@ export default function ConfirmationClient() {
           {items.map((item, i) => (
             <div key={i} className="flex gap-4 items-start">
               <div className="relative w-20 h-28 rounded-xl overflow-hidden">
-                <span className="absolute bg-gray-200 text-xs w-6 h-6 flex items-center justify-center rounded-full z-99">
+                <span className="absolute bg-gray-200 text-xs w-6 h-6 flex items-center justify-center rounded-full z-[99]">
                   {item.qty}
                 </span>
                 <Image

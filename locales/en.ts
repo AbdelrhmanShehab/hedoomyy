@@ -44,6 +44,10 @@ const en = {
   best_seller_title: "Best Sellers",
   best_seller_see_more: "See More",
 
+  // ── Search ───────────────────────────────────────────────
+  search_placeholder: "Search for products...",
+  search_no_results: "No products found matching your search.",
+
   // ── Product Card ─────────────────────────────────────────
   card_best_seller: "BEST SELLER",
   card_sale: "SALE",

@@ -1,8 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
 import { onAuthStateChanged } from "firebase/auth";
-import { collection, query, where, getDocs } from "firebase/firestore";
-import { auth, db } from "@/lib/firebase";
 import { Loader2, Package, ChevronDown, ChevronUp } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -16,17 +14,11 @@ export default function OrderHistory() {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         try {
-          const q = query(
-            collection(db, "orders"),
-            where("userId", "==", user.uid)
-          );
-          const querySnapshot = await getDocs(q);
-          const ordersList = querySnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-          })).sort((a: any, b: any) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
-
-          setOrders(ordersList);
+          const res = await fetch(`/api/orders?uid=${user.uid}`);
+          if (res.ok) {
+            const data = await res.json();
+            setOrders(data);
+          }
         } catch (error) {
           console.error("Error fetching orders:", error);
         }

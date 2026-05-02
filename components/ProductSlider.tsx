@@ -42,6 +42,7 @@ const ProductSlider: React.FC<ProductSliderProps> = ({ products }) => {
       <button
         onClick={() => scroll(isRTL ? "right" : "left")}
         aria-label={isRTL ? "التالي" : "Previous"}
+        suppressHydrationWarning
         className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
       >
         <ChevronLeft className="w-6 h-6" />
@@ -49,6 +50,7 @@ const ProductSlider: React.FC<ProductSliderProps> = ({ products }) => {
       <button
         onClick={() => scroll(isRTL ? "left" : "right")}
         aria-label={isRTL ? "السابق" : "Next"}
+        suppressHydrationWarning
         className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
       >
         <ChevronRight className="w-6 h-6" />

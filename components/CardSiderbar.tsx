@@ -38,6 +38,7 @@ export function CartSidebar() {
           </div>
           <button
             onClick={closeCart}
+            suppressHydrationWarning
             className="p-2 hover:bg-zinc-100 rounded-full transition-colors group cursor-pointer"
           >
             <X className="w-5 h-5 text-zinc-400 group-hover:text-zinc-800" />
@@ -54,6 +55,7 @@ export function CartSidebar() {
               <p className="text-zinc-500 font-medium">{t("cart_empty")}</p>
               <button
                 onClick={closeCart}
+                suppressHydrationWarning
                 className="text-pink-400 font-bold hover:underline cursor-pointer"
               >
                 {t("about_start_shopping")}
@@ -94,6 +96,7 @@ export function CartSidebar() {
                       <div className="flex items-center bg-zinc-50 rounded-full p-1 border border-zinc-100">
                         <button
                           onClick={() => updateQty(item.productId, item.variantId, -1)}
+                          suppressHydrationWarning
                           className="w-7 h-7 flex items-center justify-center text-zinc-400 hover:text-zinc-800 hover:bg-white rounded-full transition-all disabled:opacity-30 cursor-pointer"
                           disabled={item.qty <= 1}
                         >
@@ -104,6 +107,7 @@ export function CartSidebar() {
                         </span>
                         <button
                           onClick={() => updateQty(item.productId, item.variantId, 1)}
+                          suppressHydrationWarning
                           className="w-7 h-7 flex items-center justify-center text-zinc-400 hover:text-zinc-800 hover:bg-white rounded-full transition-all disabled:opacity-30 cursor-pointer"
                           disabled={item.stock !== undefined && item.qty >= item.stock}
                         >
@@ -145,6 +149,7 @@ export function CartSidebar() {
 
             <button
               onClick={closeCart}
+              suppressHydrationWarning
               className="w-full text-zinc-400 text-sm font-medium hover:text-zinc-800 transition-colors cursor-pointer"
             >
               ← {t("cart_close")}

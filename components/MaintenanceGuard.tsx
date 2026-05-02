@@ -1,8 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { db } from "@/lib/firebase";
-import { doc, onSnapshot } from "firebase/firestore";
 import MaintenanceMode from "./MaintenanceMode";
 
 export default function MaintenanceGuard({
@@ -15,48 +13,43 @@ export default function MaintenanceGuard({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let isMounted = true; // prevent state updates after unmount
+
+    // Detect local environment
     if (typeof window !== "undefined") {
       const hostname = window.location.hostname;
-      setIsLocal(hostname === "localhost" || hostname === "127.0.0.1");
-    }
-
-    let unsubscribe = () => { };
-
-    try {
-      unsubscribe = onSnapshot(
-        doc(db, "settings", "website"),
-        (snapshot) => {
-          if (snapshot.exists()) {
-            const data = snapshot.data();
-            setIsActive(data?.isActive ?? true);
-          }
-          setLoading(false);
-        },
-        (error) => {
-          console.error("Error fetching website status:", error);
-          setIsActive(true);
-          setLoading(false);
-        }
+      setIsLocal(
+        hostname === "localhost" || hostname === "127.0.0.1"
       );
-    } catch (error) {
-      console.error("Firestore failed completely:", error);
-      setIsActive(true);
-      setLoading(false);
     }
 
+    const fetchStatus = async () => {
+      try {
+        const res = await fetch("/api/settings");
+        if (res.ok) {
+          const data = await res.json();
+          if (isMounted) setIsActive(data?.isActive ?? true);
+        }
+      } catch (error) {
+        console.error("Error fetching website status:", error);
+        if (isMounted) setIsActive(true);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    fetchStatus();
+
+    // Fallback timeout (unchanged logic)
     const timer = setTimeout(() => {
-      setLoading(false);
+      if (isMounted) setLoading(false);
     }, 3000);
 
     return () => {
-      unsubscribe();
+      isMounted = false;
       clearTimeout(timer);
     };
   }, []);
-  // While checking, we still show the app by default (isActive is true)
-  // unless we've explicitly received a 'false' from Firestore.
-  // We use the loading state to decide if we should even bother
-  // with the maintenance screen during the first 3 seconds.
 
   if (!isActive && !isLocal && !loading) {
     return <MaintenanceMode />;

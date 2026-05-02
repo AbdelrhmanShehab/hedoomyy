@@ -69,6 +69,7 @@ export default function NewArrivals({ products }: Props) {
                     e.stopPropagation();
                     setSelectedProduct(product);
                   }}
+                  suppressHydrationWarning
                   className="bg-white text-black px-6 py-2.5 rounded-full font-medium text-sm transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 hover:bg-zinc-100"
                 >
                   {t("product_quick_add")}
@@ -91,6 +92,7 @@ export default function NewArrivals({ products }: Props) {
                   e.stopPropagation();
                   setSelectedProduct(product);
                 }}
+                suppressHydrationWarning
                 className="absolute bottom-3 right-3 md:hidden bg-white/90 backdrop-blur-md p-2 rounded-full shadow-lg border border-black/5 active:scale-95 transition-transform"
               >
                 <ShoppingCart className="w-4 h-4 text-black" />

@@ -47,6 +47,10 @@ const ar: Record<TranslationKeys, string> = {
   best_seller_title: "الأكثر مبيعًا",
   best_seller_see_more: "شوفي أكتر",
 
+  // ── Search ───────────────────────────────────────────────
+  search_placeholder: "ابحثي عن المنتجات...",
+  search_no_results: "لم يتم العثور على منتجات تطابق بحثك.",
+
   // ── Product Card ─────────────────────────────────────────
   card_best_seller: "الأكثر مبيعًا",
   card_sale: "تخفيض",

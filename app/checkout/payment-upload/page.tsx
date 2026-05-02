@@ -5,8 +5,6 @@ import { useCart } from "../../../context/CartContext";
 import { useAuth } from "../../../context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
-import { storage } from "../../../lib/firebase";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 export default function PaymentUploadPage() {
     const { order, shippingFee } = useCheckout();
@@ -33,8 +31,6 @@ export default function PaymentUploadPage() {
     const shipping = shippingFee;
     const total = subtotal + shipping;
 
-    // COD  → Tiered deposit
-    // Online → full amount
     const isCOD = order.payment === "cod";
     
     const calculateDeposit = (amount: number) => {
@@ -48,7 +44,6 @@ export default function PaymentUploadPage() {
     const amountDue = isCOD ? calculateDeposit(subtotal) : total;
     const remainingOnDelivery = isCOD ? total - amountDue : 0;
 
-    // Redirect back if cart is empty
     useEffect(() => {
         if (order.items.length === 0) {
             router.push("/checkout");
@@ -68,7 +63,6 @@ export default function PaymentUploadPage() {
     };
 
     const handleSubmit = async () => {
-        // Photo is mandatory for both COD deposit and online full payment
         if (!file) {
             setError("Please attach your Instapay transaction screenshot to proceed.");
             return;
@@ -78,15 +72,22 @@ export default function PaymentUploadPage() {
         setError("");
 
         try {
-            // Upload photo to Firebase Storage
-            const storageRef = ref(
-                storage,
-                `payment-proofs/${Date.now()}_${file.name}`
-            );
-            const snapshot = await uploadBytes(storageRef, file);
-            const photoUrl = await getDownloadURL(snapshot.ref);
+            // ✅ Upload via API route instead of browser SDK
+            const formData = new FormData();
+            formData.append("file", file);
 
-            // Build order items
+            const uploadRes = await fetch("/api/upload", {
+                method: "POST",
+                body: formData,
+            });
+
+            if (!uploadRes.ok) {
+                const errData = await uploadRes.json();
+                throw new Error(errData.error || "Upload failed");
+            }
+
+            const { url: photoUrl } = await uploadRes.json();
+
             const orderItems = order.items.map((item) => ({
                 productId: item.productId,
                 variantId: item.variantId,
@@ -98,7 +99,6 @@ export default function PaymentUploadPage() {
                 size: item.size,
             }));
 
-            // Submit order
             const response = await fetch("/api/orders", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -111,8 +111,6 @@ export default function PaymentUploadPage() {
                     },
                     delivery: order.delivery,
                     payment: order.payment,
-                    // COD → depositType = "deposit", amount = 10%
-                    // Online → depositType = "full", amount = total
                     depositType: isCOD ? "deposit" : "full",
                     depositAmount: amountDue,
                     paymentPhotoUrl: photoUrl,
@@ -129,7 +127,7 @@ export default function PaymentUploadPage() {
             clearCart();
             router.push(`/confirmation/${data.orderId}`);
         } catch (err: any) {
-            setError("Upload failed: " + err.message);
+            setError("Submission failed: " + err.message);
             setUploading(false);
         }
     };
@@ -137,8 +135,6 @@ export default function PaymentUploadPage() {
     return (
         <section className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 flex items-center justify-center px-4 py-16">
             <div className="w-full max-w-lg">
-
-                {/* ── Step indicator ── */}
                 <div className="flex items-center gap-2 mb-10 text-xs text-gray-400">
                     <span className="text-gray-300">Contact &amp; Delivery</span>
                     <span className="mx-1 text-gray-300">›</span>
@@ -150,8 +146,6 @@ export default function PaymentUploadPage() {
                 </div>
 
                 <div className="bg-white rounded-3xl shadow-xl p-8 space-y-7">
-
-                    {/* ── Header ── */}
                     <div className="space-y-1">
                         <h1 className="text-2xl font-light tracking-tight">
                             {isCOD ? "Pay Your Deposit" : "Complete Payment via Instapay"}
@@ -163,7 +157,6 @@ export default function PaymentUploadPage() {
                         </p>
                     </div>
 
-                    {/* ── Amount breakdown ── */}
                     <div
                         className={`rounded-2xl p-5 space-y-3 text-sm ${isCOD
                             ? "bg-amber-50 border border-amber-200"
@@ -205,7 +198,6 @@ export default function PaymentUploadPage() {
                         </div>
                     </div>
 
-                    {/* ── Instapay account card ── */}
                     <div className="bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl p-5 space-y-1.5 text-sm">
                         <p className="text-xs font-semibold uppercase tracking-widest text-purple-500 mb-2">
                             Instapay Account or Vodafone Cash
@@ -226,7 +218,6 @@ export default function PaymentUploadPage() {
                         </p>
                     </div>
 
-                    {/* ── Photo upload ── */}
                     <div className="space-y-2">
                         <p className="text-sm font-medium text-gray-700">
                             Transaction screenshot{" "}
@@ -283,7 +274,6 @@ export default function PaymentUploadPage() {
                         </div>
                     </div>
 
-                    {/* ── Error ── */}
                     {error && (
                         <div className="bg-red-50 border border-red-200 text-red-600 rounded-xl px-4 py-3 text-sm flex items-start gap-2">
                             <span className="mt-0.5">⚠️</span>
@@ -291,7 +281,6 @@ export default function PaymentUploadPage() {
                         </div>
                     )}
 
-                    {/* ── Actions ── */}
                     <div className="flex gap-3 pt-1">
                         <button
                             onClick={() => router.push("/checkout")}
@@ -303,6 +292,7 @@ export default function PaymentUploadPage() {
                         <button
                             onClick={handleSubmit}
                             disabled={uploading || !file}
+                            suppressHydrationWarning
                             className={`flex-1 rounded-full py-3 font-medium text-sm transition ${uploading || !file
                                 ? "bg-gray-200 text-gray-400 cursor-not-allowed"
                                 : "bg-purple-400 hover:bg-purple-500 text-white shadow-md shadow-purple-200"

@@ -76,6 +76,7 @@ export default function ProductCard({ product }: Props) {
             }
             toggleFavorite(product.id);
           }}
+          suppressHydrationWarning
           className="absolute top-2 right-2 md:top-3 md:right-3 bg-white/80 backdrop-blur-sm p-1.5 md:p-2 rounded-full z-10 transition hover:bg-white shadow-sm cursor-pointer"
           aria-label={isFavorited ? t("card_remove_from_favorites") : t("card_add_to_favorites")}
         >
@@ -144,6 +145,7 @@ export default function ProductCard({ product }: Props) {
         <button
           disabled={!hasStock}
           onClick={() => setOpen(true)}
+          suppressHydrationWarning
           className={`mt-3 cursor-pointer px-4 md:px-6 py-2.5 md:py-4 rounded-full text-[12px] md:text-sm
             ${hasStock
               ? "border text-[#DE9DE5] font-medium border-[#DE9DE5] border-2 hover:bg-[#DE9DE5] hover:text-white"

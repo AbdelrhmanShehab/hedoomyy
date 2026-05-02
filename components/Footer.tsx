@@ -99,6 +99,7 @@ export default function Footer() {
               {t("footer_powered_by")}{" "}
               <button
                 onClick={() => setIsDevPopupOpen(true)}
+                suppressHydrationWarning
                 className="font-bold text-zinc-600 transition-colors hover:text-zinc-900 cursor-pointer"
               >
                 Abdelrhman Shehab

@@ -1,39 +1,21 @@
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "../../../lib/firebase";
+/**
+ * GET /api/products
+ * Returns all active products using the Firestore REST API.
+ * No Firebase client SDK = no channel/WebSocket connections.
+ */
+import { fetchActiveProducts, fetchCategories } from "@/lib/firestore-server";
+
+export const revalidate = 60; // ISR: re-fetch at most once per minute
 
 export async function GET() {
-  const snapshot = await getDocs(collection(db, "products"));
-
-  const products = snapshot.docs.map((doc) => {
-    const data = doc.data();
-
-    return {
-      id: doc.id,
-
-      // Normalize old + new DB fields
-      title: data.title ?? data.name ?? "",
-      description: data.description ?? "",
-      category: data.category ?? "",
-      price: data.price ?? 0,
-      status: data.status ?? "active",
-      isBestSeller: data.isBestSeller ?? false,
-
-      originalPrice: data.originalPrice,
-      offerId: data.offerId,
-
-      images: data.images
-        ? data.images
-        : data.imageUrl
-          ? [data.imageUrl]
-          : [],
-
-      variants: data.variants ?? [],
-      shareCount: data.shareCount ?? 0,
-
-      createdAt: data.createdAt ?? null,
-      updatedAt: data.updatedAt ?? null,
-    };
-  });
-
-  return Response.json(products);
+  try {
+    const [products, categories] = await Promise.all([
+      fetchActiveProducts(),
+      fetchCategories(),
+    ]);
+    return Response.json({ products, categories });
+  } catch (error) {
+    console.error("GET /api/products error:", error);
+    return Response.json({ products: [], categories: [] }, { status: 500 });
+  }
 }

@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { onAuthStateChanged, User as FirebaseUser } from "firebase/auth";
-import { doc, getDoc, setDoc, collection, getDocs } from "firebase/firestore";
-import { auth, db } from "@/lib/firebase";
+import { auth } from "@/lib/firebase";
 import { User, Save, Loader2 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -27,11 +26,14 @@ export default function ProfileOverview() {
         const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
             setUser(currentUser);
             if (currentUser) {
-                // Load additional data from Firestore
                 try {
-                    const userDoc = await getDoc(doc(db, "users", currentUser.uid));
-                    if (userDoc.exists()) {
-                        setFormData(prev => ({ ...prev, ...userDoc.data() }));
+                    // ✅ Load data via API route (REST API)
+                    const res = await fetch(`/api/user-data?uid=${currentUser.uid}`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data) {
+                            setFormData(prev => ({ ...prev, ...data }));
+                        }
                     }
                 } catch (error) {
                     console.error("Error loading user data:", error);
@@ -45,9 +47,12 @@ export default function ProfileOverview() {
     useEffect(() => {
         const fetchCities = async () => {
             try {
-                const snapshot = await getDocs(collection(db, "cities"));
-                const cities = snapshot.docs.map(doc => doc.id);
-                setCitiesData(cities);
+                // ✅ Fetch cities via API route
+                const res = await fetch("/api/cities");
+                if (res.ok) {
+                    const cities = await res.json();
+                    setCitiesData(cities.map((c: any) => c.id));
+                }
             } catch (error) {
                 console.error("Error fetching cities:", error);
             }
@@ -64,7 +69,15 @@ export default function ProfileOverview() {
         if (!user) return;
         setSaving(true);
         try {
-            await setDoc(doc(db, "users", user.uid), formData, { merge: true });
+            // ✅ Save data via API route
+            const res = await fetch("/api/user-data", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ uid: user.uid, ...formData }),
+            });
+
+            if (!res.ok) throw new Error("Failed to save");
+            
             alert(t("profile_saved"));
         } catch (error) {
             console.error("Error saving user data:", error);
@@ -193,6 +206,7 @@ export default function ProfileOverview() {
             <button
                 onClick={handleSave}
                 disabled={saving}
+                suppressHydrationWarning
                 className="flex items-center justify-center gap-2 bg-purple-600 text-white px-8 py-3 rounded-full font-medium hover:bg-purple-700 transition-colors disabled:bg-purple-300 w-full md:w-auto cursor-pointer"
             >
                 {saving ? (

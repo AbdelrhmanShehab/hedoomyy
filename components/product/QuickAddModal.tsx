@@ -128,15 +128,10 @@ export default function QuickAddModal({
                     setSelectedColor(color);
                     setSelectedSize("");
                   }}
+                  suppressHydrationWarning
                   className={`px-3 py-2 border rounded text-sm cursor-pointer
-                    ${selectedColor === color
-                      ? "bg-black text-white"
-                      : ""
-                    }
-                    ${!hasStock
-                      ? "opacity-40 cursor-not-allowed"
-                      : ""
-                    }
+                    ${selectedColor === color ? "bg-black text-white" : ""}
+                    ${!hasStock ? "opacity-40 cursor-not-allowed" : ""}
                   `}
                 >
                   {color}
@@ -165,18 +160,11 @@ export default function QuickAddModal({
                   <button
                     key={size}
                     disabled={!hasStock}
-                    onClick={() =>
-                      setSelectedSize(size)
-                    }
+                    onClick={() => setSelectedSize(size)}
+                    suppressHydrationWarning
                     className={`px-3 py-2 border rounded text-sm cursor-pointer
-                      ${selectedSize === size
-                        ? "bg-black text-white"
-                        : ""
-                      }
-                      ${!hasStock
-                        ? "opacity-40 cursor-not-allowed"
-                        : ""
-                      }
+                      ${selectedSize === size ? "bg-black text-white" : ""}
+                      ${!hasStock ? "opacity-40 cursor-not-allowed" : ""}
                     `}
                   >
                     {size}
@@ -194,6 +182,7 @@ export default function QuickAddModal({
               <div className="flex items-center border rounded-full px-2 py-1">
                 <button
                   onClick={() => setQty(Math.max(1, qty - 1))}
+                  suppressHydrationWarning
                   className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded-full transition cursor-pointer"
                 >
                   −
@@ -202,6 +191,7 @@ export default function QuickAddModal({
                 <button
                   onClick={() => setQty(prev => (selectedVariant?.stock && prev < selectedVariant.stock) ? prev + 1 : prev)}
                   disabled={selectedVariant?.stock !== undefined && qty >= selectedVariant.stock}
+                  suppressHydrationWarning
                   className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded-full transition disabled:opacity-30 cursor-pointer"
                 >
                   +
@@ -219,6 +209,7 @@ export default function QuickAddModal({
         <button
           disabled={isOutOfStock}
           onClick={handleAdd}
+          suppressHydrationWarning
           className={`w-full py-3 rounded-full cursor-pointer
             ${!selectedVariant
               ? "bg-gray-200 text-gray-400"
@@ -237,6 +228,7 @@ export default function QuickAddModal({
 
         <button
           onClick={onClose}
+          suppressHydrationWarning
           className="mt-3 w-full text-sm text-gray-500 cursor-pointer"
         >
           {t("modal_cancel")}
