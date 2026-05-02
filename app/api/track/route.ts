@@ -10,6 +10,13 @@ export async function POST(req: NextRequest) {
       return Response.json({ error: "Missing required fields" }, { status: 400 });
     }
 
+    // Handle generic stats (e.g. developer clicks)
+    if (event === "stat") {
+      const statRef = doc(db, "stats", productId); // productId acts as stat key
+      await setDoc(statRef, { count: increment(1) }, { merge: true });
+      return Response.json({ success: true });
+    }
+
     const fieldMap: Record<string, string> = {
       click: "clicks",
       view: "views",

@@ -9,9 +9,6 @@ import tiktok from "../public/tiktok.svg";
 import { useLanguage } from "@/context/LanguageContext";
 import { useState } from "react";
 import DeveloperPopup from "./DeveloperPopup";
-import { doc, setDoc, increment } from "firebase/firestore";
-import { db } from "@/lib/firebase";
-
 export default function Footer() {
   const { categories = [] } = useCategories();
   const { t } = useLanguage();
@@ -20,8 +17,15 @@ export default function Footer() {
   const handleDevClick = async () => {
     setIsDevPopupOpen(true);
     try {
-      const devStatsRef = doc(db, "stats", "developer_clicks");
-      await setDoc(devStatsRef, { count: increment(1) }, { merge: true });
+      // ✅ Use API route instead of direct Firestore SDK
+      await fetch("/api/track", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          productId: "developer_clicks",
+          event: "stat"
+        }),
+      });
     } catch (error) {
       console.error("Error tracking dev click:", error);
     }
@@ -110,7 +114,7 @@ export default function Footer() {
             <p className="text-[10px] text-zinc-400 uppercase tracking-widest">
               {t("footer_powered_by")}{" "}
               <button
-                onClick={() => setIsDevPopupOpen(true)}
+                onClick={handleDevClick}
                 suppressHydrationWarning
                 className="font-bold text-zinc-600 transition-colors hover:text-zinc-900 cursor-pointer"
               >

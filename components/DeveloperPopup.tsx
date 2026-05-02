@@ -104,29 +104,67 @@ export default function DeveloperPopup({ isOpen, onClose }: DeveloperPopupProps)
               </motion.div>
             </div>
 
-            {/* Social Links */}
             <div className="space-y-3 px-6 md:px-8 pb-8 md:pb-10">
-              {socials.map((social, index) => (
-                <motion.a
-                  key={social.name}
-                  href={social.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.2 + index * 0.05 }}
-                  className="group flex items-center gap-3 md:gap-4 rounded-xl md:rounded-2xl bg-white/5 p-2 md:p-3 pr-4 md:pr-5 transition-all hover:bg-white/10 hover:translate-x-1"
-                >
-                  <div className={`flex h-10 w-10 md:h-12 md:w-12 shrink-0 items-center justify-center rounded-lg md:rounded-xl transition-transform group-hover:scale-110 shadow-lg ${social.color}`}>
-                    <social.icon className="h-5 w-5 md:h-6 md:w-6 text-white" />
-                  </div>
-                  <div className="flex-1 min-w-0 text-left">
-                    <h3 className="font-bold text-xs md:text-sm uppercase tracking-wide">{social.name}</h3>
-                    <p className="text-[9px] md:text-[10px] text-zinc-500 truncate font-medium">{social.description}</p>
-                  </div>
-                  <ExternalLink className="h-3 w-3 md:h-4 md:w-4 text-zinc-700 group-hover:text-white transition-colors" />
-                </motion.a>
-              ))}
+              {socials.map((social, index) => {
+                const isPortfolio = social.name === "Portfolio";
+                return (
+                  <motion.a
+                    key={social.name}
+                    href={social.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.2 + index * 0.05 }}
+                    className={`group relative flex items-center gap-3 md:gap-4 rounded-xl md:rounded-2xl p-2 md:p-3 pr-4 md:pr-5 transition-all overflow-hidden ${
+                      isPortfolio
+                        ? "bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 bg-[length:200%_auto] animate-gradient-x ring-1 ring-white/20 shadow-[0_0_20px_rgba(99,102,241,0.3)] hover:scale-[1.02] active:scale-[0.98]"
+                        : "bg-white/5 hover:bg-white/10 hover:translate-x-1"
+                    }`}
+                  >
+                    {/* Shimmer Effect for Portfolio */}
+                    {isPortfolio && (
+                      <motion.div
+                        animate={{
+                          x: ["-100%", "200%"],
+                        }}
+                        transition={{
+                          duration: 3,
+                          repeat: Infinity,
+                          ease: "linear",
+                        }}
+                        className="absolute inset-0 z-0 bg-gradient-to-r from-transparent via-white/20 to-transparent w-1/2 -skew-x-12"
+                      />
+                    )}
+
+                    <div className={`relative z-10 flex h-10 w-10 md:h-12 md:w-12 shrink-0 items-center justify-center rounded-lg md:rounded-xl transition-transform group-hover:scale-110 shadow-lg ${
+                      isPortfolio ? "bg-white/20 backdrop-blur-md" : social.color
+                    }`}>
+                      <social.icon className="h-5 w-5 md:h-6 md:w-6 text-white" />
+                    </div>
+                    
+                    <div className="relative z-10 flex-1 min-w-0 text-left">
+                      <div className="flex items-center gap-2">
+                        <h3 className={`font-bold text-xs md:text-sm uppercase tracking-wide ${isPortfolio ? "text-white" : ""}`}>
+                          {social.name}
+                        </h3>
+                        {isPortfolio && (
+                          <span className="bg-white/20 text-[8px] px-1.5 py-0.5 rounded-full font-black uppercase tracking-tighter animate-pulse">
+                            Live
+                          </span>
+                        )}
+                      </div>
+                      <p className={`text-[9px] md:text-[10px] truncate font-medium ${isPortfolio ? "text-white/70" : "text-zinc-500"}`}>
+                        {social.description}
+                      </p>
+                    </div>
+                    
+                    <ExternalLink className={`relative z-10 h-3 w-3 md:h-4 md:w-4 transition-colors ${
+                      isPortfolio ? "text-white/60 group-hover:text-white" : "text-zinc-700 group-hover:text-white"
+                    }`} />
+                  </motion.a>
+                );
+              })}
 
               {/* Phone / Marketing */}
               <motion.a
