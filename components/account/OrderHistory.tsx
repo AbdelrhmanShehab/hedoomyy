@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "@/lib/firebase";
 import { Loader2, Package, ChevronDown, ChevronUp } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
