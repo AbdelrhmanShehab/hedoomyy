@@ -1,6 +1,7 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getMessaging } from "firebase/messaging";
 import { getAuth } from "firebase/auth";
+import { getStorage } from "firebase/storage";
 import type { Messaging } from "firebase/messaging";
 
 const firebaseConfig = {
@@ -14,8 +15,9 @@ const firebaseConfig = {
 
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
-// 🔐 Auth (Safe for client)
+// 🔐 Auth & Storage (Safe for client)
 export const auth = getAuth(app);
+export const storage = getStorage(app);
 
 let messaging: Messaging | null = null;
 
