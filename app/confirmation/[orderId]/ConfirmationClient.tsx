@@ -37,10 +37,10 @@ export default function ConfirmationClient() {
   if (loading) return <p className="p-10">{t("confirmation_loading")}</p>;
   if (!order) return <p className="p-10">{t("confirmation_not_found")}</p>;
 
-  const { items, delivery, payment, totals, createdAt } = order;
+  const { items = [], delivery, payment, totals = { subtotal: 0, shipping: 0, total: 0 }, createdAt } = order;
 
   // Handle date from REST API/SDK
-  const dateObj = createdAt ? (typeof createdAt === 'number' ? new Date(createdAt) : (createdAt as any).seconds ? new Date((createdAt as any).seconds * 1000) : new Date()) : new Date();
+  const dateObj = createdAt ? (typeof createdAt === 'number' ? new Date(createdAt) : (createdAt as any).seconds ? new Date((createdAt as any).seconds * 1000) : new Date(createdAt)) : new Date();
 
   return (
     <section className="max-w-7xl mx-auto px-6 py-20 grid lg:grid-cols-[1fr_420px] gap-20">
@@ -54,7 +54,7 @@ export default function ConfirmationClient() {
           <h1 className="text-2xl font-light">{t("confirmation_title")}</h1>
         </div>
         <p className="text-sm text-gray-500">
-          {t("confirmation_thank_you")} <strong>{delivery.firstName}</strong> {t("confirmation_for_order")}.
+          {t("confirmation_thank_you")} <strong>{delivery?.firstName}</strong> {t("confirmation_for_order")}.
           {t("confirmation_check_email")}
         </p>
 
@@ -67,12 +67,10 @@ export default function ConfirmationClient() {
           <div className="space-y-1">
             <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">{t("orders_date")}</p>
             <p className="text-sm font-medium text-zinc-900">
-              {createdAt
-                ? new Date(createdAt.seconds * 1000).toLocaleDateString(isRTL ? "ar-EG" : "en-GB", {
+              {dateObj.toLocaleDateString(isRTL ? "ar-EG" : "en-GB", {
                   day: "numeric",
                   month: "short",
-                })
-                : "N/A"}
+                })}
             </p>
           </div>
           <div className="space-y-1">
@@ -96,12 +94,12 @@ export default function ConfirmationClient() {
             <div>
               <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">{t("checkout_address")}</h4>
               <p className="text-sm text-zinc-700 leading-relaxed font-medium">
-                {delivery.firstName} {delivery.lastName}
+                {delivery?.firstName} {delivery?.lastName}
                 <br />
-                {delivery.address}
-                {delivery.apartment && `, Apt ${delivery.apartment}`}
+                {delivery?.address}
+                {delivery?.apartment && `, Apt ${delivery.apartment}`}
                 <br />
-                {delivery.city}, {delivery.government}
+                {delivery?.city}{delivery?.government ? `, ${delivery.government}` : ""}
               </p>
             </div>
 
@@ -169,7 +167,7 @@ export default function ConfirmationClient() {
                     <div className="flex justify-between text-xs">
                       <p className="text-gray-500">{t("confirmation_remaining")}</p>
                       <p className="font-bold text-pink-500">
-                        EGP {( (totals?.total ?? 0) - payment.depositAmount ).toLocaleString()}
+                        EGP {((totals?.total ?? 0) - (payment?.depositAmount ?? 0)).toLocaleString()}
                       </p>
                     </div>
                   )}

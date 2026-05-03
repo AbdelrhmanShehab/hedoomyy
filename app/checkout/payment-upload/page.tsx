@@ -114,6 +114,11 @@ export default function PaymentUploadPage() {
                     depositType: isCOD ? "deposit" : "full",
                     depositAmount: amountDue,
                     paymentPhotoUrl: photoUrl,
+                    totals: {
+                        subtotal,
+                        shipping,
+                        total,
+                    },
                 }),
             });
 
