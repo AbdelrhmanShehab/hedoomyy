@@ -110,10 +110,13 @@ export default function PaymentUploadPage() {
                         phone: order.delivery.phone,
                     },
                     delivery: order.delivery,
-                    payment: order.payment,
-                    depositType: isCOD ? "deposit" : "full",
-                    depositAmount: amountDue,
-                    paymentPhotoUrl: photoUrl,
+                    payment: {
+                        method: order.payment,
+                        depositType: isCOD ? "deposit" : "full",
+                        depositAmount: amountDue,
+                        paymentPhotoUrl: photoUrl,
+                        paid: false,
+                    },
                     totals: {
                         subtotal,
                         shipping,

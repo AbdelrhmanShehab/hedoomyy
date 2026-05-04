@@ -37,7 +37,7 @@ export default function ConfirmationClient() {
   if (loading) return <p className="p-10">{t("confirmation_loading")}</p>;
   if (!order) return <p className="p-10">{t("confirmation_not_found")}</p>;
 
-  const { items = [], delivery, payment, totals = { subtotal: 0, shipping: 0, total: 0 }, createdAt } = order;
+  const { items = [], delivery, payment = {} as any, totals = { subtotal: 0, shipping: 0, total: 0 }, createdAt } = order;
 
   // Handle date from REST API/SDK
   const dateObj = createdAt ? (typeof createdAt === 'number' ? new Date(createdAt) : (createdAt as any).seconds ? new Date((createdAt as any).seconds * 1000) : new Date(createdAt)) : new Date();
@@ -132,38 +132,38 @@ export default function ConfirmationClient() {
             <div>
               <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">{t("checkout_payment")}</h4>
               <p className="text-sm text-zinc-700 font-medium capitalize">
-                {payment.method === "cod"
+                {payment?.method === "cod"
                   ? t("checkout_cod")
                   : t("checkout_online")}
               </p>
 
               {/* Deposit / payment details */}
-              {payment.depositType && (
+              {payment?.depositType && (
                 <div className="mt-4 rounded-2xl bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-100 p-5 space-y-3 shadow-sm">
                   <div className="flex justify-between items-center">
                     <p className="text-xs font-bold text-purple-700 uppercase tracking-widest">
-                      {payment.depositType === "deposit"
+                      {payment?.depositType === "deposit"
                         ? t("confirmation_deposit_paid")
                         : t("confirmation_full_paid")}
                     </p>
                     <div
-                      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-tighter ${payment.paid
+                      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-tighter ${payment?.paid
                         ? "bg-green-100 text-green-700"
                         : "bg-amber-100 text-amber-700"
                         }`}
                     >
-                      {payment.paid ? `✓ ${t("confirmation_confirmed")}` : `⏳ ${t("confirmation_awaiting")}`}
+                      {payment?.paid ? `✓ ${t("confirmation_confirmed")}` : `⏳ ${t("confirmation_awaiting")}`}
                     </div>
                   </div>
 
-                  {payment.depositAmount && (
+                  {payment?.depositAmount && (
                     <div className="flex justify-between text-xs pt-2 border-t border-purple-100/50">
                       <p className="text-gray-500">{t("confirmation_amount_paid")}</p>
                       <p className="font-bold text-zinc-900">EGP {payment.depositAmount.toLocaleString()}</p>
                     </div>
                   )}
 
-                  {payment.depositType === "deposit" && payment.depositAmount && (
+                  {payment?.depositType === "deposit" && payment?.depositAmount && (
                     <div className="flex justify-between text-xs">
                       <p className="text-gray-500">{t("confirmation_remaining")}</p>
                       <p className="font-bold text-pink-500">
@@ -175,7 +175,7 @@ export default function ConfirmationClient() {
               )}
 
               {/* Payment screenshot */}
-              {payment.paymentPhotoUrl && (
+              {payment?.paymentPhotoUrl && (
                 <div className="mt-6 space-y-3">
                   <p className="text-xs text-gray-400 font-medium uppercase tracking-widest">{t("confirmation_screenshot")}</p>
                   <a
