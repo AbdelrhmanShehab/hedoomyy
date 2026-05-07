@@ -1,5 +1,4 @@
-import { db } from "@/lib/firestore-server-sdk";
-import { doc, setDoc, updateDoc, increment, serverTimestamp } from "firebase/firestore";
+import { incrementField, upsertDocument } from "@/lib/firestore-server";
 import { NextRequest } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -12,8 +11,7 @@ export async function POST(req: NextRequest) {
 
     // Handle generic stats (e.g. developer clicks)
     if (event === "stat") {
-      const statRef = doc(db, "stats", productId); // productId acts as stat key
-      await setDoc(statRef, { count: increment(1) }, { merge: true });
+      await incrementField("stats", productId, "count", 1);
       return Response.json({ success: true });
     }
 
@@ -27,30 +25,26 @@ export async function POST(req: NextRequest) {
     const field = fieldMap[event];
     if (!field) return Response.json({ error: "Invalid event" }, { status: 400 });
 
-    const statsRef = doc(db, "productStats", productId);
-
     // 1. Update Aggregate Stats
-    await setDoc(statsRef, { [field]: increment(1) }, { merge: true });
+    await incrementField("productStats", productId, field, 1);
 
     // 2. Update main product document for immediate display
     if (event === "share") {
-      const productRef = doc(db, "products", productId);
-      await updateDoc(productRef, { shareCount: increment(1) });
+      await incrementField("products", productId, "shareCount", 1);
     }
 
     // 3. Log to Leads
     if (userInfo?.email && (event === "cart" || event === "view")) {
       const leadId = `${userInfo.email}_${productId}`;
-      const leadRef = doc(db, "leads", leadId);
-
-      await setDoc(leadRef, {
+      
+      await upsertDocument("leads", leadId, {
         email: userInfo.email,
         name: userInfo.name || "",
         productId,
-        updatedAt: serverTimestamp(),
+        updatedAt: new Date(),
         status: "pending",
         lastActivity: event
-      }, { merge: true });
+      });
     }
 
     return Response.json({ success: true });

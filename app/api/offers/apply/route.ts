@@ -1,5 +1,4 @@
-import { db } from "../../../../lib/firestore-server-sdk";
-import { collection, getDocs, query, where, writeBatch } from "firebase/firestore";
+import { fetchProductsByField, fetchActiveProducts, fetchProductById, runBatchUpdate } from "../../../../lib/firestore-server";
 
 export async function POST(request: Request) {
     try {
@@ -10,46 +9,47 @@ export async function POST(request: Request) {
             return Response.json({ error: "Missing required fields" }, { status: 400 });
         }
 
-        let q;
-        const productsRef = collection(db, "products");
+        let products: any[] = [];
 
         if (type === "product") {
-            q = query(productsRef, where("__name__", "==", targetId));
+            const p = await fetchProductById(targetId);
+            if (p) products = [p];
         } else if (type === "category") {
-            q = query(productsRef, where("category", "==", targetId));
+            products = await fetchProductsByField("category", targetId);
         } else {
             // all active products
-            q = query(productsRef, where("status", "==", "active"));
+            products = await fetchActiveProducts();
         }
 
-        const snapshot = await getDocs(q);
-        const batch = writeBatch(db);
-        let updatedCount = 0;
+        if (products.length === 0) {
+            return Response.json({ success: true, updatedCount: 0 });
+        }
 
-        snapshot.docs.forEach((productDoc) => {
-            const data = productDoc.data();
-
-            const currentPrice = data.price || 0;
-            // If it already has an originalPrice from a previous offer, keep that one
-            const originalPrice = data.originalPrice || currentPrice;
-
+        const updates = products.map((product) => {
+            const currentPrice = product.price || 0;
+            const originalPrice = product.originalPrice || currentPrice;
             const discountAmount = originalPrice * (discountPercentage / 100);
             const newPrice = Math.max(0, originalPrice - discountAmount);
 
-            batch.update(productDoc.ref, {
-                price: newPrice,
-                originalPrice: originalPrice,
-                offerId: offerId,
-                updatedAt: new Date().toISOString()
-            });
-
-            updatedCount++;
+            return {
+                id: product.id,
+                data: {
+                    price: newPrice,
+                    originalPrice: originalPrice,
+                    offerId: offerId,
+                    updatedAt: new Date().toISOString()
+                }
+            };
         });
 
-        await batch.commit();
+        // Split into chunks of 500 (Firestore limit for batch)
+        for (let i = 0; i < updates.length; i += 500) {
+            await runBatchUpdate("products", updates.slice(i, i + 500));
+        }
 
-        return Response.json({ success: true, updatedCount });
+        return Response.json({ success: true, updatedCount: updates.length });
     } catch (error: any) {
+        console.error("API /api/offers/apply error:", error);
         return Response.json({ error: error.message }, { status: 500 });
     }
 }

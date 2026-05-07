@@ -1,6 +1,4 @@
-import { fetchUserById } from "@/lib/firestore-server";
-import { db } from "@/lib/firestore-server-sdk";
-import { doc, setDoc } from "firebase/firestore";
+import { fetchUserById, upsertDocument } from "@/lib/firestore-server";
 import { NextRequest } from "next/server";
 
 export async function GET(req: NextRequest) {
@@ -26,8 +24,8 @@ export async function POST(req: NextRequest) {
       return Response.json({ error: "UID is required" }, { status: 400 });
     }
 
-    // Server-side write
-    await setDoc(doc(db, "users", uid), data, { merge: true });
+    // Use REST API PATCH — equivalent to setDoc with merge:false on known fields
+    await upsertDocument("users", uid, data);
 
     return Response.json({ success: true });
   } catch (error) {

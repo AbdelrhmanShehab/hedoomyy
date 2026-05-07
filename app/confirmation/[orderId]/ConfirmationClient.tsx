@@ -211,7 +211,7 @@ export default function ConfirmationClient() {
           <div>
             <span className="text-gray-300">{t("orders_date")}:</span>{" "}
             {createdAt
-              ? new Date(createdAt.seconds * 1000).toLocaleString(isRTL ? "ar-EG" : "en-GB")
+              ? new Date(typeof createdAt === "number" ? createdAt : (createdAt as any).seconds * 1000).toLocaleString(isRTL ? "ar-EG" : "en-GB")
               : "N/A"}
           </div>
         </div>

@@ -1,5 +1,4 @@
-import { db } from "../../../../lib/firestore-server-sdk";
-import { collection, getDocs, query, where, writeBatch, deleteField } from "firebase/firestore";
+import { fetchProductsByField, runBatchUpdate } from "../../../../lib/firestore-server";
 
 export async function POST(request: Request) {
     try {
@@ -10,30 +9,31 @@ export async function POST(request: Request) {
             return Response.json({ error: "Missing offerId" }, { status: 400 });
         }
 
-        const q = query(collection(db, "products"), where("offerId", "==", offerId));
-        const snapshot = await getDocs(q);
+        const products = await fetchProductsByField("offerId", offerId);
 
-        const batch = writeBatch(db);
-        let updatedCount = 0;
+        if (products.length === 0) {
+            return Response.json({ success: true, updatedCount: 0 });
+        }
 
-        snapshot.docs.forEach((productDoc) => {
-            const data = productDoc.data();
-
-            if (data.originalPrice !== undefined) {
-                batch.update(productDoc.ref, {
-                    price: data.originalPrice,
-                    originalPrice: deleteField(),
-                    offerId: deleteField(),
+        const updates = products
+            .filter(p => p.originalPrice !== undefined)
+            .map((product) => ({
+                id: product.id,
+                data: {
+                    price: product.originalPrice,
+                    originalPrice: null, // Set to null to effectively "remove" it
+                    offerId: null,
                     updatedAt: new Date().toISOString()
-                });
-                updatedCount++;
-            }
-        });
+                }
+            }));
 
-        await batch.commit();
+        for (let i = 0; i < updates.length; i += 500) {
+            await runBatchUpdate("products", updates.slice(i, i + 500));
+        }
 
-        return Response.json({ success: true, updatedCount });
+        return Response.json({ success: true, updatedCount: updates.length });
     } catch (error: any) {
+        console.error("API /api/offers/remove error:", error);
         return Response.json({ error: error.message }, { status: 500 });
     }
 }

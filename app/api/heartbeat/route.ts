@@ -1,5 +1,4 @@
-import { db } from "@/lib/firestore-server-sdk";
-import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { upsertDocument } from "@/lib/firestore-server";
 import { NextRequest } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -10,13 +9,13 @@ export async function POST(req: NextRequest) {
       return Response.json({ error: "Missing sessionId" }, { status: 400 });
     }
 
-    const ref = doc(db, "activePresence", sessionId);
-    await setDoc(ref, {
-      lastActive: serverTimestamp(),
+    // Use REST API to track presence
+    await upsertDocument("activePresence", sessionId, {
+      lastActive: new Date(),
       path,
       email: email || "Anonymous",
       uid: uid || null,
-    }, { merge: true });
+    });
 
     return Response.json({ success: true });
   } catch (error) {

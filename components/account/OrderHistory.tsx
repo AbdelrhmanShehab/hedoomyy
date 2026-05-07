@@ -62,7 +62,7 @@ export default function OrderHistory() {
                 <div className="text-right">
                   <span className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1">{t("orders_date")}</span>
                   <span className="text-sm text-zinc-600">
-                    {order.createdAt?.toDate ? order.createdAt.toDate().toLocaleDateString(isRTL ? "ar-EG" : "en-GB", { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A'}
+                    {order.createdAt ? new Date(order.createdAt).toLocaleDateString(isRTL ? "ar-EG" : "en-GB", { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A'}
                   </span>
                 </div>
               </div>
