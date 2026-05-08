@@ -1,4 +1,5 @@
 import { fetchProductsByField, runBatchUpdate } from "../../../../lib/firestore-server";
+import { Product } from "@/data/product";
 
 export async function POST(request: Request) {
     try {
@@ -9,7 +10,7 @@ export async function POST(request: Request) {
             return Response.json({ error: "Missing offerId" }, { status: 400 });
         }
 
-        const products = await fetchProductsByField("offerId", offerId);
+        const products = await fetchProductsByField("offerId", offerId) as Product[];
 
         if (products.length === 0) {
             return Response.json({ success: true, updatedCount: 0 });

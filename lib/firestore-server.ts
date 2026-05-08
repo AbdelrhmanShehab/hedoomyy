@@ -35,7 +35,7 @@ function parseFields(fields: Record<string, any>): Record<string, any> {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function docToObject(doc: any) {
+function docToObject(doc: any): any {
     const id = doc.name?.split("/").pop() ?? "";
     const fields = parseFields(doc.fields ?? {});
     return { id, ...fields };
@@ -43,7 +43,7 @@ function docToObject(doc: any) {
 
 // ---------- Query helpers ----------
 
-async function runQuery(body: object) {
+async function runQuery<T = any>(body: object): Promise<T[]> {
     const res = await fetch(`${BASE_URL}:runQuery`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
