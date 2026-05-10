@@ -21,6 +21,7 @@ export default function ProfileOverview() {
         city: "",
     });
     const [citiesData, setCitiesData] = useState<string[]>([]);
+    const [loadingCities, setLoadingCities] = useState(true);
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -32,7 +33,12 @@ export default function ProfileOverview() {
                     if (res.ok) {
                         const data = await res.json();
                         if (data) {
-                            setFormData(prev => ({ ...prev, ...data }));
+                            setFormData(prev => ({ 
+                                ...prev, 
+                                ...data,
+                                // Ensure city is at least an empty string
+                                city: data.city || "" 
+                            }));
                         }
                     }
                 } catch (error) {
@@ -47,6 +53,7 @@ export default function ProfileOverview() {
     useEffect(() => {
         const fetchCities = async () => {
             try {
+                setLoadingCities(true);
                 // ✅ Fetch cities via API route
                 const res = await fetch("/api/cities");
                 if (res.ok) {
@@ -55,6 +62,8 @@ export default function ProfileOverview() {
                 }
             } catch (error) {
                 console.error("Error fetching cities:", error);
+            } finally {
+                setLoadingCities(false);
             }
         };
         fetchCities();
@@ -195,7 +204,7 @@ export default function ProfileOverview() {
                         onChange={handleChange}
                         className="w-full border-b border-gray-200 focus:border-purple-500 outline-none py-2 transition-colors bg-white cursor-pointer"
                     >
-                        <option value="">{t("profile_select_city")}</option>
+                        <option value="">{loadingCities ? t("profile_loading_cities") || "Loading cities..." : t("profile_select_city")}</option>
                         {citiesData.map(city => (
                             <option key={city} value={city}>{city}</option>
                         ))}

@@ -176,6 +176,7 @@ const ar: Record<TranslationKeys, string> = {
   profile_apartment: "الشقة / الوحدة",
   profile_city: "المدينة",
   profile_select_city: "اختاري المدينة",
+  profile_loading_cities: "جاري تحميل المدن...",
   profile_save: "احفظي التغييرات",
   profile_saved: "تم تحديث الملف الشخصي بنجاح!",
   profile_save_failed: "فشل تحديث الملف الشخصي.",

@@ -68,9 +68,9 @@ export default function ConfirmationClient() {
             <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">{t("orders_date")}</p>
             <p className="text-sm font-medium text-zinc-900">
               {dateObj.toLocaleDateString(isRTL ? "ar-EG" : "en-GB", {
-                  day: "numeric",
-                  month: "short",
-                })}
+                day: "numeric",
+                month: "short",
+              })}
             </p>
           </div>
           <div className="space-y-1">

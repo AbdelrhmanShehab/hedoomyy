@@ -173,6 +173,7 @@ const en = {
   profile_apartment: "Apartment/Suite",
   profile_city: "City",
   profile_select_city: "Select City",
+  profile_loading_cities: "Loading cities...",
   profile_save: "Save Changes",
   profile_saved: "Profile updated successfully!",
   profile_save_failed: "Failed to update profile.",

@@ -74,21 +74,32 @@ export default function DeliveryForm() {
   const autoFillFromProfile = () => {
     if (!userData) return;
 
+    const profileCity = userData.city || "";
+    
     setOrder(prev => ({
       ...prev,
       contact: {
         email: userData.email || prev.contact.email || ""
       },
       delivery: {
-        address: userData.address || "",
-        phone: userData.phone || "",
-        firstName: userData.firstName || "",
-        lastName: userData.lastName || "",
-        city: userData.city || "",
-        apartment: userData.apartment || "",
-        secondPhone: userData.secondPhone || "",
+        ...prev.delivery,
+        address: userData.address || prev.delivery.address || "",
+        phone: userData.phone || prev.delivery.phone || "",
+        firstName: userData.firstName || prev.delivery.firstName || "",
+        lastName: userData.lastName || prev.delivery.lastName || "",
+        city: profileCity || prev.delivery.city || "",
+        apartment: userData.apartment || prev.delivery.apartment || "",
+        secondPhone: userData.secondPhone || prev.delivery.secondPhone || "",
       }
     }));
+
+    // Manually trigger shipping fee update for the autofilled city
+    if (profileCity && citiesData.length > 0) {
+      const selectedCity = citiesData.find(c => c.id === profileCity);
+      if (selectedCity) {
+        setShippingFee(selectedCity.fee);
+      }
+    }
 
     // Clear form errors after filling
     setErrors({});

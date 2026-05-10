@@ -45,10 +45,10 @@ export default function PaymentUploadPage() {
     const remainingOnDelivery = isCOD ? total - amountDue : 0;
 
     useEffect(() => {
-        if (order.items.length === 0) {
+        if (order.items.length === 0 || !order.delivery.city) {
             router.push("/checkout");
         }
-    }, [order.items.length, router]);
+    }, [order.items.length, order.delivery.city, router]);
 
     const handleFile = (f: File) => {
         setFile(f);
