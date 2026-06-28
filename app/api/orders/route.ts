@@ -1,4 +1,4 @@
-import { fetchUserOrders, fetchOrderById, createOrder } from "@/lib/firestore-server";
+import { fetchUserOrders, fetchOrderById, createOrderSecure, fetchProductById } from "@/lib/firestore-server";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
@@ -30,15 +30,95 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const order = await createOrder(body);
+    const orderData = await req.json();
+    const items = orderData.items || [];
+    
+    if (items.length === 0) {
+      return NextResponse.json({ error: "Order must contain items" }, { status: 400 });
+    }
+
+    let calculatedSubtotal = 0;
+    const productUpdates: { id: string, data: Record<string, any> }[] = [];
+
+    // 1. Validate items and calculate server-side totals
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      
+      if (!Number.isInteger(item.qty) || item.qty <= 0) {
+         return NextResponse.json({ error: `Invalid quantity for ${item.title}` }, { status: 400 });
+      }
+
+      const product = await fetchProductById(item.productId);
+      if (!product) {
+         return NextResponse.json({ error: `Product ${item.productId} not found` }, { status: 400 });
+      }
+
+      const variants = product.variants || [];
+      const variantIndex = variants.findIndex((v: any) => v.id === item.variantId);
+      
+      if (variantIndex === -1) {
+         return NextResponse.json({ error: `Variant ${item.variantId} not found in product` }, { status: 400 });
+      }
+
+      const variant = variants[variantIndex];
+      if ((variant.stock || 0) < item.qty) {
+         return NextResponse.json({ error: `Insufficient stock for ${item.title}` }, { status: 400 });
+      }
+
+      // Deduct stock for the update payload
+      variants[variantIndex].stock -= item.qty;
+      product.totalStock = (product.totalStock || 0) - item.qty;
+
+      productUpdates.push({
+         id: item.productId,
+         data: {
+             variants,
+             totalStock: product.totalStock
+         }
+      });
+
+      // Recalculate price and update item cost safely
+      item.cost = Number(product.cost) || 0;
+      item.price = Number(product.price) || 0;
+      calculatedSubtotal += item.price * item.qty;
+    }
+
+    // 2. Validate Financial Totals
+    const clientTotals = orderData.totals || {};
+    const clientShipping = Number(clientTotals.shipping) || 0;
+    const clientDiscount = Number(clientTotals.discount) || 0;
+
+    if (clientShipping < 0 || clientDiscount < 0) {
+      return NextResponse.json({ error: "Invalid shipping or discount amount" }, { status: 400 });
+    }
+
+    const expectedTotal = Math.max(0, calculatedSubtotal + clientShipping - clientDiscount);
+    const clientTotal = Number(clientTotals.total) || 0;
+
+    if (Math.abs(expectedTotal - clientTotal) > 0.01) {
+      return NextResponse.json({ error: `Total mismatch. Expected: ${expectedTotal}` }, { status: 400 });
+    }
+
+    orderData.totals = {
+      subtotal: calculatedSubtotal,
+      shipping: clientShipping,
+      discount: clientDiscount,
+      total: expectedTotal
+    };
+
+    // Validate delivery and contact info
+    if (!orderData.contact?.email || !orderData.delivery?.address) {
+       return NextResponse.json({ error: "Missing required contact or delivery info" }, { status: 400 });
+    }
+
+    const order = await createOrderSecure(orderData, productUpdates);
 
     return NextResponse.json(
       { success: true, orderId: order.id },
       { status: 201 }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error("POST /api/orders error:", error);
-    return NextResponse.json({ error: "Failed to create order" }, { status: 500 });
+    return NextResponse.json({ error: error.message || "Failed to create order" }, { status: 500 });
   }
 }

@@ -116,7 +116,7 @@ const ar: Record<TranslationKeys, string> = {
   checkout_first_name: "الاسم الأول *",
   checkout_last_name: "الاسم الأخير *",
   checkout_phone: "رقم التليفون *",
-  checkout_second_phone: "تليفون تاني (اختياري)",
+  checkout_second_phone: "تليفون تاني *",
   checkout_city: "المدينة *",
   checkout_city_placeholder: "اختاري المدينة",
   checkout_apartment: "الشقة *",

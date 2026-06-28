@@ -8,7 +8,7 @@ import { useLanguage } from "@/context/LanguageContext";
 
 export default function DeliveryForm() {
   const { order, setOrder, errors, setErrors, setShippingFee } = useCheckout();
-  const { userData } = useAuth();
+  const { userData, user } = useAuth();
   const { t } = useLanguage();
   const [citiesData, setCitiesData] = useState<{ id: string; fee: number }[]>([]);
 
@@ -61,48 +61,56 @@ export default function DeliveryForm() {
     setErrors(prev => ({ ...prev, [field]: undefined }));
   };
 
-  const validatePhone = (phone: string) => {
+  const validatePhone = (phone: string | undefined, field: "phone" | "secondPhone") => {
     const regex = /^01[0-9]{9}$/; // Egyptian mobile format
-    if (!regex.test(phone)) {
+    if (phone && !regex.test(phone)) {
       setErrors(prev => ({
         ...prev,
-        phone: t("checkout_invalid_phone"),
+        [field]: t("checkout_invalid_phone"),
       }));
     }
   };
 
-  const autoFillFromProfile = () => {
-    if (!userData) return;
+  const autoFillFromProfile = async () => {
+    if (!user) return;
 
-    const profileCity = userData.city || "";
-    
-    setOrder(prev => ({
-      ...prev,
-      contact: {
-        email: userData.email || prev.contact.email || ""
-      },
-      delivery: {
-        ...prev.delivery,
-        address: userData.address || prev.delivery.address || "",
-        phone: userData.phone || prev.delivery.phone || "",
-        firstName: userData.firstName || prev.delivery.firstName || "",
-        lastName: userData.lastName || prev.delivery.lastName || "",
-        city: profileCity || prev.delivery.city || "",
-        apartment: userData.apartment || prev.delivery.apartment || "",
-        secondPhone: userData.secondPhone || prev.delivery.secondPhone || "",
-      }
-    }));
+    try {
+      const res = await fetch(`/api/user-data?uid=${user.uid}`);
+      if (!res.ok) return;
+      const freshData = await res.json();
 
-    // Manually trigger shipping fee update for the autofilled city
-    if (profileCity && citiesData.length > 0) {
-      const selectedCity = citiesData.find(c => c.id === profileCity);
-      if (selectedCity) {
-        setShippingFee(selectedCity.fee);
+      const profileCity = freshData?.city || "";
+      
+      setOrder(prev => ({
+        ...prev,
+        contact: {
+          email: freshData?.email || prev.contact.email || ""
+        },
+        delivery: {
+          ...prev.delivery,
+          address: freshData?.address || prev.delivery.address || "",
+          phone: freshData?.phone || prev.delivery.phone || "",
+          firstName: freshData?.firstName || prev.delivery.firstName || "",
+          lastName: freshData?.lastName || prev.delivery.lastName || "",
+          city: profileCity || prev.delivery.city || "",
+          apartment: freshData?.apartment || prev.delivery.apartment || "",
+          secondPhone: freshData?.secondPhone || prev.delivery.secondPhone || "",
+        }
+      }));
+
+      // Manually trigger shipping fee update for the autofilled city
+      if (profileCity && citiesData.length > 0) {
+        const selectedCity = citiesData.find(c => c.id === profileCity);
+        if (selectedCity) {
+          setShippingFee(selectedCity.fee);
+        }
       }
+
+      // Clear form errors after filling
+      setErrors({});
+    } catch (error) {
+      console.error("Error fetching fresh user data for autofill:", error);
     }
-
-    // Clear form errors after filling
-    setErrors({});
   };
 
   return (
@@ -200,7 +208,7 @@ export default function DeliveryForm() {
           <input
             value={order.delivery.phone}
             onChange={(e) => updateDelivery("phone", e.target.value)}
-            onBlur={() => validatePhone(order.delivery.phone)}
+            onBlur={() => validatePhone(order.delivery.phone, "phone")}
             placeholder="01xxxxxxxxx"
             className={`w-full border rounded-xl px-4 py-3 text-sm ${errors.phone ? "border-red-500" : "border-gray-300"
               }`}
@@ -219,8 +227,14 @@ export default function DeliveryForm() {
             onChange={(e) =>
               updateDelivery("secondPhone", e.target.value)
             }
-            className="w-full border rounded-xl px-4 py-3 text-sm"
+            onBlur={() => validatePhone(order.delivery.secondPhone, "secondPhone")}
+            className={`w-full border rounded-xl px-4 py-3 text-sm ${errors.secondPhone ? "border-red-500" : "border-gray-300"
+              }`}
+            placeholder="01xxxxxxxxx"
           />
+          {errors.secondPhone && (
+            <p className="text-red-500 text-xs mt-1">{errors.secondPhone}</p>
+          )}
         </div>
       </div>
 

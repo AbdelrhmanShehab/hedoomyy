@@ -113,7 +113,7 @@ const en = {
   checkout_first_name: "First Name *",
   checkout_last_name: "Last Name *",
   checkout_phone: "Phone Number *",
-  checkout_second_phone: "Second Phone (optional)",
+  checkout_second_phone: "Second Phone *",
   checkout_city: "City *",
   checkout_city_placeholder: "Select City",
   checkout_apartment: "Apartment *",

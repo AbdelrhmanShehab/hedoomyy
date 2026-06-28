@@ -253,7 +253,7 @@ export async function fetchRelatedProducts(categoryId: string, currentProductId:
 /** Fetch website settings — used for maintenance mode */
 export async function fetchWebsiteSettings() {
     const res = await fetch(`${BASE_URL}/settings/website`, {
-        next: { revalidate: 60 },
+        cache: 'no-store',
     });
     if (!res.ok) return { isActive: true };
     const doc: any = await res.json();
@@ -317,16 +317,54 @@ export async function fetchOrderById(id: string) {
     return docToObject(doc);
 }
 
-/** Create an order document via REST API */
+/** Create an order document and optionally run batch updates atomically via REST API commit */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function createOrder(data: Record<string, any>) {
+export async function createOrderSecure(orderData: Record<string, any>, productUpdates: { id: string, data: Record<string, any> }[]) {
     const now = new Date();
-    return createDocument("orders", {
-        ...data,
+    const orderRefId = Date.now().toString(36) + Math.random().toString(36).slice(2); // Generate simple ID
+    
+    const finalOrder = {
+        ...orderData,
         status: "pending",
         createdAt: now,
         updatedAt: now,
+    };
+
+    const writes = [];
+
+    // Add order creation
+    writes.push({
+        update: {
+            name: `projects/${PROJECT_ID}/databases/(default)/documents/orders/${orderRefId}`,
+            fields: toFirestoreFields(finalOrder)
+        }
     });
+
+    // Add product updates (for stock deduction)
+    for (const update of productUpdates) {
+        writes.push({
+            update: {
+                name: `projects/${PROJECT_ID}/databases/(default)/documents/products/${update.id}`,
+                fields: toFirestoreFields(update.data)
+            },
+            updateMask: {
+                fieldPaths: Object.keys(update.data)
+            }
+        });
+    }
+
+    const res = await fetch(`https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default):commit`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ writes })
+    });
+
+    if (!res.ok) {
+        const err = await res.text().catch(() => res.status.toString());
+        throw new Error(`Firestore order creation failed (${res.status}): ${err}`);
+    }
+
+    return { id: orderRefId, ...finalOrder };
 }
 
 /**

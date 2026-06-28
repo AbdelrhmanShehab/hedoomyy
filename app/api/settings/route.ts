@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+export const dynamic = 'force-dynamic';
 import { fetchWebsiteSettings } from "../../../lib/firestore-server";
 
 export async function GET() {

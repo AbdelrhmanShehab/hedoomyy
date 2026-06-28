@@ -76,6 +76,18 @@ export default function ProfileOverview() {
 
     const handleSave = async () => {
         if (!user) return;
+
+        const regex = /^01[0-9]{9}$/;
+        if (!regex.test(formData.phone) || !regex.test(formData.secondPhone)) {
+            alert(t("checkout_invalid_phone") || "Invalid Egyptian phone number");
+            return;
+        }
+
+        if (!formData.city) {
+            alert(t("error_city_required") || "City is required");
+            return;
+        }
+
         setSaving(true);
         try {
             // ✅ Save data via API route
@@ -168,7 +180,7 @@ export default function ProfileOverview() {
                         value={formData.secondPhone}
                         onChange={handleChange}
                         className="w-full border-b border-gray-200 focus:border-purple-500 outline-none py-2 transition-colors"
-                        placeholder="01xxxxxxxxx (Optional)"
+                        placeholder="01xxxxxxxxx"
                     />
                 </div>
 

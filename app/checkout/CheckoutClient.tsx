@@ -45,6 +45,7 @@ export default function CheckoutClient() {
     !!order.delivery.lastName &&
     !!order.delivery.city &&
     !!order.delivery.apartment &&
+    !!order.delivery.secondPhone &&
     !!order.payment &&
     order.items.length > 0;
 
@@ -53,7 +54,13 @@ export default function CheckoutClient() {
 
     if (!order.contact.email) newErrors.email = t("error_email_required");
     if (!order.delivery.address) newErrors.address = t("error_address_required");
+    
     if (!order.delivery.phone) newErrors.phone = t("error_phone_required");
+    else if (!/^01[0-9]{9}$/.test(order.delivery.phone)) newErrors.phone = t("checkout_invalid_phone");
+
+    if (!order.delivery.secondPhone) newErrors.secondPhone = t("error_phone_required");
+    else if (!/^01[0-9]{9}$/.test(order.delivery.secondPhone)) newErrors.secondPhone = t("checkout_invalid_phone");
+
     if (!order.delivery.firstName) newErrors.firstName = t("error_first_name_required");
     if (!order.delivery.lastName) newErrors.lastName = t("error_last_name_required");
     if (!order.delivery.city) newErrors.city = t("error_city_required");
