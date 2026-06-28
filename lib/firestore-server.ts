@@ -260,6 +260,21 @@ export async function fetchWebsiteSettings() {
     return parseFields(doc.fields ?? {});
 }
 
+/** Fetch last order by email to prevent duplicates */
+export async function fetchLastOrderByEmail(email: string) {
+    const orders = await runQuery({
+        structuredQuery: {
+            from: [{ collectionId: "orders" }],
+            where: {
+                fieldFilter: { field: { fieldPath: "contact.email" }, op: "EQUAL", value: { stringValue: email } }
+            },
+            orderBy: [{ field: { fieldPath: "createdAt" }, direction: "DESCENDING" }],
+            limit: 1
+        }
+    });
+    return orders[0] || null;
+}
+
 /** Fetch user document by UID */
 export async function fetchUserById(uid: string) {
     const res = await fetch(`${BASE_URL}/users/${uid}`, {

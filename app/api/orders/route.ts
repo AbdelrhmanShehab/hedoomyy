@@ -1,4 +1,4 @@
-import { fetchUserOrders, fetchOrderById, createOrderSecure, fetchProductById } from "@/lib/firestore-server";
+import { fetchUserOrders, fetchOrderById, createOrderSecure, fetchProductById, fetchLastOrderByEmail } from "@/lib/firestore-server";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
@@ -88,15 +88,34 @@ export async function POST(req: NextRequest) {
     const clientShipping = Number(clientTotals.shipping) || 0;
     const clientDiscount = Number(clientTotals.discount) || 0;
 
-    if (clientShipping < 0 || clientDiscount < 0) {
-      return NextResponse.json({ error: "Invalid shipping or discount amount" }, { status: 400 });
+    if (clientShipping < 0) {
+      return NextResponse.json({ error: "Shipping fee cannot be negative" }, { status: 400 });
     }
 
-    const expectedTotal = Math.max(0, calculatedSubtotal + clientShipping - clientDiscount);
+    if (clientDiscount < 0 || clientDiscount > calculatedSubtotal) {
+      return NextResponse.json({ error: "Invalid discount amount" }, { status: 400 });
+    }
+
+    const expectedTotal = calculatedSubtotal + clientShipping - clientDiscount;
+    if (expectedTotal < 0) {
+      return NextResponse.json({ error: "Order total cannot be negative" }, { status: 400 });
+    }
+
     const clientTotal = Number(clientTotals.total) || 0;
 
     if (Math.abs(expectedTotal - clientTotal) > 0.01) {
       return NextResponse.json({ error: `Total mismatch. Expected: ${expectedTotal}` }, { status: 400 });
+    }
+
+    // 3. Duplicate Order Prevention
+    if (orderData.contact?.email) {
+      const lastOrder = await fetchLastOrderByEmail(orderData.contact.email);
+      if (lastOrder) {
+        const timeDiff = Date.now() - new Date(lastOrder.createdAt).getTime();
+        if (timeDiff < 60000 && lastOrder.totals?.total === expectedTotal) {
+          return NextResponse.json({ error: "Duplicate order submission detected. Please wait." }, { status: 400 });
+        }
+      }
     }
 
     orderData.totals = {
