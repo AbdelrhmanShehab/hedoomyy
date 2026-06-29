@@ -122,7 +122,7 @@ const en = {
   checkout_payment: "Payment",
   checkout_cod: "Cash on Delivery",
   checkout_online: "Pay Online",
-  checkout_order_summary: "Your cart is empty.",
+  checkout_order_summary: "Your cart:",
   checkout_subtotal: "Subtotal",
   checkout_shipping: "Shipping",
   checkout_total: "Total",

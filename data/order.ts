@@ -9,7 +9,7 @@ export type OrderItem = {
 
 export type Order = {
   items: OrderItem[];
-  customer: {
+  contact: {
     email: string;
     phone: string;
   };

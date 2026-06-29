@@ -75,8 +75,8 @@ export default function ConfirmationClient() {
           </div>
           <div className="space-y-1">
             <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">{t("confirmation_email")}</p>
-            <p className="text-sm font-medium text-zinc-900 truncate" title={order.customer.email}>
-              {order.customer.email}
+            <p className="text-sm font-medium text-zinc-900 truncate" title={order.contact?.email}>
+              {order.contact?.email}
             </p>
           </div>
           <div className="space-y-1">
@@ -219,7 +219,7 @@ export default function ConfirmationClient() {
 
       {/* RIGHT – ORDER SUMMARY */}
       <div className="border rounded-3xl p-8 space-y-8">
-        <h3 className="tracking-[0.3em] text-purple-300 text-sm uppercase">
+        <h3 className="tracking-[0.3em] font-medium text-purple-300 text-lg uppercase">
           {t("checkout_order_summary")}
         </h3>
 

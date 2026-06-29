@@ -368,7 +368,7 @@ export async function createOrderSecure(orderData: Record<string, any>, productU
         });
     }
 
-    const res = await fetch(`https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default):commit`, {
+    const res = await fetch(`https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents:commit`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ writes })
@@ -441,7 +441,7 @@ export async function addReview(reviewData: Record<string, any>) {
 
 /** Atomically increment a numeric field via REST API commit:transform */
 export async function incrementField(collectionPath: string, docId: string, fieldPath: string, amount: number = 1) {
-    const res = await fetch(`https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default):commit`, {
+    const res = await fetch(`https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents:commit`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -476,7 +476,7 @@ export async function incrementField(collectionPath: string, docId: string, fiel
 export async function runBatchUpdate(collectionPath: string, updates: { id: string, data: Record<string, any> }[]) {
     if (updates.length === 0) return;
 
-    const res = await fetch(`https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default):commit`, {
+    const res = await fetch(`https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents:commit`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

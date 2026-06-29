@@ -105,7 +105,7 @@ export default function PaymentUploadPage() {
                 body: JSON.stringify({
                     userId: user?.uid ?? null,
                     items: orderItems,
-                    customer: {
+                    contact: {
                         email: order.contact.email,
                         phone: order.delivery.phone,
                     },
