@@ -1,7 +1,7 @@
 "use client";
 
 import { Product } from "@/data/product";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import {
   Heart,
@@ -30,9 +30,13 @@ type Props = {
 
 export default function ProductClient({ product, relatedProducts }: Props) {
   const { addItem, openCart } = useCart();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { toggleFavorite, isFavorite } = useFavorites();
   const { t, isRTL } = useLanguage();
+
+  useEffect(() => {
+    if (!authLoading) trackEvent(product.id, "view", user ? { email: user.email || undefined, name: user.displayName || undefined } : undefined);
+  }, [product.id, authLoading, user]);
 
   const isFavorited = isFavorite(product.id);
 

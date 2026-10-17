@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:tracking": "node --experimental-vm-modules --test tests/tracking.test.mjs"
   },
   "dependencies": {
     "embla-carousel-react": "^8.6.0",
