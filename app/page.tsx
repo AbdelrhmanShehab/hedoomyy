@@ -17,6 +17,9 @@ import { Product } from "@/data/product";
 import type { Metadata } from "next";
 import Script from "next/script";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import WholeLook from "@/components/home/WholeLook";
+import CatalogRetry from "@/components/home/CatalogRetry";
+import { loadHomeData } from "@/lib/home-data";
 
 export const metadata: Metadata = {
   title: "Hedoomyy",
@@ -34,12 +37,12 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
-  // All three fetches run in PARALLEL — no waterfall
-  const [categories, newArrivals, bestSellers] = await Promise.all([
-    fetchCategories(),
-    fetchNewArrivals(5),
-    fetchBestSellers(8),
-  ]);
+  // Keep the storefront available if one or more catalog requests fail.
+  const { categories, newArrivals, bestSellers, unavailable } = await loadHomeData({
+    categories: fetchCategories,
+    newArrivals: () => fetchNewArrivals(5),
+    bestSellers: () => fetchBestSellers(8),
+  });
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -100,11 +103,15 @@ export default async function Home() {
         sizes="100vw"
       />
       <main className="mainContainer">
+        {unavailable && <CatalogRetry />}
         <ErrorBoundary fallback={null}>
           <Hero />
         </ErrorBoundary>
         <ErrorBoundary fallback={null}>
           <Categories categories={categories} />
+        </ErrorBoundary>
+        <ErrorBoundary fallback={null}>
+          <WholeLook />
         </ErrorBoundary>
         <ErrorBoundary fallback={null}>
           <NewArrivals products={newArrivals as Product[]} />

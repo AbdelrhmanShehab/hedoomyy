@@ -27,6 +27,9 @@ export interface Product {
   offerId?: string;
 
   images: string[];
+  /** Dedicated transparent mannequin mockups, separate from catalog photos. */
+  stylingSlot?: "top" | "bottom" | "";
+  colorMockups?: { color: string; image: string }[];
   shareCount?: number;
 
   variants: ProductVariant[];

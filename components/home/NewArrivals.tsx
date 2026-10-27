@@ -13,12 +13,12 @@ interface Props {
 }
 
 export default function NewArrivals({ products }: Props) {
+  const { t } = useLanguage();
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   // 🛡️ Data Guard: Prevent crash if products is not an array
   if (!Array.isArray(products) || products.length === 0) return null;
 
   const [bigProduct, ...smallProducts] = products;
-  const { t } = useLanguage();
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   // Additional check if bigProduct is valid
   if (!bigProduct || typeof bigProduct !== "object") return null;

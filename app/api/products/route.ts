@@ -5,15 +5,18 @@
  */
 import { fetchActiveProducts, fetchCategories } from "@/lib/firestore-server";
 
-export const revalidate = 60; // ISR: re-fetch at most once per minute
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const [products, categories] = await Promise.all([
-      fetchActiveProducts(),
-      fetchCategories(),
+    const [productsResult, categoriesResult] = await Promise.allSettled([
+      fetchActiveProducts(true),
+      fetchCategories(true),
     ]);
-    return Response.json({ products, categories });
+    if (productsResult.status === "rejected") throw productsResult.reason;
+    const products = productsResult.value;
+    const categories = categoriesResult.status === "fulfilled" ? categoriesResult.value : [];
+    return Response.json({ products, categories }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     console.error("GET /api/products error:", error);
     return Response.json({ products: [], categories: [] }, { status: 500 });

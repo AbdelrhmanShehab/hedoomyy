@@ -1,0 +1,14 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import ts from "typescript";
+const source = await readFile(new URL("../lib/styling-products.ts", import.meta.url), "utf8");
+const js = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2020, module: ts.ModuleKind.ESNext } }).outputText;
+const { colorMockup, stylingColors, stylingCartItem } = await import("data:text/javascript;base64," + Buffer.from(js).toString("base64"));
+const product = { id: "top", title: "Top", status: "active", price: 500, images: ["catalog.jpg"], colorMockups: [{ color: "Red", image: "red.png" }, { color: "Blue", image: "blue.png" }, { color: "White", image: "white.png" }], variants: [{ id: "red-s", color: "Red", size: "S", stock: 2 }, { id: "blue-m", color: "Blue", size: "M", stock: 1 }, { id: "white-s", color: "White", size: "S", stock: 0 }, { id: "green-s", color: "Green", size: "S", stock: 5 }] };
+test("only in-stock colors with dedicated mockups are offered", () => assert.deepEqual(stylingColors(product), ["Red", "Blue"]));
+test("mockup lookup tolerates color case and surrounding whitespace", () => assert.equal(colorMockup(product, " blue "), "blue.png"));
+test("cart preserves the chosen color, size, variant, and mockup", () => assert.deepEqual(stylingCartItem(product, "Blue", "blue-m"), { productId: "top", title: "Top", price: 500, variantId: "blue-m", color: "Blue", size: "M", image: "blue.png", qty: 1, stock: 1 }));
+test("changing color cannot add the previous color's size variant", () => assert.equal(stylingCartItem(product, "Blue", "red-s"), null));
+test("unavailable and unconfigured colors cannot be added", () => { assert.equal(stylingCartItem(product, "White", "white-s"), null); assert.equal(stylingCartItem(product, "Green", "green-s"), null); });
+test("inactive products cannot be added", () => assert.equal(stylingCartItem({ ...product, status: "inactive" }, "Red", "red-s"), null));

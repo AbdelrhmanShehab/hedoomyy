@@ -43,12 +43,13 @@ function docToObject(doc: any): any {
 
 // ---------- Query helpers ----------
 
-async function runQuery<T = any>(body: object): Promise<T[]> {
+async function runQuery<T = any>(body: object, fresh = false): Promise<T[]> {
     const res = await fetch(`${BASE_URL}:runQuery`, {
+        signal: AbortSignal.timeout(10000),
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
-        next: { revalidate: 60 }, // cache for 60 seconds
+        ...(fresh ? { cache: "no-store" as const } : { next: { revalidate: 60 } }),
     });
 
     if (!res.ok) {
@@ -109,9 +110,10 @@ async function createDocument(collectionPath: string, data: Record<string, any>)
     return docToObject(doc);
 }
 
-async function listCollection(collection: string) {
+async function listCollection(collection: string, fresh = false) {
     const res = await fetch(`${BASE_URL}/${collection}`, {
-        next: { revalidate: 60 },
+        signal: AbortSignal.timeout(10000),
+        ...(fresh ? { cache: "no-store" as const } : { next: { revalidate: 60 } }),
     });
     if (!res.ok) return [];
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -121,12 +123,12 @@ async function listCollection(collection: string) {
 
 // ---------- Domain queries ----------
 
-export async function fetchCategories() {
-    return listCollection("categories");
+export async function fetchCategories(fresh = false) {
+    return listCollection("categories", fresh);
 }
 
 /** All active products — used by /api/products route */
-export async function fetchActiveProducts() {
+export async function fetchActiveProducts(fresh = false) {
     return runQuery({
         structuredQuery: {
             from: [{ collectionId: "products" }],
@@ -138,7 +140,7 @@ export async function fetchActiveProducts() {
                 },
             },
         },
-    });
+    }, fresh);
 }
 
 /** Reviews for a single product — used by /api/reviews route */
