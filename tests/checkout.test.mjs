@@ -145,3 +145,14 @@ test('promo validation works before contact, address, city or payment are filled
   await assert.rejects(createCheckout(h.db, body, 'cart-promo-reference', null, new Date(), false, true), /cannot place an order/);
   await assert.rejects(createCheckout(h.db, { couponCode: 'LULU', items: [] }, 'cart-promo-reference', null, new Date(), true, true));
 });
+
+test('LULU product-scoped configuration discounts only the targeted top by twenty percent', async () => {
+  const h = database(), targetId = 'xTlKDoIIl0Etrg9Zb0du';
+  h.states.set('products/' + targetId, { title: 'top', price: 300, variants: [{ id: 'red-80kg', stock: 5 }] });
+  h.states.set('offers/LULU', promo({ type: 'product', targetId, discountPercentage: 20, maxUses: 1, expiresAt: null }));
+  const body = { couponCode: 'LULU', items: [...input().items, { productId: targetId, variantId: 'red-80kg', qty: 1 }] };
+  const result = await createCheckout(h.db, body, 'lulu-product-preview', null, new Date(), true, true);
+  assert.equal(result.totals.subtotal, 500); assert.equal(result.totals.discount, 60);
+  await assert.rejects(createCheckout(h.db, { couponCode: 'LULU', items: input().items }, 'lulu-ineligible-cart', null, new Date(), true, true), /does not apply/);
+  assert.equal(h.states.get('offers/LULU').usedCount, 0);
+});

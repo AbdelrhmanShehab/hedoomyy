@@ -28,3 +28,11 @@ Code changes and rules templates are local; production deployment and a live aut
 Apply now validates cart items and the code independently of contact, delivery and payment fields, and shows checking, success with savings, or an error beside the input. Reapplying the same code retries the request. Cart changes revalidate it; removing a code ignores pending responses. Final checkout still requires the complete form and repeats validation transactionally.
 
 Local configuration inspected on this follow-up: the storefront has no `.env.local`, and the dashboard `.env.local` does not supply a non-empty `FIREBASE_PRIVATE_KEY`. This prevented inspecting the real `LULU` offer with Firebase Admin. Configure the server credentials in the environment actually running each app; the UI now reports unavailable server configuration instead of remaining silent.
+
+## Deployed server failure investigation
+
+The reported storefront is https://hedoomyy.vercel.app/. A read-only diagnostic POST to `/api/promocodes/validate` without authentication returned 401 as expected. The same request with an intentionally invalid token returned the same generic 500 shown in the screenshot, before promo lookup. This narrows the production failure to Firebase initialization/authentication rather than promo eligibility; access to production logs is needed for the exact deployed exception.
+
+The shared Firebase initializer incorrectly preserved escaped PEM line breaks. Both apps now normalize actual, single-escaped, double-escaped, quoted and escaped CRLF private keys. Tests generate a real RSA key, parse each form and construct a Firebase certificate. Promo/quote failures now distinguish credential configuration, database permissions and database availability, with safe log references and no credential contents.
+
+Deploy the updated storefront and dashboard. Check `FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL` and `FIREBASE_PRIVATE_KEY` in Vercel's **Production** environment for the storefront project, then redeploy so changes take effect. Do not paste the private key into chat. This workspace has no configured Vercel CLI/project link or production logs access; production configuration has not been changed by this investigation.
