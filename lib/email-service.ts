@@ -79,6 +79,7 @@ const generateOrderHTML = (order: any, isCustomer = false, statusUpdate = false)
                 <span>${i.price * i.qty} EGP</span>
               </div>
             `).join('')}
+            ${totals?.discount > 0 ? `<div>Promo discount: -${totals.discount} EGP</div>` : ""}
             <div class="total">Total: ${total} EGP</div>
           </div>
 

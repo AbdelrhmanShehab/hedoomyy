@@ -1,6 +1,7 @@
 import { CartItem } from "./cart";
 
 export type CheckoutOrder = {
+  couponCode?: string;
   items: CartItem[];
 
   contact: {

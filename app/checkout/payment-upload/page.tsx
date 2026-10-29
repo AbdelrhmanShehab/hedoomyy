@@ -1,5 +1,6 @@
 "use client";
 
+import { authenticatedFetch } from "@/lib/authenticatedFetch";
 import { useCheckout } from "../../../context/CheckoutContext";
 import { useCart } from "../../../context/CartContext";
 import { useAuth } from "../../../context/AuthContext";
@@ -7,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 
 export default function PaymentUploadPage() {
-    const { order, shippingFee } = useCheckout();
+    const { order, shippingFee, quote, quoteError, quoteLoading } = useCheckout();
     const { clearCart } = useCart();
     const { user, loading } = useAuth();
     const router = useRouter();
@@ -22,14 +23,24 @@ export default function PaymentUploadPage() {
     const [preview, setPreview] = useState<string | null>(null);
     const [uploading, setUploading] = useState(false);
     const [error, setError] = useState("");
+    const checkoutReference = useRef('');
+    useEffect(() => {
+        const signature = JSON.stringify(order);
+        try {
+            const saved = JSON.parse(sessionStorage.getItem('checkout_request') || 'null');
+            checkoutReference.current = saved?.signature === signature ? saved.key : crypto.randomUUID();
+            sessionStorage.setItem('checkout_request', JSON.stringify({ signature, key: checkoutReference.current }));
+        } catch { checkoutReference.current = crypto.randomUUID(); }
+    }, [order]);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const subtotal = order.items.reduce(
+    const subtotal = quote?.totals.subtotal ?? order.items.reduce(
         (sum, item) => sum + item.price * item.qty,
         0
     );
     const shipping = shippingFee;
-    const total = subtotal + shipping;
+    const discount = quote?.totals.discount || 0;
+    const total = quote?.totals.total ?? subtotal + shipping;
 
     const isCOD = order.payment === "cod";
     
@@ -41,7 +52,7 @@ export default function PaymentUploadPage() {
         return Math.ceil(amount * 0.5);
     };
 
-    const amountDue = isCOD ? calculateDeposit(subtotal) : total;
+    const amountDue = quote?.payment.depositAmount ?? (isCOD ? calculateDeposit(Math.max(0, subtotal - discount)) : total);
     const remainingOnDelivery = isCOD ? total - amountDue : 0;
 
     useEffect(() => {
@@ -63,7 +74,8 @@ export default function PaymentUploadPage() {
     };
 
     const handleSubmit = async () => {
-        if (!file) {
+        if (!quote || quoteError || quoteLoading) { setError(quoteError || "Wait for checkout validation before paying."); return; }
+        if (!file && amountDue > 0) {
             setError("Please attach your Instapay transaction screenshot to proceed.");
             return;
         }
@@ -72,7 +84,8 @@ export default function PaymentUploadPage() {
         setError("");
 
         try {
-            // ✅ Upload via API route instead of browser SDK
+            let photoUrl: string | null = null;
+            if (file) {
             const formData = new FormData();
             formData.append("file", file);
 
@@ -86,7 +99,8 @@ export default function PaymentUploadPage() {
                 throw new Error(errData.error || "Upload failed");
             }
 
-            const { url: photoUrl } = await uploadRes.json();
+            photoUrl = (await uploadRes.json()).url;
+            }
 
             const orderItems = order.items.map((item) => ({
                 productId: item.productId,
@@ -99,10 +113,13 @@ export default function PaymentUploadPage() {
                 size: item.size,
             }));
 
-            const response = await fetch("/api/orders", {
+            const response = await authenticatedFetch("/api/orders", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { "Content-Type": "application/json", "Idempotency-Key": checkoutReference.current },
                 body: JSON.stringify({
+                    couponCode: order.couponCode || "",
+                    quotedTotal: quote.totals.total,
+                    quotedDeposit: quote.payment.depositAmount,
                     userId: user?.uid ?? null,
                     items: orderItems,
                     contact: {
@@ -132,13 +149,28 @@ export default function PaymentUploadPage() {
                 return;
             }
 
+            sessionStorage.removeItem("checkout_request");
             clearCart();
             router.push(`/confirmation/${data.orderId}`);
-        } catch (err: any) {
-            setError("Submission failed: " + err.message);
+        } catch (err: unknown) {
+            setError("Submission failed: " + (err instanceof Error ? err.message : "Please try again."));
             setUploading(false);
         }
     };
+
+    if (!quote || quoteError || quoteLoading) return <section className="max-w-lg mx-auto p-8 space-y-4">
+        <p role={quoteError ? 'alert' : 'status'}>{quoteError || 'Validating your checkout and payment amount...'}</p>
+        <button onClick={() => router.push('/checkout')} className="border rounded p-3">Back to checkout</button>
+    </section>;
+
+    if (amountDue === 0) return <section className="max-w-lg mx-auto p-8 space-y-4">
+        <h1 className="text-xl">Confirm your order</h1>
+        <p>No payment is due now. Order total: EGP {total.toLocaleString()}.</p>
+        {discount > 0 && <p>Promo {order.couponCode}: - EGP {discount.toLocaleString()}</p>}
+        {error && <p role="alert">{error}</p>}
+        <button disabled={uploading} onClick={handleSubmit} className="rounded bg-purple-600 text-white p-3">{uploading ? 'Submitting...' : 'Confirm order'}</button>
+        <button onClick={() => router.push('/checkout')} className="border rounded p-3">Back</button>
+    </section>;
 
     return (
         <section className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 flex items-center justify-center px-4 py-16">
@@ -284,6 +316,9 @@ export default function PaymentUploadPage() {
                         </div>
                     </div>
 
+                    {quoteError && <p role="alert" className="text-red-600">{quoteError}</p>}
+                    {quoteLoading && <p role="status">Validating checkout...</p>}
+                    {discount > 0 && <p>Promo {order.couponCode}: - EGP {discount.toLocaleString()}</p>}
                     {error && (
                         <div className="bg-red-50 border border-red-200 text-red-600 rounded-xl px-4 py-3 text-sm flex items-start gap-2">
                             <span className="mt-0.5">⚠️</span>
@@ -301,7 +336,7 @@ export default function PaymentUploadPage() {
 
                         <button
                             onClick={handleSubmit}
-                            disabled={uploading || !file}
+                            disabled={uploading || !file || !quote || !!quoteError || quoteLoading}
                             suppressHydrationWarning
                             className={`flex-1 rounded-full py-3 font-medium text-sm transition ${uploading || !file
                                 ? "bg-gray-200 text-gray-400 cursor-not-allowed"

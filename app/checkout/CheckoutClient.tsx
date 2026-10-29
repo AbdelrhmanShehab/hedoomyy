@@ -1,5 +1,6 @@
 "use client";
 
+import PromoCode from "@/components/checkout/PromoCode";
 import ContactForm from "../../components/checkout/ContactForm";
 import DeliveryForm from "../../components/checkout/DeliveryForm";
 import PaymentMethod from "../../components/checkout/PaymentMethod";
@@ -8,16 +9,15 @@ import { useCheckout } from "../../context/CheckoutContext";
 import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 
 export default function CheckoutClient() {
   const { items } = useCart();
-  const { order, setOrder, setErrors } = useCheckout();
-  const { user, userData, loading } = useAuth();
+  const { order, setOrder, setErrors, quote, quoteError, quoteLoading } = useCheckout();
+  const { user, loading } = useAuth();
   const { t } = useLanguage();
   const router = useRouter();
-  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -26,18 +26,13 @@ export default function CheckoutClient() {
   }, [loading, user, router]);
 
   useEffect(() => {
-    if (user) {
-      setUserId(user.uid);
-    }
-  }, [user]);
-
-  useEffect(() => {
     setOrder((prev) => ({
       ...prev,
       items,
     }));
   }, [items, setOrder]);
   const isFormValid =
+    !!quote && !quoteError && !quoteLoading &&
     !!order.contact.email &&
     !!order.delivery.address &&
     !!order.delivery.phone &&
@@ -91,6 +86,9 @@ export default function CheckoutClient() {
         <ContactForm />
         <DeliveryForm />
         <PaymentMethod />
+        <PromoCode />
+        {quoteError && <p role="alert" className="text-red-600">{quoteError}</p>}
+        {quoteLoading && <p role="status">Validating checkout...</p>}
 
         <button
           onClick={proceedToPayment}

@@ -5,16 +5,17 @@ import Image from "next/image";
 import { useLanguage } from "@/context/LanguageContext";
 
 export default function OrderSummary() {
-  const { order, shippingFee } = useCheckout();
+  const { order, shippingFee, quote } = useCheckout();
   const { t } = useLanguage();
 
-  const subtotal = order.items.reduce(
+  const subtotal = quote?.totals.subtotal ?? order.items.reduce(
     (sum, item) => sum + item.price * item.qty,
     0
   );
 
   const shipping = shippingFee;
-  const total = subtotal + shipping;
+  const discount = quote?.totals.discount || 0;
+  const total = quote?.totals.total ?? subtotal + shipping;
 
   if (order.items.length === 0) {
     return (
@@ -66,6 +67,7 @@ export default function OrderSummary() {
           <span>EGP {shipping}</span>
         </div>
 
+        {discount > 0 && <div className="flex justify-between text-green-700"><span>{order.couponCode}</span><span>- EGP {discount.toLocaleString()}</span></div>}
         <div className="flex justify-between font-medium pt-2 text-base">
           <span>{t("checkout_total")}</span>
           <span>EGP {total.toLocaleString()}</span>

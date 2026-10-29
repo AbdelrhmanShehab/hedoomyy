@@ -269,6 +269,7 @@ export default function ConfirmationClient() {
             <span>{t("checkout_shipping")}</span>
             <span>EGP {totals.shipping}</span>
           </div>
+          {!!totals.discount && <div className="flex justify-between text-green-700"><span>{order.coupon?.code}</span><span>- EGP {totals.discount}</span></div>}
           <div className="flex justify-between font-medium text-base pt-3">
             <span>{t("checkout_total")}</span>
             <span>EGP {totals.total}</span>

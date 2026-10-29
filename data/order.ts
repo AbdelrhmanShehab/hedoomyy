@@ -8,6 +8,7 @@ export type OrderItem = {
 };
 
 export type Order = {
+  coupon?: { code: string; discountAmount: number };
   items: OrderItem[];
   contact: {
     email: string;
@@ -31,6 +32,7 @@ export type Order = {
     paymentPhotoUrl?: string;          // Instapay screenshot URL (Firebase Storage)
   };
   totals: {
+    discount?: number;
     subtotal: number;
     shipping: number;
     total: number;
