@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "test:tracking": "node --experimental-vm-modules --test tests/tracking.test.mjs",
-    "test:promo": "node --experimental-vm-modules --test tests/checkout.test.mjs tests/promo-flow.test.mjs tests/promo-ui.test.mjs"
+    "test:promo": "node --experimental-vm-modules --test tests/checkout.test.mjs tests/promo-flow.test.mjs tests/promo-ui.test.mjs tests/promo-interaction.test.mjs"
   },
   "dependencies": {
     "embla-carousel-react": "^8.6.0",

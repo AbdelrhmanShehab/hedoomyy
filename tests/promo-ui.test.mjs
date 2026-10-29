@@ -37,7 +37,7 @@ test('payment screen hides transfer instructions until quote validates, and disp
 });
 test('promo form renders apply and remove controls in both storefront languages', async () => {
   const english = await component('../components/checkout/PromoCode.tsx', {});
-  assert.match(english, /Promo code/); assert.match(english, /Apply/); assert.match(english, /Remove/);
+  assert.match(english, /Promo code/); assert.match(english, /Checking/); assert.match(english, /Remove/);
   const arabic = await component('../components/checkout/PromoCode.tsx', {}, 'ar');
   assert.doesNotMatch(arabic, />Apply</); assert.match(arabic, /value="SAVE"/);
 });

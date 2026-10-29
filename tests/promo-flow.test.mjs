@@ -42,6 +42,17 @@ test('dashboard creation -> storefront quote -> order -> retry -> exhausted prom
   assert.equal(listed.status, 200);
   const listing = await listed.json(); assert.equal(listing.codes[0].code, 'SAVE'); assert.equal(listing.products[0].name, 'Shirt');
   const mocks = { 'next/server': { NextResponse }, '@/lib/firebase-admin': { adminDb: () => h.db, requestIdentity: async req => { if (req.headers.get('Authorization') !== 'Bearer buyer') throw Object.assign(new Error('Sign in'), { status: 401 }); return buyer; } }, '@/lib/checkoutService': { createCheckout }, '@/lib/checkoutValidation': { CheckoutError }, '@/lib/email-service': { sendOrderConfirmationEmail: async () => {} }, '@/lib/firestore-server': { fetchUserOrders: async () => [], fetchOrderById: async () => null } };
+  const promoApi = await load('../app/api/promocodes/validate/route.ts', mocks);
+  const cartOnly = { couponCode: 'SAVE', items: input.items };
+  const promoResponse = await promoApi.POST(request(cartOnly, 'buyer'));
+  assert.equal(promoResponse.status, 200);
+  assert.deepEqual(await promoResponse.json(), { code: 'SAVE', discount: 50 });
+  assert.equal((await promoApi.POST(request({ ...cartOnly, couponCode: 'missing' }, 'buyer'))).status, 400);
+  assert.equal((await promoApi.POST(request({ ...cartOnly, couponCode: '' }, 'buyer'))).status, 400);
+  assert.equal(h.values.get('offers/SAVE').usedCount, 0);
+  const unconfiguredApi = await load('../app/api/promocodes/validate/route.ts', { ...mocks, '@/lib/firebase-admin': { adminDb: () => { throw new Error('Firebase Admin is not configured'); }, requestIdentity: async () => buyer } });
+  const unavailable = await unconfiguredApi.POST(request(cartOnly, 'buyer'));
+  assert.equal(unavailable.status, 503); assert.match((await unavailable.json()).error, /server is not configured/);
   const quoteApi = await load('../app/api/checkout/quote/route.ts', mocks);
   assert.equal((await quoteApi.POST(request(input, 'anonymous'))).status, 401);
   const response = await quoteApi.POST(request(input, 'buyer'));

@@ -105,7 +105,7 @@ test('limited promo stops at limit and expiry is checked again after preview', a
   h.states.set('offers/SAVE', promo({ maxUses: 2, expiresAt: '2030-01-01T00:00:00Z' }));
   const before = new Date('2029-12-31T23:59:00Z');
   await createCheckout(h.db, body, 'preview-before-expiry', null, before, true);
-  await assert.rejects(createCheckout(h.db, body, 'expired-code-reference', null, new Date('2030-01-01T00:00:00Z')), /not active/);
+  await assert.rejects(createCheckout(h.db, body, 'expired-code-reference', null, new Date('2030-01-01T00:00:00Z')), /expired/);
   assert.equal(h.states.get('offers/SAVE').usedCount, 0);
   await createCheckout(h.db, body, 'limited-first-order', null, before);
   await createCheckout(h.db, body, 'limited-second-order', null, before);
@@ -132,4 +132,16 @@ test('discount targets only eligible lines and unlimited codes still record usag
   assert.equal(result.order.totals.total, 30);
   assert.equal(result.order.payment.depositAmount, 0);
   assert.equal(h.states.get('offers/SAVE').usedCount, 1);
+});
+
+test('promo validation works before contact, address, city or payment are filled', async () => {
+  const h = database(); h.states.set('offers/LULU', promo({ maxUses: 1 }));
+  const body = { items: input().items, couponCode: 'LULU' };
+  const result = await createCheckout(h.db, body, 'cart-promo-reference', null, new Date(), true, true);
+  assert.equal(result.totals.discount, 50);
+  assert.equal(result.couponCode, 'LULU');
+  assert.equal(h.states.get('offers/LULU').usedCount, 0);
+  assert.equal(h.states.get('products/shirt').variants[0].stock, 10);
+  await assert.rejects(createCheckout(h.db, body, 'cart-promo-reference', null, new Date(), false, true), /cannot place an order/);
+  await assert.rejects(createCheckout(h.db, { couponCode: 'LULU', items: [] }, 'cart-promo-reference', null, new Date(), true, true));
 });

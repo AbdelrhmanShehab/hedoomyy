@@ -22,3 +22,9 @@ Deploy both applications. The storefront now requires Firebase Admin credentials
 Merge the dashboard's `security/firestore.rules` **offers** block into the actual deployed Firestore rules. Do not deploy the restricted baseline file wholesale: it intentionally omits other storefront collections. Live rules must deny customer writes to offers and deny direct browser writes to promo documents/counters, including any overlapping wildcard rules that could otherwise grant access. Staff APIs use Firebase Admin and authoritative role checks.
 
 Code changes and rules templates are local; production deployment and a live authenticated smoke test remain necessary before calling this verified in production.
+
+## Immediate promo feedback fix
+
+Apply now validates cart items and the code independently of contact, delivery and payment fields, and shows checking, success with savings, or an error beside the input. Reapplying the same code retries the request. Cart changes revalidate it; removing a code ignores pending responses. Final checkout still requires the complete form and repeats validation transactionally.
+
+Local configuration inspected on this follow-up: the storefront has no `.env.local`, and the dashboard `.env.local` does not supply a non-empty `FIREBASE_PRIVATE_KEY`. This prevented inspecting the real `LULU` offer with Firebase Admin. Configure the server credentials in the environment actually running each app; the UI now reports unavailable server configuration instead of remaining silent.
