@@ -40,3 +40,9 @@ Deploy the updated storefront and dashboard. Check `FIREBASE_PROJECT_ID`, `FIREB
 ## Removing promo codes
 
 Dashboard **Promo codes → Remove** asks for confirmation, then removes the code from the list and disables redemption. The server retains a removal record, usage count and code identity so historical orders remain intact and a removed code cannot be recreated to reset its limit. Removed codes cannot be re-enabled through the API. Removal is staff-only and safe to retry.
+
+## Configuration diagnostics follow-up
+
+The generic credentials message alone does not establish that the values entered in Vercel are wrong. Runtime diagnostics now distinguish `missing_project_id`, `missing_client_email`, `missing_private_key`, `private_key_format`, `certificate_configuration`, `app_initialization`, and `token_verification_credentials`. Logs include a sanitized SDK error code and the request reference, without raw SDK messages or secret contents. The displayed error also identifies the failing stage after this update is deployed.
+
+A production log or the newly deployed stage-specific error is still required to establish the actual cause on the running site. Do not rotate credentials merely on the basis of the former generic message.

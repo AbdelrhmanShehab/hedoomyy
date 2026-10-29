@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { generateKeyPairSync, createPrivateKey } from 'node:crypto';
 import { cert } from 'firebase-admin/app';
-import { normalizePrivateKey, firebaseCredentialOptions } from '../lib/firebaseCredentials.js';
+import { normalizePrivateKey, firebaseCredentialOptions, firebaseConfigurationError } from '../lib/firebaseCredentials.js';
 import { checkoutFailure } from '../lib/checkoutFailure.js';
 import { CheckoutError } from '../lib/checkoutValidation.js';
 const { privateKey } = generateKeyPairSync('rsa', { modulusLength: 2048, privateKeyEncoding: { type: 'pkcs8', format: 'pem' }, publicKeyEncoding: { type: 'spki', format: 'pem' } });
@@ -28,4 +28,19 @@ test('checkout distinguishes configuration, data access, database outage and inv
   }
   const failure = checkoutFailure(new CheckoutError('This code does not apply to the selected items.'), 'test');
   assert.equal(failure.status, 400); assert.match(failure.body.error, /does not apply/);
+});
+
+test('diagnostics distinguish variables missing at runtime from malformed keys and SDK initialization', () => {
+  for (const [env, expected] of [[{}, 'missing_project_id'], [{ FIREBASE_PROJECT_ID: 'demo' }, 'missing_client_email'], [{ FIREBASE_PROJECT_ID: 'demo', FIREBASE_CLIENT_EMAIL: 'server@example.com' }, 'missing_private_key'], [{ FIREBASE_PROJECT_ID: 'demo', FIREBASE_CLIENT_EMAIL: 'server@example.com', FIREBASE_PRIVATE_KEY: 'invalid-key-secret' }, 'private_key_format']]) {
+    assert.throws(() => firebaseCredentialOptions(env), error => {
+      assert.equal(error.configurationIssue, expected);
+      const response = checkoutFailure(error, 'test');
+      assert.equal(response.status, 503); assert.doesNotMatch(JSON.stringify(response), /invalid-key-secret/);
+      return true;
+    });
+  }
+  const certificate = checkoutFailure(firebaseConfigurationError('certificate_configuration', 'app/invalid-credential'), 'test');
+  assert.match(certificate.body.error, /private key parsed/);
+  const app = checkoutFailure(firebaseConfigurationError('app_initialization', 'app/duplicate-app'), 'test');
+  assert.match(app.body.error, /application initialization failed/);
 });

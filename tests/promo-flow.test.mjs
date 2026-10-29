@@ -53,7 +53,7 @@ test('dashboard creation -> storefront quote -> order -> retry -> exhausted prom
   assert.equal(h.values.get('offers/SAVE').usedCount, 0);
   const unconfiguredApi = await load('../app/api/promocodes/validate/route.ts', { ...mocks, '@/lib/firebase-admin': { adminDb: () => { throw new Error('Firebase Admin is not configured'); }, requestIdentity: async () => buyer } });
   const unavailable = await unconfiguredApi.POST(request(cartOnly, 'buyer'));
-  assert.equal(unavailable.status, 503); assert.match((await unavailable.json()).error, /server credentials are missing or invalid/);
+  assert.equal(unavailable.status, 503); assert.match((await unavailable.json()).error, /Firebase server initialization failed/);
   const quoteApi = await load('../app/api/checkout/quote/route.ts', mocks);
   assert.equal((await quoteApi.POST(request(input, 'anonymous'))).status, 401);
   const response = await quoteApi.POST(request(input, 'buyer'));
