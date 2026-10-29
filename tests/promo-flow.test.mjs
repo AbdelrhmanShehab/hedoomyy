@@ -77,4 +77,21 @@ test('dashboard creation -> storefront quote -> order -> retry -> exhausted prom
   assert.equal(h.values.get('offers/SAVE').usedCount, 1);
   assert.equal(h.values.get('offers/SAVE').maxUses, 2);
   assert.equal((await staff.PATCH(request({ code: 'SAVE', maxUses: 0 }, 'staff', 'PATCH'))).status, 400);
+  assert.equal((await staff.PATCH(request({ code: 'SAVE', isActive: true }, 'staff', 'PATCH'))).status, 200);
+  assert.equal((await promoApi.POST(request(cartOnly, 'buyer'))).status, 200);
+  assert.equal((await staff.DELETE(request({ code: 'SAVE' }, 'buyer', 'DELETE'))).status, 403);
+  assert.equal((await staff.DELETE(request({ code: '../bad' }, 'staff', 'DELETE'))).status, 400);
+  assert.equal((await staff.DELETE(request({ code: 'MISSING' }, 'staff', 'DELETE'))).status, 404);
+  assert.equal((await staff.DELETE(request({ code: 'SAVE' }, 'staff', 'DELETE'))).status, 200);
+  const removed = h.values.get('offers/SAVE');
+  assert.ok(removed.deletedAt); assert.equal(removed.isActive, false); assert.equal(removed.usedCount, 1);
+  assert.equal((await staff.DELETE(request({ code: 'SAVE' }, 'staff', 'DELETE'))).status, 200);
+  assert.equal((await staff.PATCH(request({ code: 'SAVE', isActive: true }, 'staff', 'PATCH'))).status, 409);
+  assert.equal((await staff.POST(request(payload))).status, 409);
+  assert.equal((await staff.GET(request(undefined, 'staff', 'GET'))).status, 200);
+  const afterRemoval = await (await staff.GET(request(undefined, 'staff', 'GET'))).json();
+  assert.equal(afterRemoval.codes.length, 0);
+  assert.equal((await promoApi.POST(request(cartOnly, 'buyer'))).status, 400);
+  assert.equal(h.values.get('orders/' + order.orderId).coupon.code, 'SAVE');
+
 });

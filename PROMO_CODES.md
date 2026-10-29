@@ -36,3 +36,7 @@ The reported storefront is https://hedoomyy.vercel.app/. A read-only diagnostic 
 The shared Firebase initializer incorrectly preserved escaped PEM line breaks. Both apps now normalize actual, single-escaped, double-escaped, quoted and escaped CRLF private keys. Tests generate a real RSA key, parse each form and construct a Firebase certificate. Promo/quote failures now distinguish credential configuration, database permissions and database availability, with safe log references and no credential contents.
 
 Deploy the updated storefront and dashboard. Check `FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL` and `FIREBASE_PRIVATE_KEY` in Vercel's **Production** environment for the storefront project, then redeploy so changes take effect. Do not paste the private key into chat. This workspace has no configured Vercel CLI/project link or production logs access; production configuration has not been changed by this investigation.
+
+## Removing promo codes
+
+Dashboard **Promo codes → Remove** asks for confirmation, then removes the code from the list and disables redemption. The server retains a removal record, usage count and code identity so historical orders remain intact and a removed code cannot be recreated to reset its limit. Removed codes cannot be re-enabled through the API. Removal is staff-only and safe to retry.
