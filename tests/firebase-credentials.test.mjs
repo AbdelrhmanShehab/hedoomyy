@@ -44,3 +44,20 @@ test('diagnostics distinguish variables missing at runtime from malformed keys a
   const app = checkoutFailure(firebaseConfigurationError('app_initialization', 'app/duplicate-app'), 'test');
   assert.match(app.body.error, /application initialization failed/);
 });
+
+test('private key parsing handles full service-account JSON, base64 encoding and flattened PEM', () => {
+  const env = { FIREBASE_PROJECT_ID: 'demo-project', FIREBASE_CLIENT_EMAIL: 'server@demo-project.iam.gserviceaccount.com' };
+  const account = JSON.stringify({ type: 'service_account', project_id: env.FIREBASE_PROJECT_ID, client_email: env.FIREBASE_CLIENT_EMAIL, private_key: privateKey });
+  const variants = [account, JSON.stringify(account), Buffer.from(account).toString('base64'), Buffer.from(privateKey).toString('base64'), privateKey.replaceAll(String.fromCharCode(10), ' '), privateKey.replaceAll(String.fromCharCode(10), '')];
+  for (const value of variants) {
+    const credentials = firebaseCredentialOptions({ ...env, FIREBASE_PRIVATE_KEY: value });
+    assert.equal(createPrivateKey(credentials.privateKey).asymmetricKeyType, 'rsa');
+    assert.ok(cert(credentials));
+  }
+});
+test('truncated private keys and public keys remain rejected rather than silently accepted', () => {
+  const env = { FIREBASE_PROJECT_ID: 'demo-project', FIREBASE_CLIENT_EMAIL: 'server@demo-project.iam.gserviceaccount.com' };
+  for (const value of [privateKey.slice(0, -100), JSON.stringify({ private_key: 'not-a-key' }), '-----BEGIN PRIVATE KEY-----corrupt-----END PRIVATE KEY-----']) {
+    assert.throws(() => firebaseCredentialOptions({ ...env, FIREBASE_PRIVATE_KEY: value }), error => error.configurationIssue === 'private_key_format');
+  }
+});

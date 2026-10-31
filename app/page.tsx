@@ -1,3 +1,5 @@
+import { sectionVisibility } from "@/lib/home-sections";
+import { fetchHomeSections } from "@/lib/firestore-server";
 import Image from "next/image";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -21,6 +23,8 @@ import WholeLook from "@/components/home/WholeLook";
 import CatalogRetry from "@/components/home/CatalogRetry";
 import { loadHomeData } from "@/lib/home-data";
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: "Hedoomyy",
   description:
@@ -37,11 +41,12 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
+  const visible = sectionVisibility(await fetchHomeSections());
   // Keep the storefront available if one or more catalog requests fail.
   const { categories, newArrivals, bestSellers, unavailable } = await loadHomeData({
-    categories: fetchCategories,
-    newArrivals: () => fetchNewArrivals(5),
-    bestSellers: () => fetchBestSellers(8),
+    categories: () => visible.categories ? fetchCategories() : Promise.resolve([]),
+    newArrivals: () => visible.newArrivals ? fetchNewArrivals(5) : Promise.resolve([]),
+    bestSellers: () => visible.bestSellers ? fetchBestSellers(8) : Promise.resolve([]),
   });
 
   const jsonLd = {
@@ -96,35 +101,35 @@ export default async function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <Header />
-      <Image
+      {visible.banner && <Image
         src={hedoomyybanner}
         className="   h-[35vh] md:h-[60vh] lg:h-[70vh]  w-full object-fit "
         alt="Hedoomyy — Online Fashion Store in Egypt"
         sizes="100vw"
-      />
+      />}
       <main className="mainContainer">
         {unavailable && <CatalogRetry />}
-        <ErrorBoundary fallback={null}>
+        {visible.hero && <ErrorBoundary fallback={null}>
           <Hero />
-        </ErrorBoundary>
-        <ErrorBoundary fallback={null}>
+        </ErrorBoundary>}
+        {visible.categories && <ErrorBoundary fallback={null}>
           <Categories categories={categories} />
-        </ErrorBoundary>
-        <ErrorBoundary fallback={null}>
+        </ErrorBoundary>}
+        {visible.wholeLook && <ErrorBoundary fallback={null}>
           <WholeLook />
-        </ErrorBoundary>
-        <ErrorBoundary fallback={null}>
+        </ErrorBoundary>}
+        {visible.newArrivals && <ErrorBoundary fallback={null}>
           <NewArrivals products={newArrivals as Product[]} />
-        </ErrorBoundary>
-        <ErrorBoundary fallback={null}>
+        </ErrorBoundary>}
+        {visible.bestSellers && <ErrorBoundary fallback={null}>
           <BestSeller products={bestSellers as Product[]} />
-        </ErrorBoundary>
-        <ErrorBoundary fallback={null}>
+        </ErrorBoundary>}
+        {visible.feedback && <ErrorBoundary fallback={null}>
           <Feedback />
-        </ErrorBoundary>
-        <ErrorBoundary fallback={null}>
+        </ErrorBoundary>}
+        {visible.instagram && <ErrorBoundary fallback={null}>
           <InstagramFeed />
-        </ErrorBoundary>
+        </ErrorBoundary>}
       </main>
       <Footer />
     </div>

@@ -516,3 +516,11 @@ export async function fetchProductsByField(field: string, value: string | boolea
         },
     });
 }
+
+export async function fetchHomeSections(): Promise<Record<string, boolean>> {
+  try {
+    const { adminDb } = await import('./firebase-admin');
+    const snapshot = await adminDb().collection('settings').doc('homepage').get();
+    return snapshot.exists ? snapshot.data()?.sections || {} : {};
+  } catch { console.error('Homepage visibility settings unavailable'); return {}; }
+}
