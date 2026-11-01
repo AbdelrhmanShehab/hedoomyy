@@ -1,5 +1,5 @@
 import { incrementField } from "@/lib/firestore-server";
-import { recordStoreTracking, TrackingError } from "@/lib/tracking-server";
+import { recordStoreTracking, recordCartState, TrackingError } from "@/lib/tracking-server";
 import { NextRequest } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
       await incrementField("stats", body.productId, "count", 1);
       return Response.json({ success: true });
     }
-    const result = await recordStoreTracking(body);
+    const result = body.event === "cart_state" ? await recordCartState(body) : await recordStoreTracking(body);
     return Response.json({ success: true, ...result });
   } catch (error) {
     if (error instanceof SyntaxError) return Response.json({ error: "Invalid JSON" }, { status: 400 });

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { PointerEvent as ReactPointerEvent } from "react";
-import { ArrowRight, Check, ChevronLeft, ChevronRight, RotateCcw, ShoppingBag, Shuffle, SlidersHorizontal, Sparkles } from "lucide-react";
+import { ArrowRight, Check, ChevronLeft, ChevronRight, RotateCcw, ShoppingBag, Shuffle, Sparkles } from "lucide-react";
 import type { Product } from "@/data/product";
 import { useCart } from "@/context/CartContext";
 import { useLanguage } from "@/context/LanguageContext";
@@ -45,9 +45,9 @@ export default function WholeLook() {
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [attempt, setAttempt] = useState(0);
   const [part, setPart] = useState<Part>("top");
-  const [editing, setEditing] = useState(false);
+  const [showErrors, setShowErrors] = useState(false);
+  const sizeSelect = useRef<HTMLSelectElement>(null);
   const [choices, setChoices] = useState<Record<Part, Choice>>({ top: initial(), bottom: initial() });
-  const [adjust, setAdjust] = useState(true);
   const [tucked, setTucked] = useState(false);
   const [message, setMessage] = useState("");
   const pointers = useRef(new Map<number, { x: number; y: number }>());
@@ -65,18 +65,20 @@ export default function WholeLook() {
     gesture.current = { part: activePart, placement: { ...placement }, center: { x: (points[0].x + second.x) / 2, y: (points[0].y + second.y) / 2 }, imageCenter: { x: bounds.left + bounds.width / 2, y: bounds.top + bounds.height / 2 }, distance: Math.hypot(points[0].x - second.x, points[0].y - second.y), width: bounds.width / placement.zoom, height: bounds.height / placement.zoom };
   };
   const pointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (!editing) return;
     if (event.pointerType === "mouse" && event.button !== 0) return;
     if (pointers.current.size >= 2) return;
-    // Lock both fingers to the explicitly selected piece, including overlapping photos.
-    const activePart = gesture.current?.part ?? part;
+    // Select on first contact, keeping the same piece throughout a two-finger gesture.
+    const hit = (event.target as HTMLElement).closest<HTMLElement>("[data-look-part]")?.dataset.lookPart;
+    const activePart = gesture.current?.part ?? hit;
+    if (activePart !== "top" && activePart !== "bottom") return;
+    setPart(activePart);
     pointers.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
     event.currentTarget.setPointerCapture(event.pointerId);
     setMessage("");
     rebaseGesture(event.currentTarget, activePart);
   };
   const pointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (!editing || !pointers.current.has(event.pointerId) || !gesture.current) return;
+    if (!pointers.current.has(event.pointerId) || !gesture.current) return;
     pointers.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
     const points = [...pointers.current.values()];
     const second = points[1] ?? points[0];
@@ -98,10 +100,6 @@ export default function WholeLook() {
     if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
     rebaseGesture(event.currentTarget, gesture.current?.part ?? part);
   };
-  useEffect(() => {
-    pointers.current.clear();
-    gesture.current = null;
-  }, [part, editing]);
   useEffect(() => {
     const controller = new AbortController();
     setStatus("loading");
@@ -127,13 +125,20 @@ export default function WholeLook() {
   const total = (selected.top?.price ?? 0) + (selected.bottom?.price ?? 0);
   const complete = selected.top && selected.bottom;
   const configured = complete && (["top", "bottom"] as Part[]).every(p => selected[p] && stylingCartItem(selected[p]!, selectedColor(p), choices[p].variant) !== null);
+  const missing = (["top", "bottom"] as Part[]).filter(p => !selected[p] || !stylingCartItem(selected[p]!, selectedColor(p), choices[p].variant));
+  const fixPiece = (p: Part) => {
+    setPart(p);
+    requestAnimationFrame(() => { sizeSelect.current?.focus({ preventScroll: true }); sizeSelect.current?.scrollIntoView({ behavior: "smooth", block: "center" }); });
+  };
   const addLook = () => {
-    if (!configured) { setMessage(say("Choose a color and size for both pieces first.", "اختاري اللون والمقاس لكل قطعة الأول.")); return; }
+    setShowErrors(true);
+    if (!configured) { setMessage(""); fixPiece(missing[0]); return; }
     const pieces = (["top", "bottom"] as Part[]).map(p => stylingCartItem(selected[p]!, selectedColor(p), choices[p].variant)!);
     if (pieces.some(piece => items.filter(i => i.productId === piece.productId && i.variantId === piece.variantId).reduce((sum, i) => sum + i.qty, 0) >= piece.stock!)) {
       setMessage(say("Your bag already has all available stock for one of these pieces.", "الكمية المتاحة من إحدى القطع موجودة بالفعل في الشنطة.")); return;
     }
     pieces.forEach(addItem);
+    setShowErrors(false);
     setMessage(say("Your whole look is in the bag!", "اللوك كله في الشنطة!"));
   };
   return <section id="whole-look" className={styles.section} aria-labelledby="whole-look-title">
@@ -141,10 +146,9 @@ export default function WholeLook() {
     {status === "loading" ? <div className={styles.loading} role="status"><Sparkles className="animate-pulse" /> {say("Opening your wardrobe…", "بنجهز دولابك…")}</div> : status === "error" ? <div className={styles.loading}><p>{say("Your wardrobe couldn't load.", "حصلت مشكلة في تحميل القطع.")}</p><button onClick={() => setAttempt(n => n + 1)}>{say("Try again", "حاولي تاني")}</button></div> : <div className={styles.studio}>
       <div className={styles.stage}>
         <div className={styles.stageHeader}><span>{say("YOUR OUTFIT, YOUR RULES", "لوكك على مزاجك")}</span><span className={styles.live}><span /> {say("Live styling", "تنسيق مباشر")}</span></div>
-        <p id="look-touch-hint" className={styles.touchHint}>{editing ? say("Drag to move · Pinch to resize · Tap Done to scroll", "اسحبي للتحريك · كبّري بصباعين · اضغطي تم عشان تعملي سكرول") : say("Scroll freely. Choose a piece below to adjust its placement.", "اعملي سكرول عادي. اختاري القطعة اللي عايزة تحركيها.")}</p>
-        <div className={styles.touchParts}>{(["top", "bottom"] as Part[]).map(p => <button key={p} aria-pressed={editing && part === p} onClick={() => { setPart(p); setEditing(true); }}>{p === "top" ? say("Move top", "تحريك التوب") : say("Move bottom", "تحريك البنطلون")}</button>)}{editing && <button onClick={() => setEditing(false)} className={styles.doneEditing}><Check size={14}/>{say("Done / scroll", "تم / سكرول")}</button>}</div>
+        <p id="look-touch-hint" className={styles.touchHint}>{say("Press a piece and drag to move it. Pinch with two fingers to resize. Scroll beside the clothes.", "اضغطي على القطعة واسحبيها للتحريك. كبّري وصغّري بصباعين. اعملي سكرول جنب الملابس.")}</p>
         <div className={styles.canvasViewport}>
-        <div className={`${styles.mannequin} ${editing ? styles.editing : ""} ${tucked ? styles.tucked : ""}`} aria-describedby="look-touch-hint" dir="ltr" onPointerDown={pointerDown} onPointerMove={pointerMove} onPointerUp={pointerEnd} onPointerCancel={pointerEnd} onLostPointerCapture={pointerEnd}>
+        <div className={`${styles.mannequin} ${tucked ? styles.tucked : ""}`} aria-describedby="look-touch-hint" dir="ltr" onPointerDown={pointerDown} onPointerMove={pointerMove} onPointerUp={pointerEnd} onPointerCancel={pointerEnd} onLostPointerCapture={pointerEnd}>
           <div className={styles.halo} />
           <svg className={styles.figure} viewBox="0 0 300 600" aria-label={say("Mannequin outfit preview", "معاينة اللوك على المانيكان")} role="img"><defs><linearGradient id="mannequin-shade"><stop stopColor="#d9c9bb"/><stop offset=".5" stopColor="#f3e8de"/><stop offset="1" stopColor="#cdbbab"/></linearGradient></defs><g fill="url(#mannequin-shade)" stroke="#c8b5a5" strokeWidth="1"><ellipse cx="150" cy="60" rx="26" ry="36"/><path d="M137 91 L137 113 L104 127 Q91 132 87 156 L69 267 L77 310 Q82 317 87 308 L83 267 L108 181 L115 242 L107 285 Q100 310 111 345 L119 451 L121 550 Q107 568 116 573 L143 573 L145 448 L150 348 L155 448 L158 573 L184 573 Q193 567 179 550 L181 451 L190 345 Q201 310 193 285 L185 242 L192 181 L217 267 L213 308 Q218 317 223 310 L231 267 L213 156 Q209 132 196 127 L163 113 L163 91 Z"/></g></svg>
           {selected.bottom && <Garment key={`bottom-${selected.bottom.id}`} product={selected.bottom} part="bottom" color={selectedColor("bottom")} placement={choices.bottom.placement} />}
@@ -165,12 +169,12 @@ export default function WholeLook() {
             <label className={styles.variantLabel} htmlFor="look-color">{say("Color", "اللون")}</label>
             <div className={styles.colorOptions}>{stylingColors(product).map(color => <button key={color} type="button" aria-pressed={selectedColor(part) === color} onClick={() => update({ color, variant: "" })}><img src={colorMockup(product, color)} alt=""/>{color}{selectedColor(part) === color && <Check size={13}/>}</button>)}</div>
             <label className={styles.variantLabel} htmlFor="look-color">{say("Selected color", "اللون المختار")}</label><select id="look-color" value={selectedColor(part)} onChange={e => update({ color: e.target.value, variant: "" })} className={styles.variantSelect}>{stylingColors(product).map(color => <option key={color} value={color}>{color}</option>)}</select>
-            <label className={styles.variantLabel} htmlFor="look-variant">{say("Size", "المقاس")}</label><select id="look-variant" value={choice.variant} onChange={e => update({ variant: e.target.value })} className={styles.variantSelect}><option value="">{say("Choose your size", "اختاري مقاسك")}</option>{product.variants.filter(v => v.stock > 0 && v.color === selectedColor(part)).map(v => <option key={v.id} value={v.id}>{v.size}</option>)}</select>
-            <button className={styles.adjustToggle} aria-expanded={adjust} onClick={() => setAdjust(v => !v)}><SlidersHorizontal size={14}/>{say("Adjust on mannequin", "ظبّطي القطعة على المانيكان")}<span>{adjust ? "−" : "+"}</span></button>
-            {adjust && <div className={styles.adjustments}>{(["zoom", "x", "y"] as const).map(axis => <label key={axis}>{axis === "zoom" ? say("Scale", "الحجم") : axis === "x" ? say("Left / right", "يمين / شمال") : say("Up / down", "فوق / تحت")}<input type="range" min={axis === "zoom" ? .5 : -100} max={axis === "zoom" ? 2 : 100} step={axis === "zoom" ? .05 : 1} value={choice.placement[axis]} onChange={e => update({ placement: { ...choice.placement, [axis]: Number(e.target.value) } })}/></label>)}<button onClick={() => update({ placement: initial().placement })}><RotateCcw size={12}/>{say("Reset placement", "إعادة الضبط")}</button></div>}
+            <label className={styles.variantLabel} htmlFor="look-variant">{say("Size", "المقاس")}</label><select ref={sizeSelect} aria-invalid={showErrors && missing.includes(part)} aria-describedby={showErrors && missing.includes(part) ? "look-size-error" : undefined} id="look-variant" value={choice.variant} onChange={e => update({ variant: e.target.value })} className={styles.variantSelect}><option value="">{say("Choose your size", "اختاري مقاسك")}</option>{product.variants.filter(v => v.stock > 0 && v.color === selectedColor(part)).map(v => <option key={v.id} value={v.id}>{v.size}</option>)}</select>
+            {showErrors && missing.includes(part) && <p id="look-size-error" className={styles.fieldError}>{say("Choose a size for this piece in the selected color.", "اختاري مقاس القطعة دي باللون المختار.")}</p>}
+            <div className={styles.desktopScale}><label>{say("Scale selected piece", "حجم القطعة المختارة")}<input type="range" min={.5} max={2} step={.05} value={choice.placement.zoom} onChange={e => update({ placement: { ...choice.placement, zoom: Number(e.target.value) } })}/><output>{Math.round(choice.placement.zoom * 100)}%</output></label><button onClick={() => update({ placement: initial().placement })}><RotateCcw size={12}/>{say("Reset placement", "إعادة الضبط")}</button></div>
           </>}
         </div>
-        <div className={styles.bagSummary}><div className={styles.step}>{say("02 / MAKE IT YOURS", "02 / اللوك بقى ليكي")}</div>{(["top", "bottom"] as Part[]).map(p => <button className={styles.summaryRow} key={p} onClick={() => setPart(p)}><span className={choices[p].variant ? styles.done : styles.pending}>{choices[p].variant ? <Check size={12}/> : p === "top" ? "1" : "2"}</span><span>{selected[p]?.title ?? (p === "top" ? say("Choose a top", "اختاري توب") : say("Choose a bottom", "اختاري بنطلون أو جيبة"))}<small>{selected[p]?.variants.find(v => v.id === choices[p].variant) ? (() => { const v = selected[p]!.variants.find(v => v.id === choices[p].variant)!; return `${v.color} / ${v.size}`; })() : say("Choose color & size", "اختاري اللون والمقاس")}</small></span><span>{selected[p] ? `EGP ${selected[p]!.price.toLocaleString()}` : "—"}</span></button>)}<div className={styles.total}><span>{say("The whole look", "اللوك كله")}</span><strong>EGP {total.toLocaleString()}</strong></div><p className={styles.shipping}>{say("Two pieces. One outfit. Shipping calculated at checkout.", "قطعتين، لوك واحد. الشحن بيتحسب عند الدفع.")}</p><button className={styles.addButton} disabled={!complete} onClick={addLook}><ShoppingBag size={17}/>{say("Add the whole look", "ضيفي اللوك كله للشنطة")}<ArrowRight size={17}/></button><p aria-live="polite" className={styles.message}>{message || (!configured ? say("Pick a color & size for each piece to complete your look.", "اختاري اللون والمقاس لكل قطعة عشان تكمّلي اللوك.") : say("Looking good. Ready when you are.", "اللوك جاهز، مستنيكي."))}</p></div>
+        <div className={styles.bagSummary}>{showErrors && missing.length > 0 && <div className={styles.validation} role="alert"><strong>{say("Your outfit isn't in the bag yet", "اللوك لسه ما اتضافش للشنطة")}</strong><p>{say("Complete these choices, then add your look again:", "كمّلي الاختيارات دي وبعدين ضيفي اللوك تاني:")}</p>{missing.map(p => <button key={p} onClick={() => fixPiece(p)}>{say(p === "top" ? "Top" : "Bottom", p === "top" ? "التوب" : "القطعة السفلية")} — {selected[p]?.title}: {say("Choose size", "اختاري المقاس")} · {say("Color", "اللون")}: {selectedColor(p)} <ArrowRight size={14}/></button>)}</div>}<div className={styles.step}>{say("02 / MAKE IT YOURS", "02 / اللوك بقى ليكي")}</div>{(["top", "bottom"] as Part[]).map(p => <button className={styles.summaryRow} key={p} onClick={() => fixPiece(p)}><span className={choices[p].variant ? styles.done : styles.pending}>{choices[p].variant ? <Check size={12}/> : p === "top" ? "1" : "2"}</span><span>{selected[p]?.title ?? (p === "top" ? say("Choose a top", "اختاري توب") : say("Choose a bottom", "اختاري بنطلون أو جيبة"))}<small>{selected[p]?.variants.find(v => v.id === choices[p].variant) ? (() => { const v = selected[p]!.variants.find(v => v.id === choices[p].variant)!; return `${v.color} / ${v.size}`; })() : `${selectedColor(p)} / ${say("Choose size", "اختاري المقاس")}`}</small></span><span>{selected[p] ? `EGP ${selected[p]!.price.toLocaleString()}` : "—"}</span></button>)}<div className={styles.total}><span>{say("The whole look", "اللوك كله")}</span><strong>EGP {total.toLocaleString()}</strong></div><p className={styles.shipping}>{say("Two pieces. One outfit. Shipping calculated at checkout.", "قطعتين، لوك واحد. الشحن بيتحسب عند الدفع.")}</p><button className={styles.addButton} disabled={!complete} onClick={addLook}><ShoppingBag size={17}/>{say("Add the whole look", "ضيفي اللوك كله للشنطة")}<ArrowRight size={17}/></button><p aria-live="polite" className={styles.message}>{message || (!configured ? say("Pick a color & size for each piece to complete your look.", "اختاري اللون والمقاس لكل قطعة عشان تكمّلي اللوك.") : say("Looking good. Ready when you are.", "اللوك جاهز، مستنيكي."))}</p></div>
       </div>
     </div>}
   </section>;

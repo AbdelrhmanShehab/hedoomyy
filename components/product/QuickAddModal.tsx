@@ -6,8 +6,8 @@ import Image from "next/image";
 import { X, ShoppingBag } from "lucide-react";
 import HeartRating from "./HeartRating";
 import { useCart } from "@/context/CartContext";
-import { useAuth } from "@/context/AuthContext";
-import { trackEvent } from "@/lib/trackEvent";
+
+
 import { useLanguage } from "@/context/LanguageContext";
 
 type Props = {
@@ -20,7 +20,7 @@ export default function QuickAddModal({
   onClose,
 }: Props) {
   const { addItem } = useCart();
-  const { user } = useAuth();
+
   const { t } = useLanguage();
 
   const variants = product.variants ?? [];
@@ -72,11 +72,6 @@ export default function QuickAddModal({
       qty: qty,
       stock: selectedVariant.stock,
     });
-
-    trackEvent(product.id, "cart", user ? {
-      email: user.email || undefined,
-      name: user.displayName || undefined
-    } : undefined);
 
     onClose();
   };

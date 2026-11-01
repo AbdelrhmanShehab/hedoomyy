@@ -44,6 +44,9 @@ export async function recordStoreTracking(input: Record<string, unknown>) {
     const statsPath = "productStats/" + encodeURIComponent(statsId);
     const previous = await read(statsPath);
     const receipt = createHash("sha256").update(productId + ":" + event + ":" + sessionId + ":" + eventId + ":" + period).digest("hex");
+    // Persist event receipts beyond the recent-events window so late retries
+    // and reloads cannot count again after a busy product receives 250 events.
+    if (await read("trackingEvents/" + receipt)) return { duplicate: true };
     const receipts = previous?.fields?._recentEvents?.arrayValue?.values?.map(value => text(value)) || [];
     if (receipts.includes(receipt)) return { duplicate: true };
     const statsFields: Record<string, Value> = {
@@ -56,6 +59,7 @@ export async function recordStoreTracking(input: Record<string, unknown>) {
       currentDocument: previous?.updateTime ? { updateTime: previous.updateTime } : { exists: false },
       updateTransforms: [{ fieldPath: field, increment: int(1) }],
     }];
+    writes.push({ update: { name: resource + "trackingEvents/" + receipt, fields: { productId: str(productId), event: str(event), periodStartMs: int(period), createdAt: stamp(now) } }, currentDocument: { exists: false } });
     if (event === "share") writes.push({ transform: { document: resource + "products/" + productId, fieldTransforms: [{ fieldPath: "shareCount", increment: int(1) }] } });
     if ((email && ["view", "click", "cart"].includes(event)) || event === "cart") {
       const identity = email || "anonymous_" + sessionId;
@@ -84,4 +88,30 @@ export async function recordStoreTracking(input: Record<string, unknown>) {
     throw new TrackingError(503, "Could not save tracking event");
   }
   throw new TrackingError(503, "Tracking is busy; please retry");
+}
+
+/** Current basket state is separate from engagement counters. */
+export async function recordCartState(input: Record<string, unknown>) {
+  const { productId, sessionId, quantity, revision } = input;
+  if (typeof productId !== "string" || !productId || productId.includes("/") || productId.length > 150 || typeof sessionId !== "string" || !/^[a-zA-Z0-9_-]{1,128}$/.test(sessionId) || !Number.isSafeInteger(quantity) || (quantity as number) < 0 || (quantity as number) > 100000 || !Number.isSafeInteger(revision) || (revision as number) <= 0 || (revision as number) > Date.now() + 60000) throw new TrackingError(400, "Invalid cart state");
+  const user = input.userInfo && typeof input.userInfo === "object" ? input.userInfo as Record<string, unknown> : {};
+  const email = typeof user.email === "string" && user.email.length <= 254 && /^[^\s@/,;<>]+@[^\s@/,;<>]+\.[^\s@/,;<>]+$/.test(user.email) ? user.email.trim().toLowerCase() : "";
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const settings = await read("settings/tracking");
+    const period = date(settings?.fields?.cartsResetAt);
+    const id = "cart_" + sessionId + "_" + productId + (period ? "__" + period : "");
+    const previous = await read("leads/" + encodeURIComponent(id));
+    if (number(previous?.fields?.cartStateRevision) >= (revision as number)) return { duplicate: true };
+    const now = Date.now();
+    const fields: Record<string, Value> = {
+      email: str(email), name: str(typeof user.name === "string" ? user.name.slice(0, 150) : ""), sessionId: str(sessionId), productId: str(productId),
+      cartQty: int(quantity as number), cartStateRevision: int(revision as number), cartStateAt: stamp(now),
+      lastActivity: str("cart"), status: str(quantity ? "pending" : "empty"), isArchived: { booleanValue: false }, updatedAt: stamp(now), lastCartAt: stamp(now),
+    };
+    const response = await fetch(base + ":commit", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ writes: [{ update: { name: resource + "leads/" + id, fields }, updateMask: { fieldPaths: Object.keys(fields) }, currentDocument: previous?.updateTime ? { updateTime: previous.updateTime } : { exists: false } }] }) });
+    if (response.ok) return { duplicate: false };
+    if ([409, 412].includes(response.status)) continue;
+    throw new TrackingError(503, "Could not sync cart");
+  }
+  throw new TrackingError(503, "Cart tracking is busy; please retry");
 }

@@ -1,168 +1,63 @@
 "use client";
-
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import type { CartItem } from "@/data/cart";
-import { trackEvent } from "@/lib/trackEvent";
+import { trackEvent, syncCartState } from "@/lib/trackEvent";
+import { addCartItem } from "@/lib/cart-items";
+import { useAuth } from "@/context/AuthContext";
 
 type CartContextType = {
-  items: CartItem[];
-  addItem: (item: CartItem) => void;
+  items: CartItem[]; addItem: (item: CartItem) => void;
   removeItem: (productId: string, variantId: string) => void;
   updateQty: (productId: string, variantId: string, delta: number) => void;
-  clearCart: () => void;
-  subtotal: number;
-  isOpen: boolean;
-  openCart: () => void;
-  closeCart: () => void;
+  clearCart: () => void; subtotal: number; isOpen: boolean; openCart: () => void; closeCart: () => void;
 };
-
-const CartContext = createContext<CartContextType | null>(
-  null
-);
-
+const CartContext = createContext<CartContextType | null>(null);
 const STORAGE_KEY = "hedoomyy_cart";
-
-export function CartProvider({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export function CartProvider({ children }: { children: React.ReactNode }) {
+  const { user } = useAuth();
   const [items, setItems] = useState<CartItem[]>([]);
+  const current = useRef<CartItem[]>([]);
+  const knownProducts = useRef(new Set<string>());
+  const [ready, setReady] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-
-  /* LOAD */
+  const commit = (next: CartItem[]) => { current.current = next; setItems(next); };
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      const parsed = JSON.parse(saved) as CartItem[];
-      setItems(parsed.map(item => ({
-        ...item,
-        variantId: item.variantId || `${item.color}-${item.size}`
-      })));
-    }
-  }, []);
-
-  /* SAVE */
-  useEffect(() => {
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify(items)
-    );
-  }, [items]);
-
-  /* ADD ITEM (SYNC + FAST) */
-  const addItem = (item: CartItem) => {
-    trackEvent(item.productId, "cart");
-    setItems(prev => {
-      const existing = prev.find(
-        i =>
-          i.productId === item.productId &&
-          i.variantId === item.variantId
-      );
-
-      if (existing) {
-        return prev.map(i => {
-          if (
-            i.productId === item.productId &&
-            i.variantId === item.variantId
-          ) {
-            const newQty = i.qty + item.qty;
-            const cappedQty =
-              item.stock !== undefined
-                ? Math.min(newQty, item.stock)
-                : newQty;
-            return { ...i, qty: cappedQty };
-          }
-          return i;
-        });
+    try {
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+      if (Array.isArray(saved)) {
+        const valid = (saved as CartItem[]).filter(i => i && typeof i.productId === "string" && Number.isSafeInteger(i.qty) && i.qty > 0).map(i => ({ ...i, variantId: i.variantId || `${i.color}-${i.size}` }));
+        valid.forEach(i => knownProducts.current.add(i.productId));
+        commit(valid);
       }
-
-      const newItemQty =
-        item.stock !== undefined
-          ? Math.min(item.qty, item.stock)
-          : item.qty;
-
-      return [...prev, { ...item, qty: newItemQty }];
-    });
-
+    } catch { /* A broken browser cache must not crash shopping. */ }
+    setReady(true);
+  }, []);
+  useEffect(() => {
+    if (!ready) return;
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); } catch {}
+    const ids = new Set([...knownProducts.current, ...items.map(i => i.productId)]);
+    knownProducts.current = new Set(items.map(i => i.productId));
+    const info = user ? { email: user.email || undefined, name: user.displayName || undefined } : undefined;
+    ids.forEach(id => syncCartState(id, items.filter(i => i.productId === id).reduce((sum, i) => sum + i.qty, 0), info));
+  }, [items, ready, user]);
+  const addItem = (item: CartItem) => {
+    const next = addCartItem(current.current, item);
+    if (next === current.current) return;
+    commit(next);
+    trackEvent(item.productId, "cart", user ? { email: user.email || undefined, name: user.displayName || undefined } : undefined);
     setIsOpen(true);
   };
-
-  const removeItem = (
-    productId: string,
-    variantId: string
-  ) => {
-    setItems(prev =>
-      prev.filter(
-        i =>
-          !(
-            i.productId === productId &&
-            i.variantId === variantId
-          )
-      )
-    );
+  const removeItem = (productId: string, variantId: string) => commit(current.current.filter(i => i.productId !== productId || i.variantId !== variantId));
+  const updateQty = (productId: string, variantId: string, delta: number) => {
+    if (!Number.isSafeInteger(delta)) return;
+    commit(current.current.map(i => i.productId === productId && i.variantId === variantId ? { ...i, qty: Math.min(Math.max(1, i.qty + delta), i.stock ?? Infinity) } : i).filter(i => i.qty > 0));
   };
-
-  const updateQty = (
-    productId: string,
-    variantId: string,
-    delta: number
-  ) => {
-    setItems(prev =>
-      prev.map(i => {
-        if (i.productId === productId && i.variantId === variantId) {
-          const newQty = Math.max(1, i.qty + delta);
-          const cappedQty =
-            i.stock !== undefined ? Math.min(newQty, i.stock) : newQty;
-          return { ...i, qty: cappedQty };
-        }
-        return i;
-      })
-    );
-  };
-
-  const clearCart = () => {
-    setItems([]);
-    setIsOpen(false);
-  };
-
-  const subtotal = items.reduce(
-    (sum, item) => sum + item.price * item.qty,
-    0
-  );
-
-  const openCart = () => setIsOpen(true);
-  const closeCart = () => setIsOpen(false);
-
-  return (
-    <CartContext.Provider
-      value={{
-        items,
-        addItem,
-        removeItem,
-        updateQty,
-        clearCart,
-        subtotal,
-        isOpen,
-        openCart,
-        closeCart,
-      }}
-    >
-      {children}
-    </CartContext.Provider>
-  );
+  const clearCart = () => { commit([]); setIsOpen(false); };
+  const subtotal = items.reduce((sum, item) => sum + item.price * item.qty, 0);
+  return <CartContext.Provider value={{ items, addItem, removeItem, updateQty, clearCart, subtotal, isOpen, openCart: () => setIsOpen(true), closeCart: () => setIsOpen(false) }}>{children}</CartContext.Provider>;
 }
-
 export function useCart() {
   const ctx = useContext(CartContext);
-  if (!ctx)
-    throw new Error(
-      "useCart must be used inside CartProvider"
-    );
+  if (!ctx) throw new Error("useCart must be used inside CartProvider");
   return ctx;
 }

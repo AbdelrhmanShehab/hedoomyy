@@ -20,7 +20,7 @@ async function harness() {
   };
   const icons = Object.fromEntries(["ArrowRight", "Check", "ChevronLeft", "ChevronRight", "RotateCcw", "ShoppingBag", "Shuffle", "SlidersHorizontal", "Sparkles"].map(name => [name, () => null]));
   const mocks = { react, "react/jsx-runtime": jsx, "lucide-react": icons, "@/context/CartContext": { useCart: () => ({ items: [], addItem() {} }) }, "@/context/LanguageContext": { useLanguage: () => ({ lang: "en" }) }, "./WholeLook.module.css": { default: new Proxy({}, { get: (_, key) => key }) }, "@/lib/styling-products": helpers };
-  const context = createContext({ console, AbortController, fetch: async () => ({ ok: true, json: async () => ({ products, categories: [] }) }) });
+  const context = createContext({ console, AbortController, requestAnimationFrame: fn => fn(), fetch: async () => ({ ok: true, json: async () => ({ products, categories: [] }) }) });
   const module = new SourceTextModule(compile(await readFile(new URL("../components/home/WholeLook.tsx", import.meta.url), "utf8")), { context });
   await module.link(async name => { const values = mocks[name]; assert.ok(values, name); return new SyntheticModule(Object.keys(values), function () { for (const [key, value] of Object.entries(values)) this.setExport(key, value); }, { context }); });
   await module.evaluate();
@@ -36,41 +36,53 @@ async function harness() {
   return {
     captures,
     placement: part => ({ ...garment(part).props.placement }),
-    editing: () => nodes(tree).find(node => node.props?.onPointerDown).props.className.includes("editing"),
+    selected: () => nodes(tree).find(node => node.props?.role === "tab" && node.props["aria-selected"]).props.id,
+    errors: () => nodes(tree).filter(node => node.props?.role === "alert").map(text).join(""),
+    chooseSize(value) { nodes(tree).find(node => node.props?.id === "look-variant").props.onChange({ target: { value } }); render(); },
     click(label) { const button = nodes(tree).find(node => node.type === "button" && text(node) === label); assert.ok(button, label); button.props.onClick(); render(); },
-    pointer(name, id, x, y, targetPart = "bottom") { const node = nodes(tree).find(node => node.props?.onPointerDown); node.props[name]({ pointerId: id, pointerType: "touch", clientX: x, clientY: y, currentTarget: element, target: { closest: () => ({ dataset: { lookPart: targetPart } }) } }); render(); },
+    pointer(name, id, x, y, targetPart = "bottom") { const node = nodes(tree).find(node => node.props?.onPointerDown); node.props[name]({ pointerId: id, pointerType: "touch", clientX: x, clientY: y, currentTarget: element, target: { closest: () => targetPart ? ({ dataset: { lookPart: targetPart } }) : null } }); render(); },
   };
 }
 
-test("ordinary scrolling never moves or selects a garment", async () => {
+test("background gestures leave clothes unchanged and allow scrolling", async () => {
   const h = await harness();
-  h.pointer("onPointerDown", 1, 100, 100);
-  h.pointer("onPointerMove", 1, 150, 200);
+  h.pointer("onPointerDown", 1, 100, 100, null);
+  h.pointer("onPointerMove", 1, 150, 200, null);
   assert.equal(h.captures.size, 0);
-  assert.equal(h.editing(), false);
   assert.deepEqual(h.placement("top"), { x: 0, y: 0, zoom: 1 });
 });
-test("dragging across the other garment keeps the explicit top selection", async () => {
-  const h = await harness(); h.click("Move top");
-  h.pointer("onPointerDown", 1, 100, 100, "bottom");
-  h.pointer("onPointerMove", 1, 130, 120);
+test("direct contact selects the garment and crossing another piece does not switch it", async () => {
+  const h = await harness();
+  h.pointer("onPointerDown", 1, 100, 100, "top");
+  h.pointer("onPointerMove", 1, 130, 120, "bottom");
   assert.ok(h.placement("top").x > 0);
+  assert.equal(h.selected(), "look-tab-top");
   assert.deepEqual(h.placement("bottom"), { x: 0, y: 0, zoom: 1 });
+  h.pointer("onPointerUp", 1, 130, 120);
+  h.pointer("onPointerDown", 2, 100, 200, "bottom");
+  assert.equal(h.selected(), "look-tab-bottom");
+  h.pointer("onPointerMove", 2, 120, 220);
+  assert.ok(h.placement("bottom").x > 0);
 });
-test("pinch then one-finger movement stays continuous and stops on release", async () => {
-  const h = await harness(); h.click("Move bottom");
-  h.pointer("onPointerDown", 1, 100, 100); h.pointer("onPointerDown", 2, 200, 100);
+test("second finger over another garment pinches the original piece and release stays continuous", async () => {
+  const h = await harness();
+  h.pointer("onPointerDown", 1, 100, 100, "bottom");
+  h.pointer("onPointerDown", 2, 200, 100, "top");
   h.pointer("onPointerMove", 2, 250, 100);
   assert.equal(h.placement("bottom").zoom, 1.5);
+  assert.equal(h.placement("top").zoom, 1);
   const before = h.placement("bottom");
   h.pointer("onPointerUp", 2, 250, 100); h.pointer("onPointerMove", 1, 100, 100);
   assert.deepEqual(h.placement("bottom"), before);
   h.pointer("onPointerUp", 1, 100, 100); h.pointer("onPointerMove", 1, 300, 100);
   assert.deepEqual(h.placement("bottom"), before);
 });
-test("Done restores scrolling and ignores further movement", async () => {
-  const h = await harness(); h.click("Move top"); h.pointer("onPointerDown", 1, 100, 100);
-  h.click("Done / scroll"); h.pointer("onPointerMove", 1, 200, 100);
-  assert.equal(h.editing(), false);
-  assert.deepEqual(h.placement("top"), { x: 0, y: 0, zoom: 1 });
+test("cart validation identifies both missing sizes and updates as each is chosen", async () => {
+  const h = await harness(); h.click("Add the whole look");
+  assert.match(h.errors(), /Top/); assert.match(h.errors(), /Bottom/);
+  assert.equal(h.selected(), "look-tab-top");
+  h.chooseSize("top-s");
+  assert.doesNotMatch(h.errors(), /Top/); assert.match(h.errors(), /Bottom/);
+  h.click("Add the whole look"); assert.equal(h.selected(), "look-tab-bottom");
+  h.chooseSize("bottom-s"); assert.equal(h.errors(), "");
 });

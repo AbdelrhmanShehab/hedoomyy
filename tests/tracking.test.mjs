@@ -49,7 +49,7 @@ async function harness(seed = {}) {
     return new SyntheticModule(["createHash", "randomUUID"], function() { this.setExport("createHash", createHash); this.setExport("randomUUID", randomUUID); }, { context });
   });
   await module.evaluate();
-  return { track: module.namespace.recordStoreTracking, documents, requests: () => requests };
+  return { track: module.namespace.recordStoreTracking, sync: module.namespace.recordCartState, documents, requests: () => requests };
 }
 const payload = (event, eventId = "event-1", extra = {}) => ({ productId: "p", event, eventId, sessionId: "browser-1", userInfo: { email: "buyer@example.com", name: "Buyer" }, ...extra });
 
@@ -96,4 +96,27 @@ test("old cart activity expires instead of surviving later page views", async ()
   const h = await harness({ "leads/buyer@example.com_p": { fields: { lastActivity: str("cart"), status: str("pending"), lastCartAt: stamp(Date.now() - 90000000) }, updateTime: "old-lead" } });
   await h.track(payload("view"));
   assert.equal(h.documents.get("leads/buyer@example.com_p").fields.lastActivity.stringValue, "view");
+});
+
+test("clearing a basket is persisted without incrementing engagement counters", async () => {
+  const h = await harness();
+  const revision = Date.now();
+  await h.sync({ productId: "p", sessionId: "browser-1", quantity: 2, revision, userInfo: { email: "buyer@example.com" } });
+  await h.sync({ productId: "p", sessionId: "browser-1", quantity: 0, revision: revision + 1 });
+  const lead = h.documents.get("leads/cart_browser-1_p").fields;
+  assert.equal(lead.status.stringValue, "empty"); assert.equal(lead.cartQty.integerValue, "0");
+  assert.equal(h.documents.has("productStats/p"), false);
+});
+test("a late or repeated state update cannot revive an emptied basket", async () => {
+  const h = await harness(); const revision = Date.now();
+  await h.sync({ productId: "p", sessionId: "browser-1", quantity: 0, revision });
+  const result = await h.sync({ productId: "p", sessionId: "browser-1", quantity: 5, revision: revision - 1 });
+  assert.equal(result.duplicate, true); assert.equal(h.documents.get("leads/cart_browser-1_p").fields.cartQty.integerValue, "0");
+});
+test("event receipts prevent double-counting after the recent receipt cache rolls over", async () => {
+  const h = await harness();
+  await h.track(payload("cart", "first"));
+  for (let i = 0; i < 251; i++) await h.track(payload("cart", "later-" + i));
+  await h.track(payload("cart", "first"));
+  assert.equal(h.documents.get("productStats/p").fields.cartAdds.integerValue, "252");
 });

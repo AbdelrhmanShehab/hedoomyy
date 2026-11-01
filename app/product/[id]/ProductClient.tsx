@@ -74,7 +74,6 @@ export default function ProductClient({ product, relatedProducts }: Props) {
       qty: qty,
       stock: selectedVariant.stock,
     });
-    trackEvent(product.id, "cart", user ? { email: user.email || undefined, name: user.displayName || undefined } : undefined);
     openCart();
   };
 
