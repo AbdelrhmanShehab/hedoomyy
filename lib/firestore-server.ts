@@ -519,8 +519,24 @@ export async function fetchProductsByField(field: string, value: string | boolea
 
 export async function fetchHomeSections(): Promise<Record<string, boolean>> {
   try {
-    const { adminDb } = await import('./firebase-admin');
-    const snapshot = await adminDb().collection('settings').doc('homepage').get();
-    return snapshot.exists ? snapshot.data()?.sections || {} : {};
-  } catch { console.error('Homepage visibility settings unavailable'); return {}; }
+    const response = await fetch(`${BASE_URL}/settings/homepage`, {
+      cache: 'no-store',
+      signal: AbortSignal.timeout(10000),
+    });
+    // A new store has no document until the dashboard saves a visibility toggle.
+    if (response.status === 404) return {};
+    if (response.status === 401 || response.status === 403) {
+      const { adminDb } = await import('./firebase-admin');
+      const snapshot = await adminDb().collection('settings').doc('homepage').get();
+      return snapshot.exists ? snapshot.data()?.sections || {} : {};
+    }
+    if (!response.ok) throw Object.assign(new Error('Settings request failed'), { code: `HTTP_${response.status}` });
+    const document = await response.json();
+    const sections = parseFields(document.fields ?? {}).sections;
+    return sections && typeof sections === 'object' && !Array.isArray(sections) ? sections : {};
+  } catch (error: unknown) {
+    const failure = error as { code?: string; name?: string; configurationIssue?: string };
+    console.warn('Homepage visibility using defaults:', failure.configurationIssue || failure.code || failure.name || 'unknown');
+    return {};
+  }
 }
