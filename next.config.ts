@@ -2,7 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   async redirects() {
-    return ["hedoomyy.com", "www.hedoomyy.com", "www.hedoomyy.co"].map(host => ({
+    // Hosting owns the .co / www.co redirect. Redirecting www.co back here
+    // creates a loop when hosting selects www.co as the primary domain.
+    return ["hedoomyy.com", "www.hedoomyy.com"].map(host => ({
       source: "/:path*",
       has: [{ type: "host" as const, value: host.replace(/\./g, "\\.") }],
       destination: "https://hedoomyy.co/:path*",
