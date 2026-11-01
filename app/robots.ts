@@ -16,7 +16,7 @@ export default function robots(): MetadataRoute.Robots {
         ],
       },
     ],
-    sitemap: "https://hedoomyy.com/sitemap.xml",
-    host: "https://hedoomyy.com",
+    sitemap: "https://hedoomyy.co/sitemap.xml",
+    host: "https://hedoomyy.co",
   };
 }

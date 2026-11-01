@@ -45,12 +45,13 @@ export default function WholeLook() {
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [attempt, setAttempt] = useState(0);
   const [part, setPart] = useState<Part>("top");
+  const [editing, setEditing] = useState(false);
   const [choices, setChoices] = useState<Record<Part, Choice>>({ top: initial(), bottom: initial() });
   const [adjust, setAdjust] = useState(true);
   const [tucked, setTucked] = useState(false);
   const [message, setMessage] = useState("");
   const pointers = useRef(new Map<number, { x: number; y: number }>());
-  const gesture = useRef<{ part: Part; placement: Placement; center: { x: number; y: number }; distance: number; width: number; height: number } | null>(null);
+  const gesture = useRef<{ part: Part; placement: Placement; center: { x: number; y: number }; imageCenter: { x: number; y: number }; distance: number; width: number; height: number } | null>(null);
   const latestChoices = useRef(choices);
   latestChoices.current = choices;
   const rebaseGesture = (element: HTMLDivElement, activePart: Part) => {
@@ -59,32 +60,34 @@ export default function WholeLook() {
     const placement = latestChoices.current[activePart].placement;
     const image = element.querySelector<HTMLImageElement>(`[data-look-part="${activePart}"] img`);
     const bounds = image?.getBoundingClientRect();
-    if (!bounds) return;
+    if (!bounds || bounds.width <= 0 || bounds.height <= 0) { gesture.current = null; return; }
     const second = points[1] ?? points[0];
-    gesture.current = { part: activePart, placement: { ...placement }, center: { x: (points[0].x + second.x) / 2, y: (points[0].y + second.y) / 2 }, distance: Math.hypot(points[0].x - second.x, points[0].y - second.y), width: bounds.width / placement.zoom, height: bounds.height / placement.zoom };
+    gesture.current = { part: activePart, placement: { ...placement }, center: { x: (points[0].x + second.x) / 2, y: (points[0].y + second.y) / 2 }, imageCenter: { x: bounds.left + bounds.width / 2, y: bounds.top + bounds.height / 2 }, distance: Math.hypot(points[0].x - second.x, points[0].y - second.y), width: bounds.width / placement.zoom, height: bounds.height / placement.zoom };
   };
   const pointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (!editing) return;
     if (event.pointerType === "mouse" && event.button !== 0) return;
     if (pointers.current.size >= 2) return;
-    const hit = (event.target as Element).closest<HTMLElement>("[data-look-part]")?.dataset.lookPart as Part | undefined;
-    const activePart = gesture.current?.part ?? hit ?? part;
+    // Lock both fingers to the explicitly selected piece, including overlapping photos.
+    const activePart = gesture.current?.part ?? part;
     pointers.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
     event.currentTarget.setPointerCapture(event.pointerId);
-    setPart(activePart);
     setMessage("");
     rebaseGesture(event.currentTarget, activePart);
   };
   const pointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (!pointers.current.has(event.pointerId) || !gesture.current) return;
+    if (!editing || !pointers.current.has(event.pointerId) || !gesture.current) return;
     pointers.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
     const points = [...pointers.current.values()];
     const second = points[1] ?? points[0];
     const start = gesture.current;
     const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
+    const zoom = start.distance > 0 && points.length === 2 ? clamp(start.placement.zoom * Math.hypot(points[0].x - second.x, points[0].y - second.y) / start.distance, .5, 2) : start.placement.zoom;
+    const anchor = 1 - zoom / start.placement.zoom;
     const placement = {
-      x: clamp(start.placement.x + (((points[0].x + second.x) / 2 - start.center.x) / start.width) * 100, -100, 100),
-      y: clamp(start.placement.y + (((points[0].y + second.y) / 2 - start.center.y) / start.height) * 100, -100, 100),
-      zoom: start.distance > 0 && points.length === 2 ? clamp(start.placement.zoom * Math.hypot(points[0].x - second.x, points[0].y - second.y) / start.distance, .5, 2) : start.placement.zoom,
+      x: clamp(start.placement.x + (((points[0].x + second.x) / 2 - start.center.x + anchor * (start.center.x - start.imageCenter.x)) / start.width) * 100, -100, 100),
+      y: clamp(start.placement.y + (((points[0].y + second.y) / 2 - start.center.y + anchor * (start.center.y - start.imageCenter.y)) / start.height) * 100, -100, 100),
+      zoom,
     };
     const next = { ...latestChoices.current, [start.part]: { ...latestChoices.current[start.part], placement } };
     latestChoices.current = next;
@@ -95,6 +98,10 @@ export default function WholeLook() {
     if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
     rebaseGesture(event.currentTarget, gesture.current?.part ?? part);
   };
+  useEffect(() => {
+    pointers.current.clear();
+    gesture.current = null;
+  }, [part, editing]);
   useEffect(() => {
     const controller = new AbortController();
     setStatus("loading");
@@ -134,14 +141,16 @@ export default function WholeLook() {
     {status === "loading" ? <div className={styles.loading} role="status"><Sparkles className="animate-pulse" /> {say("Opening your wardrobe…", "بنجهز دولابك…")}</div> : status === "error" ? <div className={styles.loading}><p>{say("Your wardrobe couldn't load.", "حصلت مشكلة في تحميل القطع.")}</p><button onClick={() => setAttempt(n => n + 1)}>{say("Try again", "حاولي تاني")}</button></div> : <div className={styles.studio}>
       <div className={styles.stage}>
         <div className={styles.stageHeader}><span>{say("YOUR OUTFIT, YOUR RULES", "لوكك على مزاجك")}</span><span className={styles.live}><span /> {say("Live styling", "تنسيق مباشر")}</span></div>
-        <p className={styles.touchHint}>{say("Drag a piece to move it · Pinch with two fingers to resize", "اسحبي القطعة عشان تحركيها · كبّري وصغّري بصباعين")}</p>
-        <div className={styles.touchParts}>{(["top", "bottom"] as Part[]).map(p => <button key={p} aria-pressed={part === p} onClick={() => setPart(p)}>{p === "top" ? say("Move top", "تحريك التوب") : say("Move bottom", "تحريك البنطلون")}</button>)}</div>
-        <div className={`${styles.mannequin} ${tucked ? styles.tucked : ""}`} dir="ltr" onPointerDown={pointerDown} onPointerMove={pointerMove} onPointerUp={pointerEnd} onPointerCancel={pointerEnd} onLostPointerCapture={pointerEnd}>
+        <p id="look-touch-hint" className={styles.touchHint}>{editing ? say("Drag to move · Pinch to resize · Tap Done to scroll", "اسحبي للتحريك · كبّري بصباعين · اضغطي تم عشان تعملي سكرول") : say("Scroll freely. Choose a piece below to adjust its placement.", "اعملي سكرول عادي. اختاري القطعة اللي عايزة تحركيها.")}</p>
+        <div className={styles.touchParts}>{(["top", "bottom"] as Part[]).map(p => <button key={p} aria-pressed={editing && part === p} onClick={() => { setPart(p); setEditing(true); }}>{p === "top" ? say("Move top", "تحريك التوب") : say("Move bottom", "تحريك البنطلون")}</button>)}{editing && <button onClick={() => setEditing(false)} className={styles.doneEditing}><Check size={14}/>{say("Done / scroll", "تم / سكرول")}</button>}</div>
+        <div className={styles.canvasViewport}>
+        <div className={`${styles.mannequin} ${editing ? styles.editing : ""} ${tucked ? styles.tucked : ""}`} aria-describedby="look-touch-hint" dir="ltr" onPointerDown={pointerDown} onPointerMove={pointerMove} onPointerUp={pointerEnd} onPointerCancel={pointerEnd} onLostPointerCapture={pointerEnd}>
           <div className={styles.halo} />
           <svg className={styles.figure} viewBox="0 0 300 600" aria-label={say("Mannequin outfit preview", "معاينة اللوك على المانيكان")} role="img"><defs><linearGradient id="mannequin-shade"><stop stopColor="#d9c9bb"/><stop offset=".5" stopColor="#f3e8de"/><stop offset="1" stopColor="#cdbbab"/></linearGradient></defs><g fill="url(#mannequin-shade)" stroke="#c8b5a5" strokeWidth="1"><ellipse cx="150" cy="60" rx="26" ry="36"/><path d="M137 91 L137 113 L104 127 Q91 132 87 156 L69 267 L77 310 Q82 317 87 308 L83 267 L108 181 L115 242 L107 285 Q100 310 111 345 L119 451 L121 550 Q107 568 116 573 L143 573 L145 448 L150 348 L155 448 L158 573 L184 573 Q193 567 179 550 L181 451 L190 345 Q201 310 193 285 L185 242 L192 181 L217 267 L213 308 Q218 317 223 310 L231 267 L213 156 Q209 132 196 127 L163 113 L163 91 Z"/></g></svg>
           {selected.bottom && <Garment key={`bottom-${selected.bottom.id}`} product={selected.bottom} part="bottom" color={selectedColor("bottom")} placement={choices.bottom.placement} />}
           {selected.top && <Garment key={`top-${selected.top.id}`} product={selected.top} part="top" color={selectedColor("top")} placement={choices.top.placement} />}
           <span className={styles.floor}>HEDOOMYY / THE WHOLE LOOK</span>
+        </div>
         </div>
         <div className={styles.stageTools}><button onClick={() => { setChoices({ top: { ...initial(), id: catalog.top[Math.floor(Math.random() * catalog.top.length)]?.id ?? "" }, bottom: { ...initial(), id: catalog.bottom[Math.floor(Math.random() * catalog.bottom.length)]?.id ?? "" } }); setMessage(""); }} disabled={!complete}><Shuffle size={15}/>{say("Surprise me", "فاجئيني")}</button><button aria-pressed={tucked} onClick={() => setTucked(v => !v)}>{tucked ? <Check size={15}/> : <ArrowRight size={15}/>} {say("Tuck it in", "دخّلي التوب")}</button></div>
         <p className={styles.previewNote}>{say("A styling preview, not a virtual fitting. Photos and garment shapes may vary.", "معاينة للتنسيق، مش قياس افتراضي. الصور وشكل القطع ممكن يختلفوا.")}</p>

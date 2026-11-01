@@ -31,7 +31,7 @@ export async function generateMetadata({
     `Shop ${title} at Hedoomyy — quality fashion at affordable prices. Fast delivery across Egypt.`;
   const images = (product.images as string[]) ?? [];
   const ogImage = images[0] ?? "/hedoomyybanner.png";
-  const canonicalUrl = `https://hedoomyy.com/product/${id}`;
+  const canonicalUrl = `https://hedoomyy.co/product/${id}`;
 
   return {
     title,
@@ -87,7 +87,7 @@ export default async function ProductPage({
     name: product.title,
     description: product.description || "",
     image: (product.images as string[]) ?? [],
-    url: `https://hedoomyy.com/product/${id}`,
+    url: `https://hedoomyy.co/product/${id}`,
     brand: {
       "@type": "Brand",
       name: "Hedoomyy",

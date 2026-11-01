@@ -1,6 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  async redirects() {
+    return ["hedoomyy.com", "www.hedoomyy.com", "www.hedoomyy.co"].map(host => ({
+      source: "/:path*",
+      has: [{ type: "host" as const, value: host.replace(/\./g, "\\.") }],
+      destination: "https://hedoomyy.co/:path*",
+      permanent: true,
+    }));
+  },
   images: {
     unoptimized: true,
     remotePatterns: [

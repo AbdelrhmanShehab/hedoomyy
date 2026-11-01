@@ -6,10 +6,10 @@ export const metadata: Metadata = {
   description:
     "Browse all women's clothing at Hedoomyy — dresses, tops, and more. Filter by category and sort by price or new arrivals. Fast delivery across Egypt.",
   alternates: {
-    canonical: "https://hedoomyy.com/products",
+    canonical: "https://hedoomyy.co/products",
   },
   openGraph: {
-    url: "https://hedoomyy.com/products",
+    url: "https://hedoomyy.co/products",
     title: "Shop All Products | Hedoomyy",
     description:
       "Browse all women's clothing at Hedoomyy — dresses, tops, and more. Fast delivery across Egypt.",

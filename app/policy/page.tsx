@@ -8,10 +8,10 @@ export const metadata: Metadata = {
   description:
     "Learn about Hedoomyy's shipping, return, delivery, and deposit policies. Contact us via email or phone. We're based in Cairo, Egypt and deliver all over Egypt.",
   alternates: {
-    canonical: "https://hedoomyy.com/policy",
+    canonical: "https://hedoomyy.co/policy",
   },
   openGraph: {
-    url: "https://hedoomyy.com/policy",
+    url: "https://hedoomyy.co/policy",
     title: "Policies & Contact | Hedoomyy",
     description:
       "Shipping, return, delivery, and deposit policies for Hedoomyy — online fashion store in Egypt.",

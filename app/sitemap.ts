@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-const BASE_URL = "https://hedoomyy.com";
+const BASE_URL = "https://hedoomyy.co";
 
 const PROJECT_ID = "hedoomyy";
 const FIRESTORE_BASE = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents`;

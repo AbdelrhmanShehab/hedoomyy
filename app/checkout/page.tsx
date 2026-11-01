@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: "Checkout",
   description: "Complete your order at Hedoomyy. Fill in your details and select a payment method to finish your purchase.",
   alternates: {
-    canonical: "https://hedoomyy.com/checkout",
+    canonical: "https://hedoomyy.co/checkout",
   },
   robots: {
     index: false,

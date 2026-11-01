@@ -5,7 +5,7 @@ const getEnvVars = () => {
         gmailUser: process.env.GMAIL_USER,
         gmailPass: process.env.GMAIL_PASS,
         adminEmail: process.env.ADMIN_EMAIL,
-        baseUrl: process.env.NEXT_PUBLIC_BASE_URL || 'https://hedoomyy.com'
+        baseUrl: process.env.NEXT_PUBLIC_BASE_URL || 'https://hedoomyy.co'
     };
 };
 

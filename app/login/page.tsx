@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: "Login",
   description: "Sign in to your Hedoomyy account to track orders, save favorites, and enjoy a faster checkout experience.",
   alternates: {
-    canonical: "https://hedoomyy.com/login",
+    canonical: "https://hedoomyy.co/login",
   },
   robots: {
     index: false,

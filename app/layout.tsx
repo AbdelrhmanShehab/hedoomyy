@@ -25,7 +25,7 @@ const cairo = Cairo({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://hedoomyy.com"),
+  metadataBase: new URL("https://hedoomyy.co"),
   title: {
     default: "Hedoomyy | Online Fashion Store in Egypt",
     template: "%s | Hedoomyy",
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
     "hedomy",
     "hedoomy",
   ],
-  authors: [{ name: "Hedoomyy", url: "https://hedoomyy.com" }],
+  authors: [{ name: "Hedoomyy", url: "https://hedoomyy.co" }],
   creator: "Hedoomyy",
   publisher: "Hedoomyy",
   robots: {
@@ -61,7 +61,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://hedoomyy.com",
+    url: "https://hedoomyy.co",
     siteName: "Hedoomyy | For Her",
     title: "Hedoomyy | Online Fashion Store in Egypt",
     description:
@@ -84,7 +84,7 @@ export const metadata: Metadata = {
     creator: "@hedoomyy",
   },
   alternates: {
-    canonical: "https://hedoomyy.com",
+    canonical: "https://hedoomyy.co",
   },
   category: "fashion",
   verification: {

@@ -30,10 +30,10 @@ export const metadata: Metadata = {
   description:
     "Shop affordable women's clothing online in Egypt. Discover new arrivals, best sellers, dresses, tops and more. Fast delivery across Cairo and all of Egypt.",
   alternates: {
-    canonical: "https://hedoomyy.com",
+    canonical: "https://hedoomyy.co",
   },
   openGraph: {
-    url: "https://hedoomyy.com",
+    url: "https://hedoomyy.co",
     title: "Hedoomyy",
     description:
       "Shop affordable women's clothing online in Egypt. Discover new arrivals, best sellers, dresses, tops and more. Fast delivery across Cairo and all of Egypt.",
@@ -54,8 +54,8 @@ export default async function Home() {
     "@graph": [
       {
         "@type": "WebSite",
-        "@id": "https://hedoomyy.com/#website",
-        url: "https://hedoomyy.com",
+        "@id": "https://hedoomyy.co/#website",
+        url: "https://hedoomyy.co",
         name: "Hedoomyy",
         description:
           "Online clothing store based in Cairo, Egypt. Quality fashion at affordable prices.",
@@ -63,7 +63,7 @@ export default async function Home() {
           "@type": "SearchAction",
           target: {
             "@type": "EntryPoint",
-            urlTemplate: "https://hedoomyy.com/products?category={search_term_string}",
+            urlTemplate: "https://hedoomyy.co/products?category={search_term_string}",
           },
           "query-input": "required name=search_term_string",
         },
@@ -71,12 +71,12 @@ export default async function Home() {
       },
       {
         "@type": "Organization",
-        "@id": "https://hedoomyy.com/#organization",
+        "@id": "https://hedoomyy.co/#organization",
         name: "Hedoomyy",
-        url: "https://hedoomyy.com",
+        url: "https://hedoomyy.co",
         logo: {
           "@type": "ImageObject",
-          url: "https://hedoomyy.com/footerhedoomyy.png",
+          url: "https://hedoomyy.co/footerhedoomyy.png",
         },
         contactPoint: {
           "@type": "ContactPoint",
