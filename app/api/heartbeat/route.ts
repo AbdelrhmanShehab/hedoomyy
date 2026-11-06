@@ -5,16 +5,17 @@ export async function POST(req: NextRequest) {
   try {
     const { sessionId, path, email, uid } = await req.json();
 
-    if (!sessionId) {
-      return Response.json({ error: "Missing sessionId" }, { status: 400 });
+    if (typeof sessionId !== "string" || !/^[a-zA-Z0-9_-]{6,128}$/.test(sessionId)) {
+      return Response.json({ error: "Invalid sessionId" }, { status: 400 });
     }
 
     // Use REST API to track presence
     await upsertDocument("activePresence", sessionId, {
       lastActive: new Date(),
-      path,
-      email: email || "Anonymous",
-      uid: uid || null,
+      sessionId,
+      path: typeof path === "string" ? path.split("?")[0].slice(0, 500) : "/",
+      email: typeof email === "string" ? email.slice(0, 254) : "Anonymous",
+      uid: typeof uid === "string" ? uid.slice(0, 128) : null,
     });
 
     return Response.json({ success: true });

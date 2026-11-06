@@ -11,6 +11,7 @@ import ScrollToTop from "../components/ScrollToTop";
 import { Suspense } from "react";
 import MaintenanceGuard from "../components/MaintenanceGuard";
 import ErrorBoundary from "../components/ErrorBoundary";
+import VisitorPresence from "../components/VisitorPresence";
 
 const quicksand = Quicksand({
   subsets: ["latin"],
@@ -112,6 +113,7 @@ export default function RootLayout({
                   <CheckoutProvider>
                     <Suspense fallback={null}>
                       <ScrollToTop />
+                      <VisitorPresence />
                     </Suspense>
                     <MaintenanceGuard>
                       <main>{children}</main>

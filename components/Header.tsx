@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { User, ShoppingBag, Menu, X, Heart, Search } from "lucide-react";
-import { useEffect, useState, memo } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import useCategories from "../usecategories";
 import callIcon from "../public/calIIcon.svg";
@@ -25,6 +25,35 @@ export default function Header() {
   const { t, lang, setLang } = useLanguage();
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
+  const headerRef = useRef<HTMLElement>(null);
+  const [headerHeight, setHeaderHeight] = useState(116);
+
+  useEffect(() => {
+    const header = headerRef.current;
+    if (!header) return;
+    const measure = () => setHeaderHeight(header.getBoundingClientRect().height);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(header);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!isMenuOpen) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const dismiss = (event: KeyboardEvent) => { if (event.key === "Escape") setIsMenuOpen(false); };
+    const desktop = window.matchMedia("(min-width: 768px)");
+    const resize = () => { if (desktop.matches) setIsMenuOpen(false); };
+    resize();
+    window.addEventListener("keydown", dismiss);
+    desktop.addEventListener("change", resize);
+    return () => {
+      document.body.style.overflow = previous;
+      window.removeEventListener("keydown", dismiss);
+      desktop.removeEventListener("change", resize);
+    };
+  }, [isMenuOpen]);
 
   const cartCount = items.reduce(
     (sum, item) => sum + item.qty,
@@ -34,7 +63,7 @@ export default function Header() {
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   return (
-    <header className="w-full border-b border-gray-200 bg-white sticky top-0 z-40">
+    <header ref={headerRef} className="w-full border-b border-gray-200 bg-white sticky top-0 z-40">
       {/* Top Bar */}
       <div className="bg-gray-400 text-white text-sm font-bold">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-4 py-2">
@@ -99,6 +128,8 @@ export default function Header() {
             onClick={toggleMenu}
             suppressHydrationWarning
             aria-label="Toggle Menu"
+            aria-expanded={isMenuOpen}
+            aria-controls="mobile-category-menu"
           >
             {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -204,11 +235,12 @@ export default function Header() {
       {isMenuOpen && (
         <>
           <div
-            className="fixed inset-0 top-[116px] bg-black/40 z-30 md:hidden backdrop-blur-[2px] cursor-pointer"
+            className="fixed inset-0 bg-black/40 z-30 md:hidden backdrop-blur-[2px] cursor-pointer"
+            style={{ top: headerHeight }}
             onClick={() => setIsMenuOpen(false)}
           />
-          <div className="absolute top-full left-0 w-full bg-white border-b border-gray-200 shadow-xl z-40 md:hidden">
-            <nav className="flex flex-col p-6 gap-5">
+          <div id="mobile-category-menu" className="absolute top-full left-0 w-full overflow-y-auto overscroll-contain bg-white border-b border-gray-200 shadow-xl z-40 md:hidden" style={{ maxHeight: `calc(100dvh - ${headerHeight}px)` }}>
+            <nav className="flex flex-col p-6 gap-5" style={{ paddingBottom: "calc(24px + env(safe-area-inset-bottom))" }}>
               {/* Mobile Search */}
               <div className="relative mb-2">
                 <input

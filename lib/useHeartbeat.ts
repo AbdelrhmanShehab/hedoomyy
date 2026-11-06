@@ -1,47 +1,47 @@
+"use client";
 import { useEffect, useRef } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { usePathname } from "next/navigation";
 
-/**
- * Sends a heartbeat to the server-side API every 45s.
- * Used for "Live Visitors" real-time monitoring.
- * No Firestore SDK used on the client.
- */
+// One browser across tabs/reloads. Hidden tabs do not renew presence.
+const KEY = "hedoomyy-presence-browser";
 export function useHeartbeat() {
-    const { user } = useAuth();
-    const pathname = usePathname();
-    const sessionIdRef = useRef<string | null>(null);
-
-    useEffect(() => {
-        if (!sessionIdRef.current) {
-            sessionIdRef.current = Math.random().toString(36).substring(7);
-        }
-
-        const sendHeartbeat = async () => {
-            try {
-                await fetch("/api/heartbeat", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        sessionId: sessionIdRef.current,
-                        path: pathname,
-                        email: user?.email || "Anonymous",
-                        uid: user?.uid || null,
-                    }),
-                });
-            } catch (error) {
-                // Silently fails
-            }
-        };
-
-        // Initial heartbeat
-        sendHeartbeat();
-
-        // Interval heartbeat every 45 seconds
-        const interval = setInterval(sendHeartbeat, 45000);
-
-        return () => {
-            clearInterval(interval);
-        };
-    }, [user, pathname]);
+  const { user } = useAuth();
+  const pathname = usePathname();
+  const session = useRef<string | null>(null);
+  useEffect(() => {
+    if (!session.current) {
+      try {
+        session.current = localStorage.getItem(KEY) || crypto.randomUUID();
+        localStorage.setItem(KEY, session.current);
+      } catch { session.current = crypto.randomUUID(); }
+    }
+    let pending = false;
+    let stopped = false;
+    const send = async () => {
+      if (stopped || pending || document.visibilityState !== "visible" || !navigator.onLine) return;
+      pending = true;
+      try {
+        const response = await fetch("/api/heartbeat", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sessionId: session.current, path: pathname, email: user?.email || "Anonymous", uid: user?.uid || null }),
+          signal: AbortSignal.timeout(10000), cache: "no-store",
+        });
+        if (!response.ok) console.warn("Visitor heartbeat unavailable:", response.status);
+      } catch { /* Retry on the next interval or reconnect. */ }
+      finally { pending = false; }
+    };
+    void send();
+    const interval = setInterval(send, 30000);
+    document.addEventListener("visibilitychange", send);
+    window.addEventListener("online", send);
+    window.addEventListener("pageshow", send);
+    return () => {
+      stopped = true;
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", send);
+      window.removeEventListener("online", send);
+      window.removeEventListener("pageshow", send);
+    };
+  }, [user?.uid, user?.email, pathname]);
 }

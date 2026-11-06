@@ -23,6 +23,7 @@ import HeartRating from "@/components/product/HeartRating";
 import ReviewSection from "@/components/product/ReviewSection";
 import { trackEvent } from "@/lib/trackEvent";
 import { useLanguage } from "@/context/LanguageContext";
+import { useImageSwipe } from "@/lib/useImageSwipe";
 type Props = {
   product: Product;
   relatedProducts: Product[];
@@ -48,6 +49,7 @@ export default function ProductClient({ product, relatedProducts }: Props) {
   const [selectedSize, setSelectedSize] = useState("");
   const [qty, setQty] = useState(1);
   const [activeImg, setActiveImg] = useState(0);
+  const imageSwipe = useImageSwipe(direction => setActiveImg(current => Math.max(0, Math.min((product.images?.length || 1) - 1, current + direction))));
   const [currentShareCount, setCurrentShareCount] = useState(product.shareCount || 0);
 
   const selectedVariant = variants.find(
@@ -109,10 +111,11 @@ export default function ProductClient({ product, relatedProducts }: Props) {
 
             {/* Gallery Section */}
             <div className="lg:col-span-7 space-y-4 md:space-y-6">
-              <div className="relative aspect-[4/5.2] md:aspect-[4/5] rounded-[32px] overflow-hidden bg-zinc-50 group border border-zinc-100/50">
+              <div {...imageSwipe} style={{ touchAction: "pan-y pinch-zoom" }} className="relative aspect-[4/5.2] md:aspect-[4/5] rounded-[32px] overflow-hidden bg-zinc-50 group border border-zinc-100/50 select-none">
                 <Image
                   src={product.images?.[activeImg] ?? "/1.png"}
                   alt={product.title}
+                  draggable={false}
                   fill
                   className="object-cover transition-all duration-700 group-hover:scale-105"
                   unoptimized
@@ -120,6 +123,7 @@ export default function ProductClient({ product, relatedProducts }: Props) {
                 {activeImg > 0 && (
                   <button
                     onClick={() => setActiveImg((prev) => prev - 1)}
+                    aria-label={isRTL ? "الصورة السابقة" : "Previous image"}
                     className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center shadow-lg transition-all hover:bg-white active:scale-95 z-10 cursor-pointer"
                   >
                     <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
@@ -128,6 +132,7 @@ export default function ProductClient({ product, relatedProducts }: Props) {
                 {activeImg < (product.images?.length ?? 1) - 1 && (
                   <button
                     onClick={() => setActiveImg((prev) => prev + 1)}
+                    aria-label={isRTL ? "الصورة التالية" : "Next image"}
                     className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center shadow-lg transition-all hover:bg-white active:scale-95 z-10 cursor-pointer"
                   >
                     <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
