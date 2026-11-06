@@ -4,7 +4,6 @@ import { Suspense, useEffect, useMemo, useState, useRef, memo, useCallback } fro
 import { Product } from "../../data/product";
 import ProductGrid from "../../components/ProductGrid";
 import { useRouter, useSearchParams } from "next/navigation";
-import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import { Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
@@ -407,7 +406,6 @@ function ProductsContent() {
 export default function ProductsClient() {
   return (
     <>
-      <Header />
       <Suspense
         fallback={
           <section className="px-6 py-12 max-w-7xl mx-auto">

@@ -1,7 +1,6 @@
 import { sectionVisibility } from "@/lib/home-sections";
 import { fetchHomeSections } from "@/lib/firestore-server";
 import Image from "next/image";
-import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Categories from "@/components/home/Categories";
 import Hero from "@/components/home/Hero";
@@ -100,7 +99,6 @@ export default async function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <Header />
       {visible.banner && <Image
         src={hedoomyybanner}
         className="   h-[35vh] md:h-[60vh] lg:h-[70vh]  w-full object-fit "

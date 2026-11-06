@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import PolicyClient from "./PolicyClient";
-import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 
 export const metadata: Metadata = {
@@ -25,7 +24,6 @@ export const metadata: Metadata = {
 export default function PolicyPage() {
   return (
     <div>
-      <Header />
       <PolicyClient />
       <Footer />
     </div>

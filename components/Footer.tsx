@@ -38,13 +38,13 @@ export default function Footer() {
         <div className="grid grid-cols-2 gap-12 md:grid-cols-4">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1 space-y-10">
-            <Image
+            <Link href="/" aria-label="Hedoomyy — Home" className="inline-block"><Image
               src={hedoomybanner}
               alt="Hedoomyy"
               width={140}
               height={100}
               className="h-28 w-34"
-            />
+            /></Link>
             <p className="text-base font-semibold text-zinc-600">
               {t("footer_tagline")}
             </p>

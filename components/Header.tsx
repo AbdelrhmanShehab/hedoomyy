@@ -134,8 +134,12 @@ export default function Header() {
             {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
 
+          <Link href="/" aria-label={lang === "ar" ? "هدومي — الرئيسية" : "Hedoomyy — Home"} onClick={() => setIsMenuOpen(false)} className="shrink-0 mx-3">
+            <Image src="/footerhedoomyy.png" alt="Hedoomyy" width={183} height={134} className="w-[82px] md:w-[96px] h-auto" priority />
+          </Link>
+
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
+          <nav className="hidden md:flex min-w-0 flex-1 overflow-x-auto whitespace-nowrap items-center gap-6 text-sm font-medium px-3 py-2">
             <Link href="/" className="hover:text-black transition-colors cursor-pointer">{t("header_home")}</Link>
             <Link href="/products" className="hover:text-black transition-colors cursor-pointer">{t("header_all_items")}</Link>
 
@@ -150,7 +154,7 @@ export default function Header() {
             ))}
           </nav>
 
-          <div className="flex items-center gap-5">
+          <div className="flex shrink-0 items-center gap-3 md:gap-5">
             {/* Desktop Search */}
             <div className="hidden lg:relative lg:block">
               <input
@@ -195,7 +199,7 @@ export default function Header() {
 
             <button
                onClick={() => {
-                 window.location.href = user ? "/favorites" : "/login-required?redirect=/favorites";
+                 router.push("/favorites");
                }}
                suppressHydrationWarning
               className="relative p-1 hover:bg-gray-100 rounded-full transition-all cursor-pointer bg-transparent border-none"

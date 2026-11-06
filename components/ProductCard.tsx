@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Product } from "../data/product";
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+
 import QuickAddModal from "./product/QuickAddModal";
 import { Heart } from "lucide-react";
 import HeartRating from "./product/HeartRating";
@@ -21,7 +21,7 @@ const ProductCard = React.memo(({ product }: Props) => {
   // 🛡️ Data Guard: Prevent crash on invalid objects
   if (!product || typeof product !== "object" || !product.id) return null;
 
-  const router = useRouter();
+
   const [open, setOpen] = useState(false);
   const { toggleFavorite, isFavorite } = useFavorites();
   const { user } = useAuth();
@@ -73,15 +73,11 @@ const ProductCard = React.memo(({ product }: Props) => {
         <button
           onClick={(e) => {
             e.preventDefault();
-            if (!user) {
-              const currentPath = typeof window !== "undefined" ? window.location.pathname : "/";
-              router.push(`/login-required?redirect=${encodeURIComponent(currentPath)}`);
-              return;
-            }
             toggleFavorite(product.id);
           }}
           suppressHydrationWarning
           className="absolute top-2 right-2 md:top-3 md:right-3 bg-white/80 backdrop-blur-sm p-1.5 md:p-2 rounded-full z-10 transition hover:bg-white shadow-sm cursor-pointer"
+          aria-pressed={isFavorited}
           aria-label={isFavorited ? t("card_remove_from_favorites") : t("card_add_to_favorites")}
         >
           <Heart

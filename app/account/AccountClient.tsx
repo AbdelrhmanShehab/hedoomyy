@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
-import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProfileOverview from "@/components/account/ProfileOverview";
 import OrderHistory from "@/components/account/OrderHistory";
@@ -47,7 +46,6 @@ export default function AccountClient() {
 
   return (
     <div className="min-h-screen bg-zinc-50/50">
-      <Header />
 
       <main className="max-w-4xl mx-auto px-4 py-12">
         <div className="flex items-center justify-between mb-10">

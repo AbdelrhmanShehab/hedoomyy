@@ -5,8 +5,10 @@ import Link from "next/link";
 import { Product } from "@/data/product";
 import { useState } from "react";
 import QuickAddModal from "../product/QuickAddModal";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, Heart } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
+
+import { useFavorites } from "@/context/FavoritesContext";
 
 interface Props {
   products: Product[];
@@ -14,6 +16,7 @@ interface Props {
 
 export default function NewArrivals({ products }: Props) {
   const { t } = useLanguage();
+  const { toggleFavorite, isFavorite } = useFavorites();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   // 🛡️ Data Guard: Prevent crash if products is not an array
   if (!Array.isArray(products) || products.length === 0) return null;
@@ -54,6 +57,9 @@ export default function NewArrivals({ products }: Props) {
               ? "aspect-[4/5] md:flex-1 md:min-h-0 md:aspect-auto"
               : "aspect-[5/5]"}`}
         >
+          <button type="button" onClick={() => toggleFavorite(product.id)} aria-pressed={isFavorite(product.id)} aria-label={isFavorite(product.id) ? t("card_remove_from_favorites") : t("card_add_to_favorites")} className="absolute top-3 right-3 z-20 flex h-11 w-11 items-center justify-center rounded-full bg-white/90 shadow-sm cursor-pointer">
+            <Heart className={isFavorite(product.id) ? "w-5 h-5 text-pink-500 fill-pink-500" : "w-5 h-5 text-zinc-500"} />
+          </button>
           <Link
             href={`/product/${product.id}`}
             className="block w-full h-full"

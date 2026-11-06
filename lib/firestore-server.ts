@@ -208,11 +208,14 @@ export async function fetchBestSellers(limitCount = 8) {
     });
 }
 
-export async function fetchProductById(id: string) {
+export async function fetchProductById(id: string, strict = false) {
     const res = await fetch(`${BASE_URL}/products/${id}`, {
         next: { revalidate: 60 },
     });
-    if (!res.ok) return null;
+    if (!res.ok) {
+        if (strict && res.status !== 404) throw new Error(`Product lookup failed (${res.status})`);
+        return null;
+    }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const doc: any = await res.json();
     if (!doc.fields) return null;
@@ -299,7 +302,7 @@ export async function fetchProductsByIds(ids: string[]) {
     // The REST API doesn't have a direct 'in' operator for document IDs in a simple way like the SDK.
     // We can fetch them in parallel or use a more complex runQuery.
     // Let's use parallel fetch for simplicity since favorites lists are usually small.
-    const promises = ids.map(id => fetchProductById(id));
+    const promises = ids.map(id => fetchProductById(id, true));
     const results = await Promise.all(promises);
     return results.filter(p => p !== null);
 }

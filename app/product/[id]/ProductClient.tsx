@@ -13,7 +13,6 @@ import {
   Check,
 } from "lucide-react";
 import Link from "next/link";
-import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductSlider from "@/components/ProductSlider";
 import { useCart } from "@/context/CartContext";
@@ -91,7 +90,6 @@ export default function ProductClient({ product, relatedProducts }: Props) {
 
   return (
     <div className="bg-white min-h-screen flex flex-col">
-      <Header />
       <main className="flex-grow">
         {/* Breadcrumb */}
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 md:py-6">
@@ -306,13 +304,10 @@ export default function ProductClient({ product, relatedProducts }: Props) {
 
                       <button
                         onClick={() => {
-                          if (!user) {
-                            const currentPath = window.location.pathname;
-                            window.location.href = `/login-required?redirect=${encodeURIComponent(currentPath)}`;
-                            return;
-                          }
                           toggleFavorite(product.id);
                         }}
+                        aria-pressed={isFavorited}
+                        aria-label={isFavorited ? t("card_remove_from_favorites") : t("card_add_to_favorites")}
                         className={`w-16 flex items-center justify-center rounded-2xl border-2 transition-all active:scale-95 cursor-pointer ${isFavorited
                           ? "bg-pink-50 border-pink-100 text-pink-500"
                           : "border-zinc-100 text-zinc-400 hover:border-zinc-300"
