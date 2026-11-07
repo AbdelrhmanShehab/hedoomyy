@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { User, ShoppingBag, Menu, X, Heart, Search } from "lucide-react";
+import { User, ShoppingBag, Menu, X, Heart, Search, ChevronDown } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import useCategories from "../usecategories";
@@ -27,6 +27,29 @@ export default function Header() {
   const [searchQuery, setSearchQuery] = useState("");
   const headerRef = useRef<HTMLElement>(null);
   const [headerHeight, setHeaderHeight] = useState(116);
+  const [categoriesOpen, setCategoriesOpen] = useState(false);
+  const categoriesRef = useRef<HTMLDivElement>(null);
+  const categoriesButton = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!categoriesOpen) return;
+    const outside = (event: PointerEvent) => {
+      if (!categoriesRef.current?.contains(event.target as Node)) setCategoriesOpen(false);
+    };
+    const escape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") { setCategoriesOpen(false); categoriesButton.current?.focus(); }
+    };
+    const mobile = window.matchMedia("(max-width: 767px)");
+    const resize = () => { if (mobile.matches) setCategoriesOpen(false); };
+    document.addEventListener("pointerdown", outside);
+    document.addEventListener("keydown", escape);
+    mobile.addEventListener("change", resize);
+    return () => {
+      document.removeEventListener("pointerdown", outside);
+      document.removeEventListener("keydown", escape);
+      mobile.removeEventListener("change", resize);
+    };
+  }, [categoriesOpen]);
 
   useEffect(() => {
     const header = headerRef.current;
@@ -139,19 +162,25 @@ export default function Header() {
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex min-w-0 flex-1 overflow-x-auto whitespace-nowrap items-center gap-6 text-sm font-medium px-3 py-2">
+          <nav className="hidden md:flex min-w-0 flex-1 whitespace-nowrap items-center gap-6 text-sm font-medium px-3 py-2">
             <Link href="/" className="hover:text-black transition-colors cursor-pointer">{t("header_home")}</Link>
             <Link href="/products" className="hover:text-black transition-colors cursor-pointer">{t("header_all_items")}</Link>
 
-            {categories.map(cat => (
-              <Link
-                key={cat.id}
-                href={`/products?category=${cat.slug}`}
-                className="capitalize text-gray-700 hover:text-black transition-colors cursor-pointer"
-              >
-                {cat.name}
-              </Link>
-            ))}
+            <div ref={categoriesRef} className="relative" onBlur={event => {
+              if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setCategoriesOpen(false);
+            }}>
+              <button ref={categoriesButton} type="button" aria-expanded={categoriesOpen} aria-controls="desktop-category-menu" onClick={() => setCategoriesOpen(open => !open)} className="flex items-center gap-2 py-2 text-gray-700 hover:text-black cursor-pointer">
+                {lang === "ar" ? "الأقسام" : "Categories"}
+                <ChevronDown aria-hidden="true" className={`h-4 w-4 transition-transform ${categoriesOpen ? "rotate-180" : ""}`} />
+              </button>
+              {categoriesOpen && <div id="desktop-category-menu" className="absolute start-0 top-full z-50 mt-2 w-64 overflow-y-auto overscroll-contain rounded-2xl border border-gray-100 bg-white p-2 shadow-xl" style={{ maxHeight: `min(420px, calc(100dvh - ${headerHeight}px - 16px))` }}>
+                {categories.map(cat => (
+                  <Link key={cat.id} href={`/products?category=${encodeURIComponent(cat.slug || cat.id)}`} onClick={() => setCategoriesOpen(false)} className="block rounded-xl px-4 py-3 whitespace-normal break-words capitalize text-gray-700 hover:bg-gray-50 hover:text-black focus-visible:bg-gray-50 focus-visible:outline-2 focus-visible:outline-zinc-500">
+                    {cat.name}
+                  </Link>
+                ))}
+              </div>}
+            </div>
           </nav>
 
           <div className="flex shrink-0 items-center gap-3 md:gap-5">
@@ -297,3 +326,4 @@ export default function Header() {
     </header>
   );
 }
+
